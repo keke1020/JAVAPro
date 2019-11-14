@@ -85,7 +85,7 @@
 					</li>
 				</ul>
 
-				<a　href="javascript:void(0)" class="navbar-brand" id="logout" style="font-size: 12px;">ログアウト</a>
+				<a　href="javascript:void(0)" class="navbar-brand" id="logout" style="font-size: 12px; cursor: pointer;">ログアウト</a>
 			</div>
 		</nav>
 	</body>

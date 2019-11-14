@@ -79,6 +79,7 @@ public class loginController {
 	private ModelAndView logout(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws UnsupportedEncodingException {
 		ModelAndView mv = new ModelAndView();
 		session.invalidate();
+		mv.setViewName("login");
 		return mv;
 	}
 
