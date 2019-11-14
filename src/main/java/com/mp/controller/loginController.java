@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.mp.dto.system;
 import com.mp.entity.user;
@@ -25,7 +26,7 @@ public class loginController {
 	@Autowired
 	private userService userService;
 
-	@RequestMapping(value = "/index", method = RequestMethod.GET)
+	@RequestMapping(value = "/", method = RequestMethod.GET)
 	private String index(HttpServletRequest req, HttpSession session) {
 		String pg = null;
 		pg = "login";
@@ -37,29 +38,27 @@ public class loginController {
 	}
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	private String login(HttpServletRequest request, HttpServletResponse response, HttpSession session,
+	private ModelAndView login(HttpServletRequest request, HttpServletResponse response, HttpSession session,
 			@Param("password") String password) throws UnsupportedEncodingException {
 		request.setCharacterEncoding("utf-8");
 		response.setCharacterEncoding("utf-8");
+		ModelAndView mv = new ModelAndView();
 
-		String pg = null;
 		if ("".equals(password) || password == null) {
-			pg = "common/error";
-			return pg;
+			mv.setViewName("common/error");
 		} else {
 			user user_ = userService.login(password);
 			if (user_ != null) {
 				session.setAttribute(system.usr, user_.getRealname());
-				pg = "index";
+				mv.setViewName("index");
 			} else {
-				pg = "common/error";
-				return pg;
+				mv.setViewName("common/error");
 			}
 		}
 
 		if("".equals(session.getAttribute(system.usr)) || session.getAttribute(system.usr) == null) {
 			System.out.println(session.getAttribute(system.usr));
-			pg = "login";
+			mv.setViewName("login");
 		}
 
 //		Object token = session.getAttribute("token");
@@ -72,7 +71,21 @@ public class loginController {
 //        	pg = "login";
 //        }
 
-		return pg;
+//		mv.addObject("msg","hello myfirst mvc");
+		return mv;
 	}
+
+	@RequestMapping(value = "/logout", method = RequestMethod.POST)
+	private ModelAndView logout(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws UnsupportedEncodingException {
+		ModelAndView mv = new ModelAndView();
+		session.invalidate();
+		return mv;
+	}
+
+
+
+
+
+
 
 }

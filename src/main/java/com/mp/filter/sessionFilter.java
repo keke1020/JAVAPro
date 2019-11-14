@@ -32,13 +32,12 @@ public class sessionFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest) req;
 		response.setCharacterEncoding("utf-8");
 		request.setCharacterEncoding("utf-8");
-//		String servletPath = request.getServletPath();
 		HttpSession session = request.getSession();
 		String isLogin = "";
 
-		Object user = request.getSession().getAttribute(system.usr);
-		System.out.println("过滤中");
-		String urlString = request.getRequestURI();
+//		Object user = request.getSession().getAttribute(system.usr);
+//		System.out.println("过滤中");
+//		String urlString = request.getRequestURI();
 //		if (urlString.endsWith("index")) {
 //		} else {
 //			chain.doFilter(request, response);
@@ -49,18 +48,27 @@ public class sessionFilter implements Filter {
 //			chain.doFilter(request, response);
 //		}
 
-		chain.doFilter(request, response);
+		String loginUrl = request.getContextPath() + "/index";
+
+//		String url = request.getScheme()+"://"+ request.getServerName()+request.getRequestURI()+"?"+request.getQueryString();
 
 		try {
 			isLogin = (String) session.getAttribute(system.usr);
-			if (isLogin != null) { // 验证成功，继续处理
-				System.out.println("在SignonFilter中验证通过");
-				chain.doFilter(req, res);
-			} else {
-				response.sendRedirect("/Manpow/index");
+//			if (isLogin != null) {
+//				System.out.println("在SignonFilter中验证通过");
+//				chain.doFilter(req, res);
+//			} else {
+//				response.sendRedirect("/Manpow/index");
+//			}
+			if (request.getRequestURI().endsWith("login") && isLogin == null) {
+				String str = "<script language='javascript'>" + "window.top.location.href='" + loginUrl + "';</script>";
+				response.setContentType("text/html;charset=UTF-8");
+				PrintWriter writer = response.getWriter();
+				writer.write(str);
+				writer.flush();
+				return;
 			}
-
-
+			chain.doFilter(request, response);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -16,7 +16,7 @@
 			}
 
 			.c_white {
-				color: white !important;
+				color: #fff !important;
 			}
 		</style>
 	</head>
@@ -84,7 +84,33 @@
 						</div>
 					</li>
 				</ul>
+
+				<a　href="javascript:void(0)" class="navbar-brand" id="logout" style="font-size: 12px;">ログアウト</a>
 			</div>
 		</nav>
 	</body>
+	<script type="text/javascript" src="${APP_PATH}/static/js/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript">
+		$("#logout").click(function() {
+			$.ajax({
+				url: "${APP_PATH}/logout",
+				dataType: "json",
+				async: false,
+				data: {},
+				type: "POST",
+				beforeSend: function() {
+					//请求前的处理
+				},
+				success: function(res) {
+
+				},
+				complete: function() {
+
+				},
+				error: function(err) {
+
+				}
+			});
+		})
+	</script>
 </html>

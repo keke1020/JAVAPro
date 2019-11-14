@@ -109,7 +109,7 @@
 
 			function addFunctionAlty(value, row, index) {
 				return [
-					row.state + value + "<a class='del_' href='#'>[del]</a>"
+					value + "<a class='del_' href='#'>[del]</a>"
 				].join('');
 			}
 
