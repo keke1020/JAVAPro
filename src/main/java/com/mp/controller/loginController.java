@@ -15,8 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.alibaba.fastjson.JSONObject;
 import com.mp.dto.system;
 import com.mp.entity.user;
 import com.mp.service.userService;
@@ -30,8 +32,8 @@ public class loginController {
 	private String index(HttpServletRequest req, HttpSession session) {
 		String pg = null;
 		pg = "login";
-		if(!"".equals(session.getAttribute(system.usr)) && session.getAttribute(system.usr) != null) {
-			System.out.println(session.getAttribute(system.usr));
+		System.out.println(session.getAttribute(system.usr));
+		if (!"".equals(session.getAttribute(system.usr)) && session.getAttribute(system.usr) != null) {
 			pg = "index";
 		}
 		return pg;
@@ -56,7 +58,7 @@ public class loginController {
 			}
 		}
 
-		if("".equals(session.getAttribute(system.usr)) || session.getAttribute(system.usr) == null) {
+		if ("".equals(session.getAttribute(system.usr)) || session.getAttribute(system.usr) == null) {
 			System.out.println(session.getAttribute(system.usr));
 			mv.setViewName("login");
 		}
@@ -72,21 +74,42 @@ public class loginController {
 //        }
 
 //		mv.addObject("msg","hello myfirst mvc");
+		System.out.println(session.getAttribute(system.usr));
 		return mv;
 	}
 
+	@ResponseBody
 	@RequestMapping(value = "/logout", method = RequestMethod.POST)
-	private ModelAndView logout(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws UnsupportedEncodingException {
-		ModelAndView mv = new ModelAndView();
+	private JSONObject logout(HttpServletRequest request, HttpServletResponse response, HttpSession session)
+			throws UnsupportedEncodingException {
 		session.invalidate();
-		mv.setViewName("login");
-		return mv;
+		JSONObject object = new JSONObject();
+		object.put("state", 0);
+		return object;
 	}
 
+	@ResponseBody
+	@RequestMapping(value = "/toPage", method = RequestMethod.POST)
+	private JSONObject toPage(HttpServletRequest request, HttpServletResponse response, HttpSession session,
+			int page_index) throws UnsupportedEncodingException {
+		JSONObject object = new JSONObject();
+		String toPage;
 
+		// 0: test
+		switch (page_index) {
+		default:
+			toPage = "";
+			break;
+		case 0:
+			toPage = "index";
+			break;
+		case 999:
+			toPage = "test";
+			break;
+		}
 
-
-
-
+		object.put("toPage", toPage);
+		return object;
+	}
 
 }

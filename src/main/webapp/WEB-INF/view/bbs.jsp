@@ -123,8 +123,7 @@
 							"ID": row.id
 						},
 						type: "POST",
-						beforeSend: function() {
-						},
+						beforeSend: function() {},
 						success: function(data) {
 							console.log(data);
 							var opt = {
@@ -134,8 +133,7 @@
 							};
 							$("#bbsTable").bootstrapTable('refresh', opt);
 						},
-						complete: function() {
-						},
+						complete: function() {},
 						error: function(XMLHttpResponse, textStatus, errorThrown) {
 							console.log("1 异步调用返回失败,XMLHttpResponse.readyState:" + XMLHttpResponse.readyState);
 							console.log("2 异步调用返回失败,XMLHttpResponse.status:" + XMLHttpResponse.status);
@@ -186,7 +184,7 @@
 						title: '更新時間',
 						align: "left",
 						valign: 'middle',
-						width: "20%"  
+						width: "20%"
 					},
 					{
 						field: 'message',
@@ -195,7 +193,7 @@
 						valign: 'middle',
 						width: "75%",
 						events: operateEvents, //给按钮注册事件
-						formatter: addFunctionAlty //表格中增加按钮 
+						formatter: addFunctionAlty //表格中增加按钮
 					}
 				]
 			});

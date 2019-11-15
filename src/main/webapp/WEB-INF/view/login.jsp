@@ -3,9 +3,6 @@
 	String path = request.getContextPath();
 	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 	pageContext.setAttribute("APP_PATH", request.getContextPath());
-	
-	String tokenValue = new Date().getTime() + "";
-		session.setAttribute("token", tokenValue);
 %>
 <!DOCTYPE html>
 <html lang="ja">
@@ -52,7 +49,7 @@
 						</div>
 					</div>
 				</div>
-				<input type="hidden" name="token" value="<%=tokenValue %>" />
+				<input type="hidden"name="formToken"value="${formToken}" />
 			</div>
 		</form>
 
