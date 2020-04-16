@@ -8,13 +8,11 @@
 		<result column="username" property="username" jdbcType="VARCHAR" />
 		<result column="update" property="update" jdbcType="TIMESTAMP" />
 		<result column="message" property="message" jdbcType="VARCHAR" />
-		<result column="state" property="state" jdbcType="INTEGER" />
 	</resultMap>
 
 	<!-- dao接口方法提供sql语句配置 -->
 	<select id="getBBS" resultMap="bbsResult">
-		 SELECT *,(case when username = "平wwwwwwww" then 0 else 1 end) as state FROM list2 WHERE `update` >= '0000-00-00' ORDER BY ID DESC
-		 <!-- LIMIT #{offset}, #{limit} -->
+		 SELECT * FROM list2 WHERE `update` >= '0000-00-00' ORDER BY ID DESC LIMIT #{offset}, #{limit}
 	</select>
 
 	<insert id="insertBBS" useGeneratedKeys="true" keyProperty="ID">
@@ -30,7 +28,9 @@
 		DELETE FROM list2 WHERE ID = #{ID}
 	</delete>
 
-
+	<select id="getTotal" resultType="java.lang.Integer">
+    	select count(*) from list2
+  	</select>
 
 
 </mapper>

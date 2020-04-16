@@ -19,6 +19,8 @@ import com.mp.dto.system;
 import com.mp.entity.bbs;
 import com.mp.service.bbsService;
 
+import javax.servlet.http.HttpServletResponse;
+
 @Controller
 public class bbsController {
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -26,20 +28,22 @@ public class bbsController {
 	@Autowired
 	private bbsService bbsService;
 
-	@ResponseBody
 	@RequestMapping(value = "/getBBS", method = RequestMethod.POST)
-	private JSONObject getBBS() {
+	@ResponseBody
+	private JSONObject getBBS(HttpServletResponse response, int currentPage) {
 		//pagelist:use bootstrap framework
-		List<bbs> bbs = bbsService.getBBS(0, 0);
-
+		List<bbs> bbs = bbsService.getBBS(0, 5);
+		int total = bbsService.getTotal();
 		JSONObject object = new JSONObject();
-		object.put("total", 5);
+		object.put("total", total);
 		object.put("rows",bbs);
+		response.setHeader("Access-Control-Allow-Origin", "*");
+		response.setHeader("Cache-Control","no-cache");
 		return object;
 	}
 
-	@ResponseBody
 	@RequestMapping(value = "/insertBBS", method = RequestMethod.POST)
+	@ResponseBody
 	private void insertBBS(HttpServletRequest req, HttpSession session,
 			@Param("message") String message) {
 		if(!"".equals(session.getAttribute(system.usr)) && session.getAttribute(system.usr) != null) {

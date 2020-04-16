@@ -8,4 +8,5 @@ public interface bbsService {
 	List<bbs> getBBS(int offset, int limit);
 	void insertBBS(int id,String username, String message, String date);
 	void deleteBBS(int id);
+	int getTotal();
 }

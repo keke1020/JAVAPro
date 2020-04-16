@@ -9,7 +9,6 @@ public class bbs {
 	private String username;
 	private Date update;
 	private String message;
-	private int state;
 
 	public int getID() {
 		return ID;
@@ -42,14 +41,6 @@ public class bbs {
 
 	public void setMessage(String message) {
 		this.message = message;
-	}
-
-	public int getState() {
-		return state;
-	}
-
-	public void setState(int state) {
-		this.state = state;
 	}
 
 

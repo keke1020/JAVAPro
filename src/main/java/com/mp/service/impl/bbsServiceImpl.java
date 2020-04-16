@@ -26,6 +26,10 @@ public class bbsServiceImpl implements bbsService{
 		bbsDao.deleteBBS(id);
 	}
 
+	public int getTotal() {
+		return bbsDao.getTotal();
+	}
+
 
 
 }

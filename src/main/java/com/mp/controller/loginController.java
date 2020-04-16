@@ -63,17 +63,6 @@ public class loginController {
 			mv.setViewName("login");
 		}
 
-//		Object token = session.getAttribute("token");
-//        String tokenValue = request.getParameter("token");
-//        System.out.println(token);
-//        System.out.println(tokenValue);
-//        if (token != null && token.equals(tokenValue)) {
-//            session.removeAttribute("token");
-//        } else {
-//        	pg = "login";
-//        }
-
-//		mv.addObject("msg","hello myfirst mvc");
 		System.out.println(session.getAttribute(system.usr));
 		return mv;
 	}
