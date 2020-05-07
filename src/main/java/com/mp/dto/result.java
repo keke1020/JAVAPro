@@ -1,6 +1,7 @@
 package com.mp.dto;
 
 public class result {
+	//0:error 1:success
 	private int state;
 	private String msg;
 

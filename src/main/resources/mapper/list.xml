@@ -3,7 +3,11 @@
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mp.dao.listDao">
-	<resultMap type="list1" id="list1Result">
+	<resultMap type="com.mp.dto.option" id="option">
+		<result column="label" property="label" jdbcType="CLOB" />
+		<result column="value" property="value" jdbcType="CLOB" />
+	</resultMap>
+	<resultMap type="com.mp.entity.list1" id="list1Result">
 		<id column="ID" property="ID" jdbcType="INTEGER" />
 		<result column="lockuser" property="lockuser" jdbcType="CLOB" />
 		<result column="locktime" property="locktime" jdbcType="TIMESTAMP" />
@@ -16,6 +20,7 @@
 		<result column="order-count" property="order_count" jdbcType="INTEGER" />
 		<result column="inspect-count" property="inspect_count"
 			jdbcType="INTEGER" />
+		<result column="arrival-depo" property="arrival_depo" jdbcType="CLOB" />
 		<result column="departure" property="departure" jdbcType="DATE" />
 		<result column="unit-ch" property="unit_ch" jdbcType="DOUBLE" />
 		<result column="total-ch" property="total_ch" jdbcType="DOUBLE" />
@@ -35,10 +40,12 @@
 		<result column="height" property="height" jdbcType="DOUBLE" />
 		<result column="width" property="width" jdbcType="DOUBLE" />
 		<result column="depth" property="depth" jdbcType="DOUBLE" />
+		<result column="info-file1" property="info_file1" jdbcType="CLOB" />
+		<result column="info-file2" property="info_file2" jdbcType="CLOB" />
 	</resultMap>
 
 	<!-- dao接口方法提供sql语句配置 -->
-	<select id="getList1" resultMap="list1Result">
+	<select id="getList1" parameterType="com.mp.entity.list1" resultMap="list1Result">
 		SELECT
 			ID,
 			lockuser,
@@ -51,8 +58,12 @@
 			`item-name`,
 			`order-count`,
 			`inspect-count`,
-			departure,
+			`arrival-depo`,
+			date_format(departure, '%Y-%m-%d' ) as departure,
+			date_format(arrival, '%Y-%m-%d' ) as arrival,
 			`unit-ch`,
+			`unit-jp`,
+			`total-ch`,
 			`total-jp`,
 			rate,
 			`fba-stock`,
@@ -67,12 +78,113 @@
 			`material-ch`,
 			height,
 			width,
-			depth
+			depth,
+			`info-file1`,
+			`info-file2`
 		FROM
 			list1
+		WHERE (`lockuser` NOT IN('del') OR `lockuser` IS NULL)
+			<if test="searchId != null and searchId != ''">
+				AND ID = #{searchId}
+			</if>
+			<if test="searchtime_s != '' and searchtime_e != ''">
+				AND ((`arrival` &gt;= #{searchtime_s} AND `arrival` &lt;= #{searchtime_e})
+			</if>
 		ORDER BY
-			ID
+			ID DESC
 		LIMIT #{offset}, #{limit}
 	</select>
+
+	<select id="getList1ById" resultMap="list1Result">
+		SELECT
+			ID,
+			lockuser,
+			DATE_FORMAT(locktime,'%Y-%m-%d %H:%i:%s') as locktime,
+			updater,
+			DATE_FORMAT(updatetime,'%Y-%m-%d %H:%i:%s') as updatetime,
+			code,
+			`sub-code`,
+			img,
+			`item-name`,
+			`order-count`,
+			`inspect-count`,
+			`arrival-depo`,
+			date_format(departure, '%Y-%m-%d' ) as departure,
+			date_format(arrival, '%Y-%m-%d' ) as arrival,
+			`unit-ch`,
+			`unit-jp`,
+			`total-ch`,
+			`total-jp`,
+			rate,
+			`fba-stock`,
+			`ne-stock`,
+			container,
+			`box-num`,
+			`box-count`,
+			kg,
+			`one-m3`,
+			`all-m3`,
+			material,
+			`material-ch`,
+			height,
+			width,
+			depth,
+			`info-file1`,
+			`info-file2`
+		FROM
+			list1
+		WHERE
+			ID = #{searchId}
+	</select>
+
+	<select id="getCountAll" resultType="java.lang.Integer">
+  		SELECT
+  			count(*)
+		FROM
+			`list1`
+  	</select>
+
+	<select id="getArrival_japan" resultMap="option">
+		select DISTINCT(IF(arrival='0000-00-00 00:00:00','0000-00-00',arrival))as value,"" as label from list1 WHERE (`lockuser` NOT IN('del') OR `lockuser` IS NULL) order by arrival desc
+	</select>
+
+	<update id="updateList1"  parameterType="com.mp.entity.list1">
+		 UPDATE `list1`
+		 <trim prefix="set" suffixOverrides=",">
+			<if test="lockuser!=null">lockuser=#{lockuser},</if>
+			<if test="locktime!=null">locktime=#{locktime},</if>
+			<if test="updater!=null">updater=#{updater},</if>
+			<if test="updatetime!=null">updatetime=#{updatetime},</if>
+			<if test="code!=null">code=#{code},</if>
+			<if test="sub_code!=null">`sub-code`=#{sub_code},</if>
+			<if test="img!=null">img=#{img},</if>
+			<if test="item_name!=null">`item-name`=#{item_name},</if>
+			<if test="order_count!=null">`order-count`=#{order_count},</if>
+			<if test="inspect_count!=null">`inspect-count`=#{inspect_count},</if>
+			<if test="arrival_depo!=null">`arrival-depo`=#{arrival_depo},</if>
+			<if test="departure!=null">departure=#{departure},</if>
+			<if test="arrival!=null">arrival=#{arrival},</if>
+			<if test="unit_ch!=null">`unit-ch`=#{unit_ch},</if>
+			<if test="total_ch!=null">`total-ch`=#{total_ch},</if>
+			<if test="unit_jp!=null">`unit-jp`=#{unit_jp},</if>
+			<if test="total_jp!=null">`total-jp`=#{total_jp},</if>
+			<if test="rate!=null">rate=#{rate},</if>
+			<if test="fba_stock!=null">`fba-stock`=#{fba_stock},</if>
+			<if test="ne_stock!=null">`ne-stock`=#{ne_stock},</if>
+			<if test="container!=null">container=#{container},</if>
+			<if test="box_num!=null">`box-num`=#{box_num},</if>
+			<if test="box_count!=null">`box-count`=#{box_count},</if>
+			<if test="kg!=null">kg=#{kg},</if>
+			<if test="one_m3!=null">`one-m3`=#{one_m3},</if>
+			<if test="all_m3!=null">`all-m3`=#{all_m3},</if>
+			<if test="material!=null">material=#{material},</if>
+			<if test="material_ch!=null">`material-ch`=#{material_ch},</if>
+			<if test="height!=null">height=#{height},</if>
+			<if test="width!=null">width=#{width},</if>
+			<if test="depth!=null">depth=#{depth},</if>
+		 </trim>
+		 WHERE `ID`=#{ID}
+	</update>
+
 
 </mapper>

@@ -44,24 +44,25 @@
 		<filter-name>CORS</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	<!--filter>
-		<filter-name>timoutFilter</filter-name>
-		<filter-class>com.mp.filter.sessionFilter</filter-class>
+	<!--filter> <filter-name>timoutFilter</filter-name> <filter-class>com.mp.filter.sessionFilter</filter-class>
+		<init-param> <param-name>charset</param-name> <param-value>UTF-8</param-value>
+		</init-param> <init-param> <param-name>contentType</param-name> <param-value>text/html;charset=UTF-8</param-value>
+		</init-param> </filter> <filter-mapping> <filter-name>timoutFilter</filter-name>
+		<url-pattern>/*</url-pattern> </filter-mapping -->
+
+	<!-- DispatcherServlet -->
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
 		<init-param>
-			<param-name>charset</param-name>
+			<param-name>encoding</param-name>
 			<param-value>UTF-8</param-value>
-		</init-param>
-		<init-param>
-			<param-name>contentType</param-name>
-			<param-value>text/html;charset=UTF-8</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>
-		<filter-name>timoutFilter</filter-name>
+		<filter-name>encodingFilter</filter-name>
 		<url-pattern>/*</url-pattern>
-	</filter-mapping-->
-
-	<!-- DispatcherServlet -->
+	</filter-mapping>
 	<servlet>
 		<servlet-name>dispatcher</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>

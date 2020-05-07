@@ -1,5 +1,6 @@
 package com.mp.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
-import com.mp.dto.system;
+import com.mp.dto.result;
 import com.mp.entity.bbs;
 import com.mp.service.bbsService;
 
@@ -31,41 +32,48 @@ public class bbsController {
 	@RequestMapping(value = "/getBBS", method = RequestMethod.POST)
 	@ResponseBody
 	private JSONObject getBBS(HttpServletResponse response, int currentPage) {
-		//pagelist:use bootstrap framework
-		List<bbs> bbs = bbsService.getBBS(0, 5);
+		// pagelist:use bootstrap framework
+		int startIndex = (currentPage - 1) * 5;
+		List<bbs> bbs = bbsService.getBBS(startIndex, 5);
 		int total = bbsService.getTotal();
 		JSONObject object = new JSONObject();
 		object.put("total", total);
-		object.put("rows",bbs);
+		object.put("rows", bbs);
 		response.setHeader("Access-Control-Allow-Origin", "*");
-		response.setHeader("Cache-Control","no-cache");
+		response.setHeader("Cache-Control", "no-cache");
 		return object;
 	}
 
 	@RequestMapping(value = "/insertBBS", method = RequestMethod.POST)
 	@ResponseBody
-	private void insertBBS(HttpServletRequest req, HttpSession session,
-			@Param("message") String message) {
-		if(!"".equals(session.getAttribute(system.usr)) && session.getAttribute(system.usr) != null) {
-			System.out.println(session.getAttribute(system.usr));
-			//Dateオブジェクトを生成する
-		    Date dTime = new Date();
-		    String now = sdf.format(dTime);
+	private JSONObject insertBBS(HttpServletResponse response,HttpServletRequest request) {
 
+		JSONObject object = new JSONObject();
+		try {
+			String loginuser=new String(request.getParameter("loginuser").getBytes("ISO-8859-1"),"UTF-8");
+			String message=new String(request.getParameter("message").getBytes("ISO-8859-1"),"UTF-8");
 
-			bbsService.insertBBS(0,(String) session.getAttribute(system.usr), message, now);
+			// Dateオブジェクトを生成する
+			Date dTime = new Date();
+			String now = sdf.format(dTime);
+			bbsService.insertBBS(loginuser, message, now);
+
+			result result = new result();
+			result.setState(1);
+			object.put("rows", result);
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+		} catch (UnsupportedEncodingException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
 		}
+		return object;
 	}
 
-	@ResponseBody
-	@RequestMapping(value = "/deleteBBS", method = RequestMethod.POST)
-	private void deleteBBS(HttpServletRequest req, HttpSession session,
-			@Param("ID") int ID) {
-			bbsService.deleteBBS(ID);
-	}
-
-
-
-
+//	@ResponseBody
+//	@RequestMapping(value = "/deleteBBS", method = RequestMethod.POST)
+//	private void deleteBBS(HttpServletRequest req, HttpSession session, @Param("ID") int ID) {
+//		bbsService.deleteBBS(ID);
+//	}
 
 }

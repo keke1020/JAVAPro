@@ -18,8 +18,8 @@ public class bbsServiceImpl implements bbsService{
 		return bbsDao.getBBS(offset, limit);
 	}
 
-	public void insertBBS(int id, String username, String message, String date) {
-		bbsDao.insertBBS(0,username,message,date);
+	public void insertBBS(String username, String message, String date) {
+		bbsDao.insertBBS(username,message,date);
 	}
 
 	public void deleteBBS(int id) {
