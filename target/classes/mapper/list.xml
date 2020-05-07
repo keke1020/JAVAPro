@@ -87,13 +87,103 @@
 			<if test="searchId != null and searchId != ''">
 				AND ID = #{searchId}
 			</if>
-			<if test="searchtime_s != '' and searchtime_e != ''">
-				AND ((`arrival` &gt;= #{searchtime_s} AND `arrival` &lt;= #{searchtime_e})
+			<choose>
+			    <when test="searchtime_s != '' and searchtime_e != ''">
+					AND (`arrival` &gt;= #{searchtime_s} AND `arrival` &lt;= #{searchtime_e}
+			    </when>
+			    <when test="searchtime_s == '' and searchtime_e != ''">
+					AND (`arrival` &lt;= #{searchtime_e}
+			    </when>
+			    <when test="searchtime_s != '' and searchtime_e == ''">
+					AND (`arrival` &gt;= #{searchtime_s}
+			    </when>
+			    <otherwise>
+					AND (`arrival` &gt;= '0000-00-01'
+			    </otherwise>
+		  	</choose>
+			<if test="radio_soko1 == 'true'">
+				)
+			</if>
+			<if test="radio_soko1 == 'false'">
+				OR (`arrival` = '0000-00-00'))
+			</if>
+			<if test="searchcontain_check == 'false'">
+				AND (`container` = '')
+			</if>
+			<if test="searchcontain_check == 'true' and searchcontain != ''">
+				AND (`container` = #{searchcontain})
+			</if>
+			<if test="searchkeiban != null and searchkeiban != ''">
+				AND (`code` like #{searchkeiban})
+			</if>
+			<if test="searchedaban != null and searchedaban != ''">
+				AND (`sub-code` like #{searchedaban})
+			</if>
+			<if test="search_arrival_soko != null and search_arrival_soko != ''">
+				AND (`arrival-depo` like #{search_arrival_soko})
+			</if>
+			<if test="radio_soko2 == 'true'">
+				AND (`fba-stock` > '0')
+			</if>
+			<if test="radio_soko3 == 'true'">
+				AND (`inspect-count` = '0')
 			</if>
 		ORDER BY
 			ID DESC
 		LIMIT #{offset}, #{limit}
 	</select>
+
+	<select id="getCountAll" resultType="java.lang.Integer">
+  		SELECT
+  			count(*)
+		FROM
+			`list1`
+		WHERE (`lockuser` NOT IN('del') OR `lockuser` IS NULL)
+			<if test="searchId != null and searchId != ''">
+				AND ID = #{searchId}
+			</if>
+			<choose>
+			    <when test="searchtime_s != '' and searchtime_e != ''">
+					AND (`arrival` &gt;= #{searchtime_s} AND `arrival` &lt;= #{searchtime_e}
+			    </when>
+			    <when test="searchtime_s == '' and searchtime_e != ''">
+					AND (`arrival` &lt;= #{searchtime_e}
+			    </when>
+			    <when test="searchtime_s != '' and searchtime_e == ''">
+					AND (`arrival` &gt;= #{searchtime_s}
+			    </when>
+			    <otherwise>
+					AND (`arrival` &gt;= '0000-00-01'
+			    </otherwise>
+		  	</choose>
+			<if test="radio_soko1 == 'true'">
+				)
+			</if>
+			<if test="radio_soko1 == 'false'">
+				OR (`arrival` = '0000-00-00'))
+			</if>
+			<if test="searchcontain_check == 'false'">
+				AND (`container` = '')
+			</if>
+			<if test="searchcontain_check == 'true' and searchcontain != ''">
+				AND (`container` = #{searchcontain})
+			</if>
+			<if test="searchkeiban != null and searchkeiban != ''">
+				AND (`code` like #{searchkeiban})
+			</if>
+			<if test="searchedaban != null and searchedaban != ''">
+				AND (`sub-code` like #{searchedaban})
+			</if>
+			<if test="search_arrival_soko != null and search_arrival_soko != ''">
+				AND (`arrival-depo` like #{search_arrival_soko})
+			</if>
+			<if test="radio_soko2 == 'true'">
+				AND (`fba-stock` > '0')
+			</if>
+			<if test="radio_soko3 == 'true'">
+				AND (`inspect-count` = '0')
+			</if>
+  	</select>
 
 	<select id="getList1ById" resultMap="list1Result">
 		SELECT
@@ -136,13 +226,6 @@
 		WHERE
 			ID = #{searchId}
 	</select>
-
-	<select id="getCountAll" resultType="java.lang.Integer">
-  		SELECT
-  			count(*)
-		FROM
-			`list1`
-  	</select>
 
 	<select id="getArrival_japan" resultMap="option">
 		select DISTINCT(IF(arrival='0000-00-00 00:00:00','0000-00-00',arrival))as value,"" as label from list1 WHERE (`lockuser` NOT IN('del') OR `lockuser` IS NULL) order by arrival desc

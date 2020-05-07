@@ -50,7 +50,7 @@ public class bbsController {
 
 		JSONObject object = new JSONObject();
 		try {
-			String loginuser=new String(request.getParameter("loginuser").getBytes("ISO-8859-1"),"UTF-8");
+			String loginuser=request.getParameter("loginuser");
 			String message=new String(request.getParameter("message").getBytes("ISO-8859-1"),"UTF-8");
 
 			// Dateオブジェクトを生成する
@@ -70,10 +70,18 @@ public class bbsController {
 		return object;
 	}
 
-//	@ResponseBody
-//	@RequestMapping(value = "/deleteBBS", method = RequestMethod.POST)
-//	private void deleteBBS(HttpServletRequest req, HttpSession session, @Param("ID") int ID) {
-//		bbsService.deleteBBS(ID);
-//	}
+	@ResponseBody
+	@RequestMapping(value = "/deleteBBS", method = RequestMethod.POST)
+	private JSONObject deleteBBS(HttpServletResponse response,HttpServletRequest request, @Param("ID") int ID) {
+		JSONObject object = new JSONObject();
+		bbsService.deleteBBS(ID);
+		result result = new result();
+		result.setState(1);
+
+		object.put("rows", result);
+		response.setHeader("Access-Control-Allow-Origin", "*");
+		response.setHeader("Cache-Control", "no-cache");
+		return object;
+	}
 
 }

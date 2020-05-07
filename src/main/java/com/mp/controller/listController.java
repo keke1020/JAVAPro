@@ -51,8 +51,15 @@ public class listController {
 		try {
 			// ID
 			String searchId = new String(request.getParameter("searchId").getBytes("ISO-8859-1"), "UTF-8");
-			String searchtime_s = new String(request.getParameter("searchtime_s").getBytes("ISO-8859-1"), "UTF-8");
-			String searchtime_e = new String(request.getParameter("searchtime_e").getBytes("ISO-8859-1"), "UTF-8");
+			String searchtime_s = "";
+			if (request.getParameter("searchtime_s") != null && !"".equals(request.getParameter("searchtime_s"))) {
+				searchtime_s = new String(request.getParameter("searchtime_s").getBytes("ISO-8859-1"), "UTF-8");
+			}
+			String searchtime_e = "";
+			if (request.getParameter("searchtime_e") != null && !"".equals(request.getParameter("searchtime_e"))) {
+				searchtime_e = new String(request.getParameter("searchtime_e").getBytes("ISO-8859-1"), "UTF-8");
+			}
+			String searchcontain_check = new String(request.getParameter("searchcontain_check").getBytes("ISO-8859-1"), "UTF-8");
 			String searchcontain = new String(request.getParameter("searchcontain").getBytes("ISO-8859-1"), "UTF-8");
 			String searchkeiban = new String(request.getParameter("searchkeiban").getBytes("ISO-8859-1"), "UTF-8");
 			String searchedaban = new String(request.getParameter("searchedaban").getBytes("ISO-8859-1"), "UTF-8");
@@ -69,10 +76,12 @@ public class listController {
 					.parseInt(new String(request.getParameter("list_currentPage").getBytes("ISO-8859-1"), "UTF-8"));
 			list_currentPage = (list_currentPage - 1) * searchCount;
 
-			int total = listService.getCountAll();
+			int total = listService.getCountAll(searchId, searchtime_s,
+					searchtime_e, searchcontain_check, searchcontain, searchkeiban, searchedaban, search_arrival_japan, search_arrival_soko,
+					radio_soko1, radio_soko2, radio_soko3);
 
 			List<list1> list1 = listService.getList1(list_currentPage, searchCount, searchId, searchtime_s,
-					searchtime_e, searchcontain, searchkeiban, searchedaban, search_arrival_japan, search_arrival_soko,
+					searchtime_e, searchcontain_check, searchcontain, searchkeiban, searchedaban, search_arrival_japan, search_arrival_soko,
 					radio_soko1, radio_soko2, radio_soko3);
 
 			object.put("total", total);
