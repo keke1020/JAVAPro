@@ -1,21 +1,18 @@
 package com.mp.controller;
 
-import static org.hamcrest.CoreMatchers.nullValue;
-
 import java.io.UnsupportedEncodingException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -24,12 +21,17 @@ import com.alibaba.fastjson.JSONObject;
 import com.mp.dto.option;
 import com.mp.dto.result;
 import com.mp.entity.list1;
+import com.mp.entity.syouhin;
 import com.mp.service.listService;
+import com.mp.service.syouhinService;
 
 @Controller
 public class listController {
 	@Autowired
 	private listService listService;
+
+	@Autowired
+	private syouhinService syouhinService;
 
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -59,7 +61,8 @@ public class listController {
 			if (request.getParameter("searchtime_e") != null && !"".equals(request.getParameter("searchtime_e"))) {
 				searchtime_e = new String(request.getParameter("searchtime_e").getBytes("ISO-8859-1"), "UTF-8");
 			}
-			String searchcontain_check = new String(request.getParameter("searchcontain_check").getBytes("ISO-8859-1"), "UTF-8");
+			String searchcontain_check = new String(request.getParameter("searchcontain_check").getBytes("ISO-8859-1"),
+					"UTF-8");
 			String searchcontain = new String(request.getParameter("searchcontain").getBytes("ISO-8859-1"), "UTF-8");
 			String searchkeiban = new String(request.getParameter("searchkeiban").getBytes("ISO-8859-1"), "UTF-8");
 			String searchedaban = new String(request.getParameter("searchedaban").getBytes("ISO-8859-1"), "UTF-8");
@@ -76,13 +79,13 @@ public class listController {
 					.parseInt(new String(request.getParameter("list_currentPage").getBytes("ISO-8859-1"), "UTF-8"));
 			list_currentPage = (list_currentPage - 1) * searchCount;
 
-			int total = listService.getCountAll(searchId, searchtime_s,
-					searchtime_e, searchcontain_check, searchcontain, searchkeiban, searchedaban, search_arrival_japan, search_arrival_soko,
-					radio_soko1, radio_soko2, radio_soko3);
+			int total = listService.getCountAll(searchId, searchtime_s, searchtime_e, searchcontain_check,
+					searchcontain, searchkeiban, searchedaban, search_arrival_japan, search_arrival_soko, radio_soko1,
+					radio_soko2, radio_soko3);
 
 			List<list1> list1 = listService.getList1(list_currentPage, searchCount, searchId, searchtime_s,
-					searchtime_e, searchcontain_check, searchcontain, searchkeiban, searchedaban, search_arrival_japan, search_arrival_soko,
-					radio_soko1, radio_soko2, radio_soko3);
+					searchtime_e, searchcontain_check, searchcontain, searchkeiban, searchedaban, search_arrival_japan,
+					search_arrival_soko, radio_soko1, radio_soko2, radio_soko3);
 
 			object.put("total", total);
 			object.put("rows", list1);
@@ -108,6 +111,180 @@ public class listController {
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
+		}
+		return object;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/insertList1", method = RequestMethod.POST)
+	private JSONObject insertList1(HttpServletResponse response, HttpServletRequest request, @RequestBody String params)
+			throws Exception {
+		JSONObject object = new JSONObject();
+		try {
+			JSONObject j1 = JSONObject.parseObject(params);
+			request.setCharacterEncoding("utf-8");
+			List<list1> listnodes = JSONObject.parseArray(j1.getJSONArray("params").toJSONString(), list1.class);
+			List<syouhin> syohnodes = JSONObject.parseArray(j1.getJSONArray("params").toJSONString(), syouhin.class);
+			Date now = new Date();
+
+//			String regex_img = "/fk|[0-9]+|fx|FK/";
+
+			if (listnodes.size() > 0 && listnodes != null) {
+				for (int i = 0; i < listnodes.size(); i++) {
+					list1 list1 = listnodes.get(i);
+					list1.setLockuser(null);
+					list1.setLocktime(null);
+					list1.setUpdatetime(now);
+					listService.insertList1(list1);
+
+					List<syouhin> syouhin_ = syouhinService.getSyohinByCode(list1.getCode());
+
+					boolean isHasImg = false;
+					boolean isHasSubCode = false;
+					boolean isHasItemName = false;
+
+					syouhin syouhin = syohnodes.get(i);
+
+					if (syouhin_.get(0).getImg() != null && !"".equals(syouhin_.get(0).getImg())) {
+						isHasImg = true;
+					}
+					if (syouhin_.get(0).getSub_code() != null && !"".equals(syouhin_.get(0).getSub_code())) {
+						isHasSubCode = true;
+					}
+					if (syouhin_.get(0).getItem_name() != null && !"".equals(syouhin_.get(0).getItem_name())) {
+						isHasItemName = true;
+					}
+
+					if (syouhin_ != null && syouhin_.size() > 0) {
+						// img
+						if (syouhin.getImg() != null && !"".equals(syouhin.getImg())) {
+							if (syouhin.getImg().indexOf("fk") != -1 || syouhin.getImg().indexOf("FK") != -1
+									|| syouhin.getImg().indexOf("fx") != -1 || syouhin.getImg().indexOf("ln") != -1) {
+								if (isHasImg) {
+									syouhin.setImg(syouhin.getImg());
+								} else {
+									syouhin.setImg("");
+								}
+							} else {
+								if (isHasImg) {
+									String[] img_sp = syouhin_.get(0).getImg().split("\\|");
+									boolean flag = Arrays.asList(img_sp).contains(syouhin.getImg());
+									if(flag) {
+										syouhin.setImg(syouhin_.get(0).getImg());
+									} else {
+										syouhin.setImg(syouhin_.get(0).getImg() + "|" + syouhin.getImg());
+									}
+								}
+							}
+						} else {
+							if (isHasImg) {
+								syouhin.setImg(syouhin_.get(0).getImg());
+							}
+						}
+
+						// subcode
+						if (syouhin.getSub_code() != null && !"".equals(syouhin.getSub_code())) {
+							if (isHasSubCode) {
+								String[] subCode_sp = syouhin_.get(0).getSub_code().split("\\|");
+								boolean flag = Arrays.asList(subCode_sp).contains(syouhin.getSub_code());
+								if(flag) {
+									syouhin.setSub_code(syouhin_.get(0).getSub_code());
+								} else {
+									syouhin.setSub_code(syouhin_.get(0).getSub_code() + "|" + syouhin.getSub_code());
+								}
+							} else {
+								syouhin.setSub_code("|" + syouhin.getSub_code());
+							}
+						} else {
+							if (isHasSubCode) {
+								syouhin.setSub_code(syouhin_.get(0).getSub_code());
+							}
+						}
+
+						// itemname
+						if (syouhin.getItem_name() != null && !"".equals(syouhin.getItem_name())) {
+							if (isHasItemName) {
+								String[] itemname_sp = syouhin_.get(0).getItem_name().split("\\|");
+								boolean flag = Arrays.asList(itemname_sp).contains(syouhin.getItem_name());
+								if(flag) {
+									syouhin.setItem_name(syouhin_.get(0).getItem_name());
+								} else {
+									syouhin.setItem_name(syouhin_.get(0).getItem_name() + "|" + syouhin.getItem_name());
+								}
+								if (!syouhin.getItem_name().equals(syouhin_.get(0).getItem_name())) {
+									syouhin.setItem_name(syouhin_.get(0).getItem_name() + "|" + syouhin.getItem_name());
+								} else {
+									syouhin.setItem_name(syouhin_.get(0).getItem_name());
+								}
+							} else {
+								syouhin.setItem_name("|" + syouhin.getItem_name());
+							}
+						} else {
+							if (isHasItemName) {
+								syouhin.setItem_name(syouhin_.get(0).getItem_name());
+							}
+						}
+					} else {
+						// img
+						if (syouhin.getImg() != null && !"".equals(syouhin.getImg())) {
+							if (syouhin.getImg().indexOf("fk") != -1 || syouhin.getImg().indexOf("FK") != -1
+									|| syouhin.getImg().indexOf("fx") != -1 || syouhin.getImg().indexOf("ln") != -1) {
+								syouhin.setImg("");
+							} else {
+								syouhin.setImg("|" + syouhin.getImg());
+							}
+
+						}
+						// subcode
+						if (syouhin.getSub_code() != null && !"".equals(syouhin.getSub_code())) {
+							syouhin.setSub_code("|" + syouhin.getSub_code());
+						}
+						// itemname
+						if (syouhin.getItem_name() != null && !"".equals(syouhin.getItem_name())) {
+							syouhin.setItem_name("|" + syouhin.getItem_name());
+						}
+					}
+
+					syouhin.setUpdatetime(now);
+					syouhinService.insertSyoh(syouhin);
+				}
+			}
+
+			result result = new result();
+			result.setState(1);
+			object.put("rows", result);
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			result result = new result();
+			result.setState(0);
+			object.put("rows", result);
+		}
+		return object;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/deleteList1", method = RequestMethod.POST)
+	private JSONObject deleteList1(HttpServletResponse response, HttpServletRequest request) throws Exception {
+		request.setCharacterEncoding("utf-8");
+		response.setHeader("Access-Control-Allow-Origin", "*");
+		response.setHeader("Cache-Control", "no-cache");
+		JSONObject object = new JSONObject();
+		try {
+			int id = Integer.parseInt(new String(request.getParameter("id").getBytes("ISO-8859-1"), "UTF-8"));
+			int loginuser_id = Integer
+					.parseInt(new String(request.getParameter("loginuser_id").getBytes("ISO-8859-1"), "UTF-8"));
+			String loginuser = java.net.URLDecoder.decode(request.getParameter("loginuser"), "UTF-8");
+			listService.deleteList1(id, loginuser_id, loginuser);
+			result result = new result();
+			result.setState(1);
+			object.put("rows", result);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			result result = new result();
+			result.setState(0);
+			object.put("rows", result);
 		}
 		return object;
 	}
@@ -250,6 +427,13 @@ public class listController {
 			list1.setDepth(depth);
 
 			listService.updateList1(list1);
+
+			syouhin suSyouhin = new syouhin();
+
+
+
+
+
 
 			result result = new result();
 			result.setState(1);

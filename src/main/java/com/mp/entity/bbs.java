@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class bbs {
 	private int ID;
+	private int user_id;
 	private String username;
 	private Date update;
 	private String message;
@@ -41,6 +42,14 @@ public class bbs {
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public int getUser_id() {
+		return user_id;
+	}
+
+	public void setUser_id(int user_id) {
+		this.user_id = user_id;
 	}
 
 

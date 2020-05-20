@@ -5,6 +5,7 @@
 <mapper namespace="com.mp.dao.bbsDao">
 	<resultMap type="bbs" id="bbsResult">
 		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<id column="user_id" property="user_id" jdbcType="INTEGER" />
 		<result column="username" property="username" jdbcType="VARCHAR" />
 		<result column="update" property="update" jdbcType="TIMESTAMP" />
 		<result column="message" property="message" jdbcType="VARCHAR" />
@@ -16,8 +17,9 @@
 	</select>
 
 	<insert id="insertBBS">
-	  insert into list2(`username`, `update`, `message`)
+	  insert into list2(`user_id`, `username`, `update`, `message`)
 	  values(
+	  #{loginuser_id,jdbcType=INTEGER},
 	   #{username,jdbcType=VARCHAR},
 	   #{update,jdbcType=VARCHAR},
 	   #{message,jdbcType=VARCHAR}

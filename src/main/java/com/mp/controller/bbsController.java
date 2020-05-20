@@ -51,12 +51,13 @@ public class bbsController {
 		JSONObject object = new JSONObject();
 		try {
 			String loginuser=request.getParameter("loginuser");
+			int loginuser_id = Integer.parseInt(new String(request.getParameter("loginuser_id").getBytes("ISO-8859-1"), "UTF-8"));
 			String message=new String(request.getParameter("message").getBytes("ISO-8859-1"),"UTF-8");
 
 			// Dateオブジェクトを生成する
 			Date dTime = new Date();
 			String now = sdf.format(dTime);
-			bbsService.insertBBS(loginuser, message, now);
+			bbsService.insertBBS(loginuser_id,loginuser, message, now);
 
 			result result = new result();
 			result.setState(1);

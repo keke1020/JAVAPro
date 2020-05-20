@@ -45,4 +45,12 @@ public class listServiceImpl implements listService {
 		listDao.updateList1(list1);
 	}
 
+	public void insertList1(list1 list1) {
+		listDao.insertList1(list1);
+	}
+
+	public void deleteList1(int id, int loginuser_id, String loginuser) {
+		listDao.deleteList1(id,loginuser_id,loginuser);
+	}
+
 }

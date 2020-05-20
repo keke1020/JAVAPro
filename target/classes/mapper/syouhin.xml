@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mp.dao.syouhinDao">
+	<resultMap type="com.mp.entity.syouhin" id="syouhinResult">
+		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<result column="updater" property="updater" jdbcType="CLOB" />
+		<result column="updatetime" property="updatetime" jdbcType="DATE" />
+		<result column="code" property="code" jdbcType="CLOB" />
+		<result column="sub-code" property="sub_code" jdbcType="CLOB" />
+		<result column="img" property="img" jdbcType="CLOB" />
+		<result column="item-name" property="item_name" jdbcType="CLOB" />
+		<result column="unit-ch" property="unit_ch" jdbcType="DOUBLE" />
+		<result column="rate" property="rate" jdbcType="DOUBLE" />
+		<result column="kg" property="kg" jdbcType="DOUBLE" />
+		<result column="material" property="material" jdbcType="CLOB" />
+		<result column="material-ch" property="material_ch" jdbcType="CLOB" />
+		<result column="height" property="height" jdbcType="DOUBLE" />
+		<result column="width" property="width" jdbcType="DOUBLE" />
+		<result column="depth" property="depth" jdbcType="DOUBLE" />
+		<result column="doru" property="doru" jdbcType="DOUBLE" />
+	</resultMap>
+
+	<!-- dao接口方法提供sql语句配置 -->
+	<select id="getSyohinByCode" parameterType="com.mp.entity.syouhin" resultMap="syouhinResult">
+		SELECT
+			ID,
+			updater,
+			code,
+			`sub-code`,
+			img,
+			`item-name`,
+			`unit-ch`,
+			rate,
+			kg,
+			material,
+			`material-ch`,
+			height,
+			width,
+			depth,
+			doru
+		FROM
+			syouhin
+		WHERE
+			`code` = #{code}
+			ORDER BY `updatetime` DESC
+	</select>
+
+	<insert id="insertSyoh">
+	  INSERT INTO `syouhin`
+		(`code`,`updatetime`,`updater`,`sub-code`,`img`,`item-name`,`unit-ch`,`rate`,`kg`,`material`,`material-ch`,`height`,`width`,`depth`,`doru`)
+	  values(
+	   #{code},
+	   #{updatetime},
+	   #{updater},
+	   #{sub_code},
+	   #{img},
+	   #{item_name},
+	   #{unit_ch},
+	   #{rate},
+	   #{kg},
+	   #{material},
+	   #{material_ch},
+	   #{height},
+	   #{width},
+	   #{depth},
+	   #{doru}
+	)
+	 ON DUPLICATE KEY UPDATE
+		`updatetime`=VALUES(`updatetime`),`updater`=VALUES(`updater`),`sub-code`=VALUES(`sub-code`),`img`=VALUES(`img`),`item-name`=VALUES(`item-name`),
+		`unit-ch`=VALUES(`unit-ch`),`rate`=VALUES(`rate`),`kg`=VALUES(`kg`), `material`=VALUES(`material`),`material-ch`=VALUES(`material-ch`),`height`=VALUES(`height`),
+		`width`=VALUES(`width`),`depth`=VALUES(`depth`),`doru`=VALUES(`doru`)
+	</insert>
+
+
+</mapper>

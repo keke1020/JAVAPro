@@ -29,4 +29,7 @@ public interface listDao {
 	List<list1> getList1ById(@Param("searchId") String id);
 
 	void updateList1(list1 list1);
+	void insertList1(list1 list1);
+	void deleteList1(@Param("id") int id, @Param("loginuser_id") int loginuser_id,@Param("loginuser") String loginuser);
+
 }

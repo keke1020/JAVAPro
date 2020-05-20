@@ -6,9 +6,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class list1 {
 	private int ID;
+	private int lockuser_id;
 	private String lockuser;
 	private Date locktime;
 	private String updater;
+	private int updater_id;
 	private Date updatetime;
 	private String code;
 	private String sub_code;
@@ -43,6 +45,7 @@ public class list1 {
 	private double depth;
 	private String info_file1;
 	private String info_file2;
+
 	public int getID() {
 		return ID;
 	}
@@ -248,7 +251,18 @@ public class list1 {
 	public void setInfo_file2(String info_file2) {
 		this.info_file2 = info_file2;
 	}
-
+	public int getUpdater_id() {
+		return updater_id;
+	}
+	public void setUpdater_id(int updater_id) {
+		this.updater_id = updater_id;
+	}
+	public int getLockuser_id() {
+		return lockuser_id;
+	}
+	public void setLockuser_id(int lockuser_id) {
+		this.lockuser_id = lockuser_id;
+	}
 
 
 }

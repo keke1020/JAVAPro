@@ -269,5 +269,96 @@
 		 WHERE `ID`=#{ID}
 	</update>
 
+	<insert id="insertList1" parameterType="com.mp.entity.list1" useGeneratedKeys="true" keyProperty="ID">
+	  insert into list1
+	  	(
+	  		`updater`,
+	  		`updater-id`,
+	  		`updatetime`,
+	  		`lockuser`,
+	  		`locktime`,
+	  		`code`,
+	  		`sub-code`,
+	  		`img`,
+	  		`item-name`,
+	  		`order-count`,
+	  		`inspect-count`,
+	  		`arrival-depo`,
+	  		`departure`,
+	  		`arrival`,
+	  		`unit-ch`,
+	  		`total-ch`,
+	  		`unit-jp`,
+	  		`total-jp`,
+	  		`rate`,
+	  		`fba-stock`,
+	  		`ne-stock`,
+	  		`container`,
+	  		`box-num`,
+	  		`box-count`,
+	  		`kg`,
+	  		`one-m3`,
+	  		`all-m3`,
+	  		`material`,
+	  		`material-ch`,
+	  		`height`,
+	  		`width`,
+	  		`depth`
+  		)
+	  values(
+		#{updater},
+	   	#{updater_id},
+	   	#{updatetime},
+	   	#{lockuser},
+	   	#{locktime},
+		#{code},
+		#{sub_code},
+		#{img},
+		#{item_name},
+		#{order_count},
+		#{inspect_count},
+		#{arrival_depo},
+		<choose>
+            <when test="departure != null">
+                #{departure},
+            </when>
+            <otherwise>
+                '0000-00-00',
+            </otherwise>
+        </choose>
+		<choose>
+            <when test="arrival != null">
+                #{arrival},
+            </when>
+            <otherwise>
+                '0000-00-00',
+            </otherwise>
+        </choose>
+		#{unit_ch},
+		#{total_ch},
+		#{unit_jp},
+		#{total_jp},
+		#{rate},
+		#{fba_stock},
+		#{ne_stock},
+		#{container},
+		#{box_num},
+		#{box_count},
+		#{kg},
+		#{one_m3},
+		#{all_m3},
+		#{material},
+		#{material_ch},
+		#{height},
+		#{width},
+		#{depth}
+	)
+	</insert>
+
+	<delete id="deleteList1">
+		<!-- delete from list1 where ID = #{id} -->
+		UPDATE `list1` SET `lockuser` = 'del',`updater` = #{loginuser},`updater-id` = #{loginuser_id} WHERE `list1`.`ID` = #{id}
+	</delete>
+
 
 </mapper>

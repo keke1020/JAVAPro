@@ -21,4 +21,7 @@ public interface listService {
 	List<list1> getList1ById(String id);
 
 	void updateList1(list1 list1);
+	void insertList1(list1 list1);
+	void deleteList1(int id,int loginuser_id, String loginuser);
+
 }
