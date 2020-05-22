@@ -46,18 +46,25 @@ public class bbsController {
 
 	@RequestMapping(value = "/insertBBS", method = RequestMethod.POST)
 	@ResponseBody
-	private JSONObject insertBBS(HttpServletResponse response,HttpServletRequest request) {
+	private JSONObject insertBBS(HttpServletResponse response, HttpServletRequest request) {
 
 		JSONObject object = new JSONObject();
 		try {
-			String loginuser=request.getParameter("loginuser");
-			int loginuser_id = Integer.parseInt(new String(request.getParameter("loginuser_id").getBytes("ISO-8859-1"), "UTF-8"));
-			String message=new String(request.getParameter("message").getBytes("ISO-8859-1"),"UTF-8");
+			String loginuser = request.getParameter("loginuser");
+			int loginuser_id = Integer
+					.parseInt(new String(request.getParameter("loginuser_id").getBytes("ISO-8859-1"), "UTF-8"));
+			String message = new String(request.getParameter("message"));
 
 			// Dateオブジェクトを生成する
 			Date dTime = new Date();
-			String now = sdf.format(dTime);
-			bbsService.insertBBS(loginuser_id,loginuser, message, now);
+//			String now = sdf.format(dTime);
+			bbs bbs = new bbs();
+			bbs.setUser_id(loginuser_id);
+			bbs.setUsername(loginuser);
+			bbs.setMessage(message);
+			bbs.setUpdate(dTime);
+			bbsService.insertBBS(bbs);
+//			bbsService.insertBBS(loginuser_id, loginuser, message, now);
 
 			result result = new result();
 			result.setState(1);
@@ -73,7 +80,7 @@ public class bbsController {
 
 	@ResponseBody
 	@RequestMapping(value = "/deleteBBS", method = RequestMethod.POST)
-	private JSONObject deleteBBS(HttpServletResponse response,HttpServletRequest request, @Param("ID") int ID) {
+	private JSONObject deleteBBS(HttpServletResponse response, HttpServletRequest request, @Param("ID") int ID) {
 		JSONObject object = new JSONObject();
 		bbsService.deleteBBS(ID);
 		result result = new result();

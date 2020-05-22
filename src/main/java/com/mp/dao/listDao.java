@@ -7,9 +7,10 @@ import org.apache.ibatis.annotations.Param;
 
 import com.mp.dto.option;
 import com.mp.entity.list1;
+import com.mp.entity.list3;
 
 public interface listDao {
-	List<list1> getList1(@Param("offset") int offset, @Param("limit") int limit, @Param("searchId") String searchId,
+	List<list1> getList1(@Param("exportFlag") String exportFlag,@Param("offset") int offset, @Param("limit") int limit, @Param("searchId") String searchId,
 			@Param("searchtime_s") String searchtime_s, @Param("searchtime_e") String searchtime_e,
 			@Param("searchcontain_check") String searchcontain_check, @Param("searchcontain") String searchcontain,
 			@Param("searchkeiban") String searchkeiban, @Param("searchedaban") String searchedaban,
@@ -31,5 +32,6 @@ public interface listDao {
 	void updateList1(list1 list1);
 	void insertList1(list1 list1);
 	void deleteList1(@Param("id") int id, @Param("loginuser_id") int loginuser_id,@Param("loginuser") String loginuser);
-
+	void insertList3(list3 list3);
+	List<list1> getList1_all();
 }

@@ -19,10 +19,10 @@
 	<insert id="insertBBS">
 	  insert into list2(`user_id`, `username`, `update`, `message`)
 	  values(
-	  #{loginuser_id,jdbcType=INTEGER},
-	   #{username,jdbcType=VARCHAR},
-	   #{update,jdbcType=VARCHAR},
-	   #{message,jdbcType=VARCHAR}
+		#{user_id},
+		#{username},
+		#{update},
+		#{message}
 	)
 	</insert>
 

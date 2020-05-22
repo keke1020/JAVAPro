@@ -121,6 +121,4 @@ public class syouhin {
 	public void setDoru(double doru) {
 		this.doru = doru;
 	}
-
-
 }

@@ -4,12 +4,16 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,9 +25,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.mp.dto.option;
 import com.mp.dto.result;
 import com.mp.entity.list1;
+import com.mp.entity.list3;
 import com.mp.entity.syouhin;
 import com.mp.service.listService;
 import com.mp.service.syouhinService;
+import com.mp.util.MyBatisSqlUtils;
 
 @Controller
 public class listController {
@@ -32,6 +38,9 @@ public class listController {
 
 	@Autowired
 	private syouhinService syouhinService;
+
+//	@Autowired
+//	private SqlSessionFactory sqlSessionFactory;
 
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -83,7 +92,7 @@ public class listController {
 					searchcontain, searchkeiban, searchedaban, search_arrival_japan, search_arrival_soko, radio_soko1,
 					radio_soko2, radio_soko3);
 
-			List<list1> list1 = listService.getList1(list_currentPage, searchCount, searchId, searchtime_s,
+			List<list1> list1 = listService.getList1("false",list_currentPage, searchCount, searchId, searchtime_s,
 					searchtime_e, searchcontain_check, searchcontain, searchkeiban, searchedaban, search_arrival_japan,
 					search_arrival_soko, radio_soko1, radio_soko2, radio_soko3);
 
@@ -95,6 +104,60 @@ public class listController {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
+		return object;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/exportList1_1", method = RequestMethod.POST)
+	private JSONObject exportList1_1(HttpServletResponse response, HttpServletRequest request) {
+		JSONObject object = new JSONObject();
+		try {
+			// ID
+			String searchId = new String(request.getParameter("searchId").getBytes("ISO-8859-1"), "UTF-8");
+			String searchtime_s = "";
+			if (request.getParameter("searchtime_s") != null && !"".equals(request.getParameter("searchtime_s"))) {
+				searchtime_s = new String(request.getParameter("searchtime_s").getBytes("ISO-8859-1"), "UTF-8");
+			}
+			String searchtime_e = "";
+			if (request.getParameter("searchtime_e") != null && !"".equals(request.getParameter("searchtime_e"))) {
+				searchtime_e = new String(request.getParameter("searchtime_e").getBytes("ISO-8859-1"), "UTF-8");
+			}
+			String searchcontain_check = new String(request.getParameter("searchcontain_check").getBytes("ISO-8859-1"),
+					"UTF-8");
+			String searchcontain = new String(request.getParameter("searchcontain").getBytes("ISO-8859-1"), "UTF-8");
+			String searchkeiban = new String(request.getParameter("searchkeiban").getBytes("ISO-8859-1"), "UTF-8");
+			String searchedaban = new String(request.getParameter("searchedaban").getBytes("ISO-8859-1"), "UTF-8");
+			String search_arrival_japan = new String(
+					request.getParameter("search_arrival_japan").getBytes("ISO-8859-1"), "UTF-8");
+			String search_arrival_soko = new String(request.getParameter("search_arrival_soko").getBytes("ISO-8859-1"),
+					"UTF-8");
+			String radio_soko1 = new String(request.getParameter("radio_soko1").getBytes("ISO-8859-1"), "UTF-8");
+			String radio_soko2 = new String(request.getParameter("radio_soko2").getBytes("ISO-8859-1"), "UTF-8");
+			String radio_soko3 = new String(request.getParameter("radio_soko3").getBytes("ISO-8859-1"), "UTF-8");
+
+			List<list1> list1 = listService.getList1("true", 0, 0, searchId, searchtime_s,
+					searchtime_e, searchcontain_check, searchcontain, searchkeiban, searchedaban, search_arrival_japan,
+					search_arrival_soko, radio_soko1, radio_soko2, radio_soko3);
+
+			object.put("rows", list1);
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+		} catch (UnsupportedEncodingException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+		return object;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/exportList1_2", method = RequestMethod.POST)
+	private JSONObject exportList1_2(HttpServletResponse response, HttpServletRequest request) throws UnsupportedEncodingException {
+		JSONObject object = new JSONObject();
+		List<list1> list1 = listService.getList1_all();
+
+		object.put("rows", list1);
+		response.setHeader("Access-Control-Allow-Origin", "*");
+		response.setHeader("Cache-Control", "no-cache");
 		return object;
 	}
 
@@ -137,6 +200,16 @@ public class listController {
 					list1.setUpdatetime(now);
 					listService.insertList1(list1);
 
+					String getParam = "INSERTINTOlist1" + MyBatisSqlUtils.getParam(list1);
+					list3 list3 = new list3();
+					list3.setUpdate(now);
+					list3.setMessage(getParam);
+					list3.setMode("new");
+					list3.setUser(list1.getUpdater());
+					list3.setUser_id(list1.getUpdater_id());
+					list3.setFunction("listService.insertList1");
+					listService.insertList3(list3);
+
 					List<syouhin> syouhin_ = syouhinService.getSyohinByCode(list1.getCode());
 
 					boolean isHasImg = false;
@@ -145,14 +218,18 @@ public class listController {
 
 					syouhin syouhin = syohnodes.get(i);
 
-					if (syouhin_.get(0).getImg() != null && !"".equals(syouhin_.get(0).getImg())) {
-						isHasImg = true;
-					}
-					if (syouhin_.get(0).getSub_code() != null && !"".equals(syouhin_.get(0).getSub_code())) {
-						isHasSubCode = true;
-					}
-					if (syouhin_.get(0).getItem_name() != null && !"".equals(syouhin_.get(0).getItem_name())) {
-						isHasItemName = true;
+					// ------------------------------- ここ修正したら下のも修正してください  start -------------------------------
+
+					if(syouhin_ != null && syouhin_.size() > 0) {
+						if (syouhin_.get(0).getImg() != null && !"".equals(syouhin_.get(0).getImg())) {
+							isHasImg = true;
+						}
+						if (syouhin_.get(0).getSub_code() != null && !"".equals(syouhin_.get(0).getSub_code())) {
+							isHasSubCode = true;
+						}
+						if (syouhin_.get(0).getItem_name() != null && !"".equals(syouhin_.get(0).getItem_name())) {
+							isHasItemName = true;
+						}
 					}
 
 					if (syouhin_ != null && syouhin_.size() > 0) {
@@ -169,11 +246,13 @@ public class listController {
 								if (isHasImg) {
 									String[] img_sp = syouhin_.get(0).getImg().split("\\|");
 									boolean flag = Arrays.asList(img_sp).contains(syouhin.getImg());
-									if(flag) {
+									if (flag) {
 										syouhin.setImg(syouhin_.get(0).getImg());
 									} else {
 										syouhin.setImg(syouhin_.get(0).getImg() + "|" + syouhin.getImg());
 									}
+								} else {
+									syouhin.setImg("|" + syouhin.getImg());
 								}
 							}
 						} else {
@@ -187,7 +266,7 @@ public class listController {
 							if (isHasSubCode) {
 								String[] subCode_sp = syouhin_.get(0).getSub_code().split("\\|");
 								boolean flag = Arrays.asList(subCode_sp).contains(syouhin.getSub_code());
-								if(flag) {
+								if (flag) {
 									syouhin.setSub_code(syouhin_.get(0).getSub_code());
 								} else {
 									syouhin.setSub_code(syouhin_.get(0).getSub_code() + "|" + syouhin.getSub_code());
@@ -206,15 +285,10 @@ public class listController {
 							if (isHasItemName) {
 								String[] itemname_sp = syouhin_.get(0).getItem_name().split("\\|");
 								boolean flag = Arrays.asList(itemname_sp).contains(syouhin.getItem_name());
-								if(flag) {
+								if (flag) {
 									syouhin.setItem_name(syouhin_.get(0).getItem_name());
 								} else {
 									syouhin.setItem_name(syouhin_.get(0).getItem_name() + "|" + syouhin.getItem_name());
-								}
-								if (!syouhin.getItem_name().equals(syouhin_.get(0).getItem_name())) {
-									syouhin.setItem_name(syouhin_.get(0).getItem_name() + "|" + syouhin.getItem_name());
-								} else {
-									syouhin.setItem_name(syouhin_.get(0).getItem_name());
 								}
 							} else {
 								syouhin.setItem_name("|" + syouhin.getItem_name());
@@ -244,6 +318,8 @@ public class listController {
 							syouhin.setItem_name("|" + syouhin.getItem_name());
 						}
 					}
+
+					// ------------------------------- ここ修正したら下のも修正してください  end -------------------------------
 
 					syouhin.setUpdatetime(now);
 					syouhinService.insertSyoh(syouhin);
@@ -277,6 +353,20 @@ public class listController {
 					.parseInt(new String(request.getParameter("loginuser_id").getBytes("ISO-8859-1"), "UTF-8"));
 			String loginuser = java.net.URLDecoder.decode(request.getParameter("loginuser"), "UTF-8");
 			listService.deleteList1(id, loginuser_id, loginuser);
+			Date now = new Date();
+
+			StringBuffer buf = new StringBuffer();
+			buf = buf.append("UPDATElist1SETlockuser=del|updater=").append(loginuser).append(",`updater-id` =").append(loginuser_id).append("WHERElist1.ID=").append(id);
+			list3 list3 = new list3();
+			list3.setUpdate(now);
+			list3.setMessage(buf.toString());
+			list3.setMode("delete");
+			list3.setUser(loginuser);
+			list3.setUser_id(loginuser_id);
+			list3.setFunction("listService.deleteList1");
+			listService.insertList3(list3);
+
+
 			result result = new result();
 			result.setState(1);
 			object.put("rows", result);
@@ -300,6 +390,8 @@ public class listController {
 
 			list1 list1 = new list1();
 			String updater = java.net.URLDecoder.decode(request.getParameter("updater"), "UTF-8");
+			int loginuser_id = Integer
+					.parseInt(new String(request.getParameter("loginuser_id").getBytes("ISO-8859-1"), "UTF-8"));
 			int id = Integer.parseInt(new String(request.getParameter("id").getBytes("ISO-8859-1"), "UTF-8"));
 			String code = java.net.URLDecoder.decode(request.getParameter("code"), "UTF-8");
 			String sub_code = java.net.URLDecoder.decode(request.getParameter("sub_code"), "UTF-8");
@@ -396,6 +488,7 @@ public class listController {
 			list1.setLockuser(null);
 			list1.setLocktime(null);
 			list1.setUpdater(updater);
+			list1.setUpdater_id(loginuser_id);
 			list1.setUpdatetime(now);
 			list1.setID(id);
 			list1.setCode(code);
@@ -427,13 +520,146 @@ public class listController {
 			list1.setDepth(depth);
 
 			listService.updateList1(list1);
+//			String sql = sqlSessionFactory.getConfiguration()
+//					.getMappedStatement("com.mp.dao.listDao.updateList1").getBoundSql(list1).getSql();
+//			System.out.println(sql);
+			String getParam = "UPDATElist1" + MyBatisSqlUtils.getParam(list1);
+			list3 list3 = new list3();
+			list3.setUpdate(now);
+			list3.setMessage(getParam);
+			list3.setMode("update");
+			list3.setUser(updater);
+			list3.setUser_id(loginuser_id);
+			list3.setFunction("listService.updateList1");
+			listService.insertList3(list3);
 
-			syouhin suSyouhin = new syouhin();
+			syouhin syouhin = new syouhin();
+			syouhin.setUpdater(updater);
+			syouhin.setUpdatetime(now);
+			syouhin.setCode(code);
+			syouhin.setSub_code(sub_code);
+			syouhin.setImg(img);
+			syouhin.setItem_name(item_name);
+			syouhin.setUnit_ch(unit_ch);
+			syouhin.setRate(rate);
+			syouhin.setKg(kg);
+			syouhin.setMaterial(material);
+			syouhin.setMaterial_ch(material_ch);
+			syouhin.setHeight(height);
+			syouhin.setWidth(width);
+			syouhin.setDepth(depth);
+			syouhin.setDoru(ne_stock);
 
 
+			// ------------------------------- ここ修正したら上のも修正してください  start -------------------------------
+			List<syouhin> syouhin_ = syouhinService.getSyohinByCode(code);
 
+			boolean isHasImg = false;
+			boolean isHasSubCode = false;
+			boolean isHasItemName = false;
 
+			if(syouhin_ != null && syouhin_.size() > 0) {
+				if (syouhin_.get(0).getImg() != null && !"".equals(syouhin_.get(0).getImg())) {
+					isHasImg = true;
+				}
+				if (syouhin_.get(0).getSub_code() != null && !"".equals(syouhin_.get(0).getSub_code())) {
+					isHasSubCode = true;
+				}
+				if (syouhin_.get(0).getItem_name() != null && !"".equals(syouhin_.get(0).getItem_name())) {
+					isHasItemName = true;
+				}
+			}
 
+			if (syouhin_ != null && syouhin_.size() > 0) {
+				// img
+				if (syouhin.getImg() != null && !"".equals(syouhin.getImg())) {
+					if (syouhin.getImg().indexOf("fk") != -1 || syouhin.getImg().indexOf("FK") != -1
+							|| syouhin.getImg().indexOf("fx") != -1 || syouhin.getImg().indexOf("ln") != -1) {
+						if (isHasImg) {
+							syouhin.setImg(syouhin.getImg());
+						} else {
+							syouhin.setImg("");
+						}
+					} else {
+						if (isHasImg) {
+							String[] img_sp = syouhin_.get(0).getImg().split("\\|");
+							boolean flag = Arrays.asList(img_sp).contains(syouhin.getImg());
+							if (flag) {
+								syouhin.setImg(syouhin_.get(0).getImg());
+							} else {
+								syouhin.setImg(syouhin_.get(0).getImg() + "|" + syouhin.getImg());
+							}
+						} else {
+							syouhin.setImg("|" + syouhin.getImg());
+						}
+					}
+				} else {
+					if (isHasImg) {
+						syouhin.setImg(syouhin_.get(0).getImg());
+					}
+				}
+
+				// subcode
+				if (syouhin.getSub_code() != null && !"".equals(syouhin.getSub_code())) {
+					if (isHasSubCode) {
+						String[] subCode_sp = syouhin_.get(0).getSub_code().split("\\|");
+						boolean flag = Arrays.asList(subCode_sp).contains(syouhin.getSub_code());
+						if (flag) {
+							syouhin.setSub_code(syouhin_.get(0).getSub_code());
+						} else {
+							syouhin.setSub_code(syouhin_.get(0).getSub_code() + "|" + syouhin.getSub_code());
+						}
+					} else {
+						syouhin.setSub_code("|" + syouhin.getSub_code());
+					}
+				} else {
+					if (isHasSubCode) {
+						syouhin.setSub_code(syouhin_.get(0).getSub_code());
+					}
+				}
+
+				// itemname
+				if (syouhin.getItem_name() != null && !"".equals(syouhin.getItem_name())) {
+					if (isHasItemName) {
+						String[] itemname_sp = syouhin_.get(0).getItem_name().split("\\|");
+						boolean flag = Arrays.asList(itemname_sp).contains(syouhin.getItem_name());
+						if (flag) {
+							syouhin.setItem_name(syouhin_.get(0).getItem_name());
+						} else {
+							syouhin.setItem_name(syouhin_.get(0).getItem_name() + "|" + syouhin.getItem_name());
+						}
+					} else {
+						syouhin.setItem_name("|" + syouhin.getItem_name());
+					}
+				} else {
+					if (isHasItemName) {
+						syouhin.setItem_name(syouhin_.get(0).getItem_name());
+					}
+				}
+			} else {
+				// img
+				if (syouhin.getImg() != null && !"".equals(syouhin.getImg())) {
+					if (syouhin.getImg().indexOf("fk") != -1 || syouhin.getImg().indexOf("FK") != -1
+							|| syouhin.getImg().indexOf("fx") != -1 || syouhin.getImg().indexOf("ln") != -1) {
+						syouhin.setImg("");
+					} else {
+						syouhin.setImg("|" + syouhin.getImg());
+					}
+
+				}
+				// subcode
+				if (syouhin.getSub_code() != null && !"".equals(syouhin.getSub_code())) {
+					syouhin.setSub_code("|" + syouhin.getSub_code());
+				}
+				// itemname
+				if (syouhin.getItem_name() != null && !"".equals(syouhin.getItem_name())) {
+					syouhin.setItem_name("|" + syouhin.getItem_name());
+				}
+			}
+
+			// ------------------------------- ここ修正したら上のも修正してください  start -------------------------------
+
+			syouhinService.insertSyoh(syouhin);
 
 			result result = new result();
 			result.setState(1);
