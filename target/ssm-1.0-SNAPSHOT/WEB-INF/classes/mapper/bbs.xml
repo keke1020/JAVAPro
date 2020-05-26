@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mp.dao.bbsDao">
+	<resultMap type="bbs" id="bbsResult">
+		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<id column="user_id" property="user_id" jdbcType="INTEGER" />
+		<result column="username" property="username" jdbcType="VARCHAR" />
+		<result column="update" property="update" jdbcType="TIMESTAMP" />
+		<result column="message" property="message" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!-- dao接口方法提供sql语句配置 -->
+	<select id="getBBS" resultMap="bbsResult">
+		 SELECT * FROM list2 WHERE `update` >= '0000-00-00' ORDER BY ID DESC LIMIT #{offset}, #{limit}
+	</select>
+
+	<insert id="insertBBS">
+	  insert into list2(`user_id`, `username`, `update`, `message`)
+	  values(
+		#{user_id},
+		#{username},
+		#{update},
+		#{message}
+	)
+	</insert>
+
+	<delete id="deleteBBS" parameterType="bbs">
+		DELETE FROM list2 WHERE ID = #{ID}
+	</delete>
+
+	<select id="getTotal" resultType="java.lang.Integer">
+    	select count(*) from list2
+  	</select>
+
+
+</mapper>
