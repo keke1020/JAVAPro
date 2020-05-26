@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mp.dao.commonDao">
+	<resultMap type="com.mp.dto.option" id="option">
+		<result column="label" property="label" jdbcType="CLOB" />
+		<result column="value" property="value" jdbcType="CLOB" />
+	</resultMap>
+
+	<select id="getArrival_japan" resultMap="option">
+		SELECT DISTINCT
+			(
+				IF (
+					arrival = '0000-00-00 00:00:00',
+					'0000-00-00',
+					arrival
+				)
+			) AS
+		VALUE
+			,
+			arrival AS label
+		FROM
+			list1
+		WHERE
+			(
+				`lockuser` NOT IN ('del')
+				OR `lockuser` IS NULL
+			)
+		ORDER BY
+			arrival DESC
+	</select>
+
+	<select id="getBBS_user" resultMap="option">
+		select DISTINCT username as value,username as label from list2 ORDER BY `update` desc
+	</select>
+
+
+</mapper>

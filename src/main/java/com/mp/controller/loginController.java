@@ -27,7 +27,7 @@ public class loginController {
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	private String index(HttpServletRequest req, HttpSession session) {
 		String pg = null;
-		pg = "login";
+		pg = "hello";
 //		System.out.println(session.getAttribute(system.usr));
 //		if (!"".equals(session.getAttribute(system.usr)) && session.getAttribute(system.usr) != null) {
 //			pg = "index";

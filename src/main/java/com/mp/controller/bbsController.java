@@ -31,11 +31,17 @@ public class bbsController {
 
 	@RequestMapping(value = "/getBBS", method = RequestMethod.POST)
 	@ResponseBody
-	private JSONObject getBBS(HttpServletResponse response, int currentPage) {
+	private JSONObject getBBS(HttpServletResponse response, int currentPage, String bbs_update_s, String bbs_update_e, String bbs_keyword, String bbs_user) {
 		// pagelist:use bootstrap framework
 		int startIndex = (currentPage - 1) * 5;
-		List<bbs> bbs = bbsService.getBBS(startIndex, 5);
-		int total = bbsService.getTotal();
+		if(bbs_update_s != null && !"".equals(bbs_update_s)) {
+			bbs_update_s = bbs_update_s + " 00:00:00";
+		}
+		if(bbs_update_e != null && !"".equals(bbs_update_e)) {
+			bbs_update_e = bbs_update_e + " 00:00:00";
+		}
+		List<bbs> bbs = bbsService.getBBS(bbs_update_s, bbs_update_e, bbs_keyword, bbs_user, startIndex, 5);
+		int total = bbsService.getTotal(bbs_update_s, bbs_update_e, bbs_keyword, bbs_user);
 		JSONObject object = new JSONObject();
 		object.put("total", total);
 		object.put("rows", bbs);

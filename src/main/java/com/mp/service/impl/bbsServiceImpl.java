@@ -14,8 +14,8 @@ public class bbsServiceImpl implements bbsService{
 	@Autowired
 	private bbsDao bbsDao;
 
-	public List<bbs> getBBS(int offset, int limit) {
-		return bbsDao.getBBS(offset, limit);
+	public List<bbs> getBBS(String bbs_update_s, String bbs_update_e, String bbs_keyword, String bbs_user, int offset, int limit) {
+		return bbsDao.getBBS(bbs_update_s, bbs_update_e, bbs_keyword, bbs_user, offset, limit);
 	}
 
 //	public void insertBBS(int loginuser_id, String username, String message, String date) {
@@ -30,8 +30,8 @@ public class bbsServiceImpl implements bbsService{
 		bbsDao.deleteBBS(id);
 	}
 
-	public int getTotal() {
-		return bbsDao.getTotal();
+	public int getTotal(String bbs_update_s, String bbs_update_e, String bbs_keyword, String bbs_user) {
+		return bbsDao.getTotal(bbs_update_s, bbs_update_e, bbs_keyword, bbs_user);
 	}
 
 

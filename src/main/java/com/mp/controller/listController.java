@@ -45,17 +45,6 @@ public class listController {
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 	@ResponseBody
-	@RequestMapping(value = "/getArrival_japan", method = RequestMethod.POST)
-	private JSONObject getArrival_japan(HttpServletResponse response, HttpServletRequest request) {
-		JSONObject object = new JSONObject();
-		List<option> option = listService.getArrival_japan();
-		object.put("rows", option);
-		response.setHeader("Access-Control-Allow-Origin", "*");
-		response.setHeader("Cache-Control", "no-cache");
-		return object;
-	}
-
-	@ResponseBody
 	@RequestMapping(value = "/getList1", method = RequestMethod.POST)
 	private JSONObject getList1(HttpServletResponse response, HttpServletRequest request) {
 		JSONObject object = new JSONObject();
@@ -79,6 +68,7 @@ public class listController {
 					request.getParameter("search_arrival_japan").getBytes("ISO-8859-1"), "UTF-8");
 			String search_arrival_soko = new String(request.getParameter("search_arrival_soko").getBytes("ISO-8859-1"),
 					"UTF-8");
+			String radio_soko0 = new String(request.getParameter("radio_soko0").getBytes("ISO-8859-1"), "UTF-8");
 			String radio_soko1 = new String(request.getParameter("radio_soko1").getBytes("ISO-8859-1"), "UTF-8");
 			String radio_soko2 = new String(request.getParameter("radio_soko2").getBytes("ISO-8859-1"), "UTF-8");
 			String radio_soko3 = new String(request.getParameter("radio_soko3").getBytes("ISO-8859-1"), "UTF-8");
@@ -89,12 +79,12 @@ public class listController {
 			list_currentPage = (list_currentPage - 1) * searchCount;
 
 			int total = listService.getCountAll(searchId, searchtime_s, searchtime_e, searchcontain_check,
-					searchcontain, searchkeiban, searchedaban, search_arrival_japan, search_arrival_soko, radio_soko1,
+					searchcontain, searchkeiban, searchedaban, search_arrival_japan, search_arrival_soko, radio_soko0, radio_soko1,
 					radio_soko2, radio_soko3);
 
 			List<list1> list1 = listService.getList1("false",list_currentPage, searchCount, searchId, searchtime_s,
 					searchtime_e, searchcontain_check, searchcontain, searchkeiban, searchedaban, search_arrival_japan,
-					search_arrival_soko, radio_soko1, radio_soko2, radio_soko3);
+					search_arrival_soko, radio_soko0, radio_soko1, radio_soko2, radio_soko3);
 
 			object.put("total", total);
 			object.put("rows", list1);
@@ -131,13 +121,14 @@ public class listController {
 					request.getParameter("search_arrival_japan").getBytes("ISO-8859-1"), "UTF-8");
 			String search_arrival_soko = new String(request.getParameter("search_arrival_soko").getBytes("ISO-8859-1"),
 					"UTF-8");
+			String radio_soko0 = new String(request.getParameter("radio_soko0").getBytes("ISO-8859-1"), "UTF-8");
 			String radio_soko1 = new String(request.getParameter("radio_soko1").getBytes("ISO-8859-1"), "UTF-8");
 			String radio_soko2 = new String(request.getParameter("radio_soko2").getBytes("ISO-8859-1"), "UTF-8");
 			String radio_soko3 = new String(request.getParameter("radio_soko3").getBytes("ISO-8859-1"), "UTF-8");
 
 			List<list1> list1 = listService.getList1("true", 0, 0, searchId, searchtime_s,
 					searchtime_e, searchcontain_check, searchcontain, searchkeiban, searchedaban, search_arrival_japan,
-					search_arrival_soko, radio_soko1, radio_soko2, radio_soko3);
+					search_arrival_soko, radio_soko0, radio_soko1, radio_soko2, radio_soko3);
 
 			object.put("rows", list1);
 			response.setHeader("Access-Control-Allow-Origin", "*");
