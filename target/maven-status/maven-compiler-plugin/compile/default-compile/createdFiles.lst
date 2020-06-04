@@ -10,8 +10,10 @@ com\mp\entity\list1.class
 com\mp\dto\result.class
 com\mp\controller\listController.class
 com\mp\service\bbsService.class
+com\mp\service\commonService.class
 com\mp\entity\list3.class
 com\mp\controller\bbsController.class
+com\mp\service\impl\commonServiceImpl.class
 com\mp\dto\table.class
 com\mp\entity\bbs.class
 com\mp\filter\sessionFilter.class
@@ -19,9 +21,11 @@ com\mp\entity\user.class
 com\mp\util\MyBatisSqlUtils.class
 com\mp\dao\listDao.class
 com\mp\filter\formTokenInterceptor.class
+com\mp\dao\commonDao.class
 com\mp\util\MyBatisSql.class
 com\mp\dao\bbsDao.class
 com\mp\service\syouhinService.class
+com\mp\controller\commonController.class
 com\mp\filter\formToken.class
 com\mp\dao\userDao.class
 com\mp\dto\system.class

@@ -13,10 +13,9 @@
 	<context:component-scan
 		base-package="com.mp.service" />
 
-	<!-- 配置事务管理器 -->
+	<!-- 配置事务管理器
 	<bean id="transactionManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<!-- 注入数据库连接池 -->
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
@@ -36,7 +35,9 @@
 		</tx:attributes>
 	</tx:advice>
 
-	<!-- 配置基于注解的声明式事务 -->
 	<tx:annotation-driven
-		transaction-manager="transactionManager" />
+		transaction-manager="transactionManager" /> -->
+
+
+
 </beans>

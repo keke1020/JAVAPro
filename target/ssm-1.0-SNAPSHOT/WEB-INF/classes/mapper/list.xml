@@ -98,7 +98,14 @@
 		`info-file2`
 		FROM
 		list1
-		WHERE (`lockuser` NOT IN('del') OR `lockuser` IS NULL)
+		<choose>
+            <when test="radio_soko0 == 'true'">
+                WHERE (`lockuser` NOT IN('del') OR `lockuser` IS NULL)
+            </when>
+            <otherwise>
+                WHERE 1=1
+            </otherwise>
+        </choose>
 		<if test="searchId != null and searchId != ''">
 			AND ID = #{searchId}
 		</if>
@@ -158,8 +165,14 @@
 		count(*)
 		FROM
 		`list1`
-		WHERE (`lockuser` NOT IN('del') OR `lockuser`
-		IS NULL)
+		<choose>
+            <when test="radio_soko0 == 'true'">
+                WHERE (`lockuser` NOT IN('del') OR `lockuser` IS NULL)
+            </when>
+            <otherwise>
+                WHERE 1=1
+            </otherwise>
+        </choose>
 		<if test="searchId != null and searchId != ''">
 			AND ID = #{searchId}
 		</if>
@@ -250,13 +263,6 @@
 		WHERE
 		ID =
 		#{searchId}
-	</select>
-
-	<select id="getArrival_japan" resultMap="option">
-		select
-		DISTINCT(IF(arrival='0000-00-00 00:00:00','0000-00-00',arrival))as
-		value,"" as label from list1 WHERE (`lockuser` NOT IN('del') OR
-		`lockuser` IS NULL) order by arrival desc
 	</select>
 
 	<update id="updateList1" parameterType="com.mp.entity.list1">
