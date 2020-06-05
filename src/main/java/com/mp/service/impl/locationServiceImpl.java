@@ -14,8 +14,12 @@ public class locationServiceImpl implements locationService{
 	@Autowired
 	private locationDao locationDao;
 
-	public List<location> getlocation() {
-		return locationDao.getlocation();
+	public List<location> getlocation(String orderSC, int offset, int limit) {
+		return locationDao.getlocation(orderSC, offset, limit);
+	}
+
+	public int getTotal() {
+		return locationDao.getTotal();
 	}
 
 }

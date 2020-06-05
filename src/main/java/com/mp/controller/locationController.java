@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -114,9 +115,23 @@ public class locationController {
 			}
 
 			DynamicDataSourceHolder.setDataSource("jrt_dataSource");
-			List<location> locations = locationService.getlocation();
-			object.put("rows", locations);
 
+			String orderSC = request.getParameter("orderSC");
+			int searchCount = Integer
+					.parseInt(new String(request.getParameter("searchCount").getBytes("ISO-8859-1"), "UTF-8"));
+			int list_currentPage = Integer
+					.parseInt(new String(request.getParameter("list_currentPage").getBytes("ISO-8859-1"), "UTF-8"));
+			list_currentPage = (list_currentPage - 1) * searchCount;
+
+			List<location> locations = locationService.getlocation(orderSC,list_currentPage, searchCount);
+			for (int i = 0; i < locations.size(); i++) {
+				locations.get(i).setChk(false);
+			}
+
+			int total = locationService.getTotal();
+
+			object.put("rows", locations);
+			object.put("total", total);
 		} catch (Exception e) {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();

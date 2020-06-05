@@ -30,10 +30,79 @@
 	</resultMap>
 
 	<select id="getlocation" resultMap="locationResult">
-		 SELECT * FROM location
+		 SELECT
+			ID,
+			`UPDATE`,
+			`CODE`,
+			`name`,
+			tag,
+			dcode,
+			sw,
+			sw2,
+			kaisou,
+			tana,
+			ksize,
+			sp,
+			t_kbn,
+			`user`,
+			flag,
+			moto,
+			zaiko,
+			hikiate,
+			yoyaku,
+			zaiko_update,
+			sZaiko,
+			sBikou,
+			sTanto
+		FROM
+			location
+		WHERE
+			(`update` >= '0000-00-00')
+		<choose>
+			<when test="orderSC == '順序選択' ">
+				order by `update` desc
+			</when>
+			<when test="orderSC == 'アップデート順' ">
+				order by `update` desc
+			</when>
+			<when test="orderSC == 'コード昇順' ">
+				order by `code`
+			</when>
+			<when test="orderSC == 'コード降順' ">
+				order by `code` desc
+			</when>
+			<when test="orderSC == '棚番昇順' ">
+				order by `tana`
+			</when>
+		</choose>
+		LIMIT #{offset}, #{limit}
 	</select>
 
-
+	<select id="getTotal" resultType="java.lang.Integer">
+		SELECT
+			count(*)
+		FROM
+			location
+		WHERE
+			(`update` >= '0000-00-00')
+		<choose>
+			<when test="orderSC == '順序選択' ">
+				order by `update` desc
+			</when>
+			<when test="orderSC == 'アップデート順' ">
+				order by `update` desc
+			</when>
+			<when test="orderSC == 'コード昇順' ">
+				order by `code`
+			</when>
+			<when test="orderSC == 'コード降順' ">
+				order by `code` desc
+			</when>
+			<when test="orderSC == '棚番昇順' ">
+				order by `tana` desc
+			</when>
+		</choose>
+	</select>
 
 
 </mapper>

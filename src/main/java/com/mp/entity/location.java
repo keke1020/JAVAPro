@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class location {
 	private int ID;
+	private boolean chk;
 	private Date update;
 	private String code;
 	private String name;
@@ -33,6 +34,14 @@ public class location {
 
 	public void setID(int iD) {
 		ID = iD;
+	}
+
+	public boolean isChk() {
+		return chk;
+	}
+
+	public void setChk(boolean chk) {
+		this.chk = chk;
 	}
 
 	public Date getUpdate() {
