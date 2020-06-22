@@ -26,6 +26,8 @@
 		<result column="arrival-depo" property="arrival_depo"
 			jdbcType="CLOB" />
 		<result column="departure" property="departure" jdbcType="DATE" />
+		<result column="arrival" property="arrival" jdbcType="DATE" />
+		<result column="arrival-jikan" property="arrival_jikan" jdbcType="INTEGER" />
 		<result column="unit-ch" property="unit_ch" jdbcType="DOUBLE" />
 		<result column="total-ch" property="total_ch" jdbcType="DOUBLE" />
 		<result column="unit-jp" property="unit_jp" jdbcType="INTEGER" />
@@ -76,6 +78,7 @@
 		date_format(departure, '%Y-%m-%d' ) as
 		departure,
 		date_format(arrival, '%Y-%m-%d' ) as arrival,
+		`arrival-jikan`,
 		`unit-ch`,
 		`unit-jp`,
 		`total-ch`,
@@ -238,6 +241,7 @@
 		`arrival-depo`,
 		date_format(departure, '%Y-%m-%d' ) as departure,
 		date_format(arrival, '%Y-%m-%d' ) as arrival,
+		`arrival-jikan`,
 		`unit-ch`,
 		`unit-jp`,
 		`total-ch`,
@@ -282,6 +286,7 @@
 			<if test="arrival_depo!=null">`arrival-depo`=#{arrival_depo},</if>
 			<if test="departure!=null">departure=#{departure},</if>
 			<if test="arrival!=null">arrival=#{arrival},</if>
+			<if test="arrival_jikan!=null">`arrival-jikan`=#{arrival_jikan},</if>
 			<if test="unit_ch!=null">`unit-ch`=#{unit_ch},</if>
 			<if test="total_ch!=null">`total-ch`=#{total_ch},</if>
 			<if test="unit_jp!=null">`unit-jp`=#{unit_jp},</if>
@@ -322,6 +327,7 @@
 		`arrival-depo`,
 		`departure`,
 		`arrival`,
+		`arrival-jikan`,
 		`unit-ch`,
 		`total-ch`,
 		`unit-jp`,
@@ -370,6 +376,7 @@
 				'0000-00-00',
 			</otherwise>
 		</choose>
+		#{arrival_jikan},
 		#{unit_ch},
 		#{total_ch},
 		#{unit_jp},

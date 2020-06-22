@@ -174,9 +174,10 @@ public class listController {
 	private JSONObject insertList1(HttpServletResponse response, HttpServletRequest request, @RequestBody String params)
 			throws Exception {
 		JSONObject object = new JSONObject();
+
 		try {
-			JSONObject j1 = JSONObject.parseObject(params);
 			request.setCharacterEncoding("utf-8");
+			JSONObject j1 = JSONObject.parseObject(params);
 			List<list1> listnodes = JSONObject.parseArray(j1.getJSONArray("params").toJSONString(), list1.class);
 			List<syouhin> syohnodes = JSONObject.parseArray(j1.getJSONArray("params").toJSONString(), syouhin.class);
 			Date now = new Date();
@@ -322,7 +323,7 @@ public class listController {
 			object.put("rows", result);
 			response.setHeader("Access-Control-Allow-Origin", "*");
 			response.setHeader("Cache-Control", "no-cache");
-		} catch (UnsupportedEncodingException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			result result = new result();
 			result.setState(0);
@@ -406,6 +407,11 @@ public class listController {
 			Date arrival = null;
 			if (request.getParameter("arrival") != null && !"".equals(request.getParameter("arrival"))) {
 				arrival = sdf.parse(new String(request.getParameter("arrival").getBytes("ISO-8859-1"), "UTF-8"));
+			}
+			int arrival_jikan = 0;
+			if (request.getParameter("arrival_jikan") != null && !"".equals(request.getParameter("arrival_jikan"))) {
+				arrival_jikan = Integer
+						.parseInt(new String(request.getParameter("arrival_jikan").getBytes("ISO-8859-1"), "UTF-8"));
 			}
 			int fba_stock = 0;
 			if (request.getParameter("fba_stock") != null && !"".equals(request.getParameter("fba_stock"))) {
@@ -491,6 +497,7 @@ public class listController {
 			list1.setArrival_depo(arrival_depo);
 			list1.setDeparture(departure);
 			list1.setArrival(arrival);
+			list1.setArrival_jikan(arrival_jikan);
 			list1.setFba_stock(fba_stock);
 			list1.setUnit_ch(unit_ch);
 			list1.setTotal_ch(total_ch);

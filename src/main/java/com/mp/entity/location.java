@@ -2,9 +2,13 @@ package com.mp.entity;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class location {
 	private int ID;
+	private String router_index;
 	private boolean chk;
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date update;
 	private String code;
 	private String name;
@@ -18,15 +22,18 @@ public class location {
 	private String sp;
 	private String t_kbn;
 	private String user;
+	private int user_id;
 	private String flag;
 	private String moto;
-	private int zaiko;
-	private int hikiate;
+	private Integer zaiko;
+	private Integer hikiate;
 	private String yoyaku;
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date zaiko_update;
-	private int sZaiko;
+	private Integer sZaiko;
 	private String sBikou;
 	private String sTanto;
+	private String img;
 
 	public int getID() {
 		return ID;
@@ -34,6 +41,14 @@ public class location {
 
 	public void setID(int iD) {
 		ID = iD;
+	}
+
+	public String getRouter_index() {
+		return router_index;
+	}
+
+	public void setRouter_index(String router_index) {
+		this.router_index = router_index;
 	}
 
 	public boolean isChk() {
@@ -148,6 +163,14 @@ public class location {
 		this.user = user;
 	}
 
+	public int getUser_id() {
+		return user_id;
+	}
+
+	public void setUser_id(int user_id) {
+		this.user_id = user_id;
+	}
+
 	public String getFlag() {
 		return flag;
 	}
@@ -164,19 +187,19 @@ public class location {
 		this.moto = moto;
 	}
 
-	public int getZaiko() {
+	public Integer getZaiko() {
 		return zaiko;
 	}
 
-	public void setZaiko(int zaiko) {
+	public void setZaiko(Integer zaiko) {
 		this.zaiko = zaiko;
 	}
 
-	public int getHikiate() {
+	public Integer getHikiate() {
 		return hikiate;
 	}
 
-	public void setHikiate(int hikiate) {
+	public void setHikiate(Integer hikiate) {
 		this.hikiate = hikiate;
 	}
 
@@ -196,11 +219,11 @@ public class location {
 		this.zaiko_update = zaiko_update;
 	}
 
-	public int getsZaiko() {
+	public Integer getsZaiko() {
 		return sZaiko;
 	}
 
-	public void setsZaiko(int sZaiko) {
+	public void setsZaiko(Integer sZaiko) {
 		this.sZaiko = sZaiko;
 	}
 
@@ -218,6 +241,14 @@ public class location {
 
 	public void setsTanto(String sTanto) {
 		this.sTanto = sTanto;
+	}
+
+	public String getImg() {
+		return img;
+	}
+
+	public void setImg(String img) {
+		this.img = img;
 	}
 
 }

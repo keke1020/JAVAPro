@@ -1,5 +1,6 @@
 package com.mp.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,16 +11,73 @@ import com.mp.entity.location;
 import com.mp.service.locationService;
 
 @Service
-public class locationServiceImpl implements locationService{
+public class locationServiceImpl implements locationService {
 	@Autowired
 	private locationDao locationDao;
 
-	public List<location> getlocation(String orderSC, int offset, int limit) {
-		return locationDao.getlocation(orderSC, offset, limit);
+	public List<location> getlocation(String searchFlag, String istana, String orderSC, String t_kbn, String singuZaiko,
+			String codeSc, String containerSc, String kaisosc, String tanaSc, String kosuSC1, String kosuSC2,
+			String limitFlag,int offset, int limit) {
+		return locationDao.getlocation(searchFlag, istana, orderSC, t_kbn, singuZaiko, codeSc, containerSc, kaisosc,
+				tanaSc, kosuSC1, kosuSC2,limitFlag, offset, limit);
 	}
 
-	public int getTotal() {
-		return locationDao.getTotal();
+	public int getTotal(String searchFlag, String istana, String orderSC, String t_kbn, String singuZaiko,
+			String codeSc, String containerSc, String kaisosc, String tanaSc, String kosuSC1, String kosuSC2) {
+		return locationDao.getTotal(searchFlag, istana, orderSC, t_kbn, singuZaiko, codeSc, containerSc, kaisosc,
+				tanaSc, kosuSC1, kosuSC2);
+	}
+
+	public int getChangeCount() {
+		return locationDao.getChangeCount();
+	}
+
+	public void editlocation(location lo) {
+		locationDao.editlocation(lo);
+	}
+
+	public int getLocationCountById(String id) {
+		return locationDao.getLocationCountById(id);
+	}
+
+	public int getLocationCountByIds(String[] ids) {
+		return locationDao.getLocationCountByIds(ids);
+	}
+
+	public List<location> getLocationById(String id) {
+		return locationDao.getLocationById(id);
+	}
+
+	public List<location> getLocationByIds(String[] ids) {
+		return locationDao.getLocationByIds(ids);
+	}
+
+	public void deleteLocationByIds(String[] ids) {
+		locationDao.deleteLocationByIds(ids);
+	}
+
+	public void updateByCSV1(List<location> lo) {
+		locationDao.updateByCSV1(lo);
+	}
+
+	public void updateByCSV2(List<location> lo) {
+		locationDao.updateByCSV2(lo);
+	}
+
+	public void updateByCSV3(List<location> lo) {
+		locationDao.updateByCSV3(lo);
+	}
+
+	public void deleteByCSV(List<location> lo) {
+		locationDao.deleteByCSV(lo);
+	}
+
+	public void insertByCSV1(List<location> lo) {
+		locationDao.insertByCSV1(lo);
+	}
+
+	public void insertByCSV2(List<location> lo) {
+		locationDao.insertByCSV2(lo);
 	}
 
 }

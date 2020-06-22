@@ -1,48 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/context
-	http://www.springframework.org/schema/context/spring-context.xsd">
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd">
 	<!-- 配置整合mybatis过程 -->
 	<!-- 1.配置数据库相关参数properties的属性：${url} -->
-	<context:property-placeholder location="classpath:spring/jdbc.properties" />
+	<!-- old -->
+	<!-- <context:property-placeholder location="classpath:spring/jdbc.properties" /> -->
 
 	<!-- 2.数据库连接池 -->
-	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+	<!-- <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
 		<property name="driverClass" value="${jdbc.driver}" />
 		<property name="jdbcUrl" value="${jdbc.url}" />
 		<property name="user" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
 
-		<!-- c3p0连接池的私有属性 -->
 		<property name="maxPoolSize" value="30" />
 		<property name="minPoolSize" value="10" />
-		<!-- commit -->
 		<property name="autoCommitOnClose" value="false" />
-		<!-- 获取连接超时时间 -->
 		<property name="checkoutTimeout" value="10000" />
-		<!-- 当获取连接失败重试次数 -->
 		<property name="acquireRetryAttempts" value="2" />
-	</bean>
+	</bean> -->
 
 	<!-- 3.配置SqlSessionFactory对象 -->
-	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	<!-- <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
-		<!-- MyBaties全局配置文件:mybatis-config.xml -->
 		<property name="configLocation" value="classpath:spring/mybatis-config.xml" />
-		<!-- entity包 使用别名 -->
 		<property name="typeAliasesPackage" value="com.mp.entity" />
-		<!-- sql配置文件:mapper需要的xml文件 -->
 		<property name="mapperLocations" value="classpath:mapper/*.xml" />
-	</bean>
+	</bean> -->
 
 	<!-- 4.配置扫描Dao接口包，动态实现Dao接口，注入到spring容器中 -->
-	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<!-- 注入sqlSessionFactory -->
+	<!-- <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
-		<!-- Dao接口包 -->
 		<property name="basePackage" value="com.mp.dao" />
-	</bean>
+	</bean> -->
+
+	<!-- old -->
+
+	<!-- new https://www.cnblogs.com/MagicAsa/p/11089329.html -->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:spring/jdbc2.properties"/>
+    </bean>
+
+	<bean id="defultdataSource" class="org.apache.commons.dbcp2.BasicDataSource"
+	          destroy-method="close">
+        <property name="driverClassName" value="${driverClass}"/>
+        <property name="url" value="${jdbcUrl}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+        <property name="initialSize" value="${initialSize}"></property>
+        <!-- <property name="maxActive" value="${maxActive}"></property> -->
+        <property name="maxIdle" value="${maxIdle}"></property>
+        <property name="minIdle" value="${minIdle}"></property>
+        <!-- <property name="maxWait" value="${maxWait}"></property> -->
+    </bean>
+
+    <bean id="jrt_dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
+          destroy-method="close">
+        <property name="driverClassName" value="${jrt_driverClass}"/>
+        <property name="url" value="${jrt_jdbcUrl}"/>
+        <property name="username" value="${jrt_username}"/>
+        <property name="password" value="${jrt_password}"/>
+        <property name="initialSize" value="${initialSize}"></property>
+        <property name="maxIdle" value="${maxIdle}"></property>
+        <property name="minIdle" value="${minIdle}"></property>
+        <!-- <property name="maxWait" value="${maxWait}"></property> -->
+    </bean>
+
+	<bean id="dataSource" class="com.mp.common.DynamicDataSource">
+	        <property name="targetDataSources">
+	            <map key-type="java.lang.String">
+	                <!-- 指定lookupKey和与之对应的数据源，这里的key可以自行定义，要切换数据库的时候以key为标识，不要写错 -->
+	                <entry key="defultdataSource" value-ref="defultdataSource"></entry>
+	                <entry key="jrt_dataSource" value-ref="jrt_dataSource"></entry>
+	            </map>
+	        </property>
+        <property name="defaultTargetDataSource" ref="defultdataSource" />
+    </bean>
+
+	<!-- mybatis和spring完美整合，不需要mybatis的配置映射文件 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:spring/mybatis-config.xml" />
+		<property name="typeAliasesPackage" value="com.mp.entity" />
+		<property name="mapperLocations" value="classpath:mapper/*.xml" />
+    </bean>
+
+    <!-- DAO接口所在包名，Spring会自动查找其下的类 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+		<property name="basePackage" value="com.mp.dao" />
+    </bean>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+	<!-- new -->
+
+
 </beans>
