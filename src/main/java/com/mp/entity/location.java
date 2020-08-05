@@ -25,6 +25,7 @@ public class location {
 	private int user_id;
 	private String flag;
 	private String moto;
+	private String moto_old;
 	private Integer zaiko;
 	private Integer hikiate;
 	private String yoyaku;
@@ -185,6 +186,14 @@ public class location {
 
 	public void setMoto(String moto) {
 		this.moto = moto;
+	}
+
+	public String getMoto_old() {
+		return moto_old;
+	}
+
+	public void setMoto_old(String moto_old) {
+		this.moto_old = moto_old;
 	}
 
 	public Integer getZaiko() {

@@ -9,12 +9,12 @@ import com.mp.entity.list3;
 public interface listService {
 	List<list1> getList1(String exportFlag,int offset, int limit, String searchId, String searchtime_s, String searchtime_e,
 			String searchcontain_check, String searchcontain, String searchkeiban, String searchedaban,
-			String search_arrival_japan, String search_arrival_soko, String radio_soko0, String radio_soko1, String radio_soko2,
+			String search_arrival_japan, String search_arrival_jikan, String search_arrival_flag, String search_arrival_soko, String radio_soko0, String radio_soko1, String radio_soko2,
 			String radio_soko3);
 
 	int getCountAll(String searchId, String searchtime_s, String searchtime_e, String searchcontain_check,
 			String searchcontain, String searchkeiban, String searchedaban, String search_arrival_japan,
-			String search_arrival_soko, String radio_soko0, String radio_soko1, String radio_soko2, String radio_soko3);
+			String search_arrival_jikan, String search_arrival_flag, String search_arrival_soko, String radio_soko0, String radio_soko1, String radio_soko2, String radio_soko3);
 
 	List<list1> getList1ById(String id);
 

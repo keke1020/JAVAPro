@@ -59,8 +59,11 @@
 		sTanto
 		FROM
 		location
-		WHERE
-		(`update` >= '0000-00-00')
+		WHERE 1 = 1
+		<if test="commonFlag == 'false'">
+			AND (`update` >= '0000-00-00')
+		</if>
+
 		<if test="searchFlag == 'true'">
 			<choose>
 				<when test="istana == 'false'">
@@ -135,6 +138,20 @@
 		<foreach collection="ids" item="id" index="index" open="("
 			close=")" separator=",">
 			#{id}
+		</foreach>
+	</select>
+
+	<select id="getLocationCountByCodes"
+		resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		location
+		WHERE
+		`code` in
+		<foreach collection="codes" item="code" index="index" open="("
+			close=")" separator=",">
+			#{code}
 		</foreach>
 	</select>
 
@@ -275,17 +292,17 @@
 	<update id="editlocation" parameterType="com.mp.entity.location">
 		UPDATE `location`
 		<trim prefix="set" suffixOverrides=",">
-			<choose>
-				<when test="router_index == 'one'">
+				<!-- when test="router_index == 'one'"> -->
 					`update` = #{update},
 					`kaisou` = #{kaisou},
 					`tana` =
 					#{tana},
 					`sw` = #{sw},
 					`user` = #{user},
-					`moto` = #{moto}
-				</when>
-			</choose>
+					`moto` = #{moto},
+					`sZaiko` = #{sZaiko},
+					`sBikou` = #{sBikou},
+				<!--/when -->
 		</trim>
 		WHERE `ID` = #{ID}
 	</update>
@@ -474,14 +491,16 @@
 	<delete id="deleteByCSV">
 		DELETE FROM `location`
 		WHERE `code` IN
+		(
 		<foreach collection="list" item="item" index="index"
 			separator=",">
-			(
 			#{item.code}
-			)
 		</foreach>
+		)
 	</delete>
 
-
+<update id="updateShinguByCode" parameterType="com.mp.entity.location">
+		UPDATE `location` set`sZaiko` = #{sZaiko}, `user_id` = #{user_id} WHERE `code` = #{code}
+	</update>
 
 </mapper>

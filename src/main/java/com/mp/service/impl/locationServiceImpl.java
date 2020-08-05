@@ -15,10 +15,10 @@ public class locationServiceImpl implements locationService {
 	@Autowired
 	private locationDao locationDao;
 
-	public List<location> getlocation(String searchFlag, String istana, String orderSC, String t_kbn, String singuZaiko,
+	public List<location> getlocation(String searchFlag, String commonFlag,String istana, String orderSC, String t_kbn, String singuZaiko,
 			String codeSc, String containerSc, String kaisosc, String tanaSc, String kosuSC1, String kosuSC2,
 			String limitFlag,int offset, int limit) {
-		return locationDao.getlocation(searchFlag, istana, orderSC, t_kbn, singuZaiko, codeSc, containerSc, kaisosc,
+		return locationDao.getlocation(searchFlag, commonFlag, istana, orderSC, t_kbn, singuZaiko, codeSc, containerSc, kaisosc,
 				tanaSc, kosuSC1, kosuSC2,limitFlag, offset, limit);
 	}
 
@@ -42,6 +42,10 @@ public class locationServiceImpl implements locationService {
 
 	public int getLocationCountByIds(String[] ids) {
 		return locationDao.getLocationCountByIds(ids);
+	}
+
+	public int getLocationCountByCodes(String[] codes) {
+		return locationDao.getLocationCountByCodes(codes);
 	}
 
 	public List<location> getLocationById(String id) {
@@ -79,5 +83,11 @@ public class locationServiceImpl implements locationService {
 	public void insertByCSV2(List<location> lo) {
 		locationDao.insertByCSV2(lo);
 	}
+
+	public void updateShinguByCode(location lo) {
+		locationDao.updateShinguByCode(lo);
+	}
+
+
 
 }

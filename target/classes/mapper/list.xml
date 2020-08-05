@@ -28,6 +28,7 @@
 		<result column="departure" property="departure" jdbcType="DATE" />
 		<result column="arrival" property="arrival" jdbcType="DATE" />
 		<result column="arrival-jikan" property="arrival_jikan" jdbcType="INTEGER" />
+		<result column="arrival-flag" property="arrival_flag" jdbcType="INTEGER" />
 		<result column="unit-ch" property="unit_ch" jdbcType="DOUBLE" />
 		<result column="total-ch" property="total_ch" jdbcType="DOUBLE" />
 		<result column="unit-jp" property="unit_jp" jdbcType="INTEGER" />
@@ -79,6 +80,7 @@
 		departure,
 		date_format(arrival, '%Y-%m-%d' ) as arrival,
 		`arrival-jikan`,
+		`arrival-flag`,
 		`unit-ch`,
 		`unit-jp`,
 		`total-ch`,
@@ -133,6 +135,14 @@
 		</if>
 		<if test="radio_soko1 == 'false'">
 			OR (`arrival` = '0000-00-00'))
+		</if>
+		<if
+			test="search_arrival_jikan != null and search_arrival_jikan != ''">
+			AND (`arrival-jikan` = #{search_arrival_jikan})
+		</if>
+		<if
+			test="search_arrival_flag != null and search_arrival_flag != ''">
+			AND (`arrival-flag` = #{search_arrival_flag})
 		</if>
 		<if test="searchcontain_check == 'false'">
 			AND (`container` = '')
@@ -201,6 +211,14 @@
 		<if test="radio_soko1 == 'false'">
 			OR (`arrival` = '0000-00-00'))
 		</if>
+		<if
+			test="search_arrival_jikan != null and search_arrival_jikan != ''">
+			AND (`arrival-jikan` = #{search_arrival_jikan})
+		</if>
+		<if
+			test="search_arrival_flag != null and search_arrival_flag != ''">
+			AND (`arrival-flag` = #{search_arrival_flag})
+		</if>
 		<if test="searchcontain_check == 'false'">
 			AND (`container` = '')
 		</if>
@@ -215,7 +233,7 @@
 		</if>
 		<if
 			test="search_arrival_soko != null and search_arrival_soko != ''">
-			AND (`arrival-depo` like #{search_arrival_soko})
+			AND (`arrival-depo` = #{search_arrival_soko})
 		</if>
 		<if test="radio_soko2 == 'true'">
 			AND (`fba-stock` > '0')
@@ -242,6 +260,7 @@
 		date_format(departure, '%Y-%m-%d' ) as departure,
 		date_format(arrival, '%Y-%m-%d' ) as arrival,
 		`arrival-jikan`,
+		`arrival-flag`,
 		`unit-ch`,
 		`unit-jp`,
 		`total-ch`,
@@ -287,6 +306,7 @@
 			<if test="departure!=null">departure=#{departure},</if>
 			<if test="arrival!=null">arrival=#{arrival},</if>
 			<if test="arrival_jikan!=null">`arrival-jikan`=#{arrival_jikan},</if>
+			<if test="arrival_flag!=null">`arrival-flag`=#{arrival_flag},</if>
 			<if test="unit_ch!=null">`unit-ch`=#{unit_ch},</if>
 			<if test="total_ch!=null">`total-ch`=#{total_ch},</if>
 			<if test="unit_jp!=null">`unit-jp`=#{unit_jp},</if>
@@ -328,6 +348,7 @@
 		`departure`,
 		`arrival`,
 		`arrival-jikan`,
+		`arrival-flag`,
 		`unit-ch`,
 		`total-ch`,
 		`unit-jp`,
@@ -377,6 +398,7 @@
 			</otherwise>
 		</choose>
 		#{arrival_jikan},
+		#{arrival_flag},
 		#{unit_ch},
 		#{total_ch},
 		#{unit_jp},

@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import com.mp.entity.location;
 
 public interface locationDao {
-	List<location> getlocation(@Param("searchFlag") String searchFlag, @Param("istana") String istana,
+	List<location> getlocation(@Param("searchFlag") String searchFlag, @Param("commonFlag") String commonFlag,@Param("istana") String istana,
 			@Param("orderSC") String orderSC, @Param("t_kbn") String t_kbn, @Param("singuZaiko") String singuZaiko,
 			@Param("codeSc") String codeSc, @Param("containerSc") String containerSc, @Param("kaisosc") String kaisosc,
 			@Param("tanaSc") String tanaSc, @Param("kosuSC1") String kosuSC1, @Param("kosuSC2") String kosuSC2,
@@ -24,6 +24,7 @@ public interface locationDao {
 	void editlocation(location lo);
 	int getLocationCountById(@Param("id") String id);
 	int getLocationCountByIds(@Param("ids") String[] ids);
+	int getLocationCountByCodes(@Param("codes") String[] codes);
 	List<location> getLocationById(@Param("id") String id);
 	List<location> getLocationByIds(@Param("ids") String[] ids);
 	void deleteLocationByIds(@Param("ids") String[] ids);
@@ -33,6 +34,6 @@ public interface locationDao {
 	void deleteByCSV(@Param("list") List<location> lo);
 	void insertByCSV1(@Param("list") List<location> lo);
 	void insertByCSV2(@Param("list") List<location> lo);
-
+	void updateShinguByCode(location lo);
 
 }

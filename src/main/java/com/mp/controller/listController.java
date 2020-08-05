@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
-import com.mp.dto.option;
 import com.mp.dto.result;
 import com.mp.entity.list1;
 import com.mp.entity.list3;
@@ -66,6 +65,10 @@ public class listController {
 			String searchedaban = new String(request.getParameter("searchedaban").getBytes("ISO-8859-1"), "UTF-8");
 			String search_arrival_japan = new String(
 					request.getParameter("search_arrival_japan").getBytes("ISO-8859-1"), "UTF-8");
+			String search_arrival_jikan = new String(
+					request.getParameter("search_arrival_jikan").getBytes("ISO-8859-1"), "UTF-8");
+			String search_arrival_flag = new String(request.getParameter("search_arrival_flag").getBytes("ISO-8859-1"),
+					"UTF-8");
 			String search_arrival_soko = new String(request.getParameter("search_arrival_soko").getBytes("ISO-8859-1"),
 					"UTF-8");
 			String radio_soko0 = new String(request.getParameter("radio_soko0").getBytes("ISO-8859-1"), "UTF-8");
@@ -79,12 +82,13 @@ public class listController {
 			list_currentPage = (list_currentPage - 1) * searchCount;
 
 			int total = listService.getCountAll(searchId, searchtime_s, searchtime_e, searchcontain_check,
-					searchcontain, searchkeiban, searchedaban, search_arrival_japan, search_arrival_soko, radio_soko0, radio_soko1,
-					radio_soko2, radio_soko3);
+					searchcontain, searchkeiban, searchedaban, search_arrival_japan, search_arrival_jikan,
+					search_arrival_flag, search_arrival_soko, radio_soko0, radio_soko1, radio_soko2, radio_soko3);
 
-			List<list1> list1 = listService.getList1("false",list_currentPage, searchCount, searchId, searchtime_s,
+			List<list1> list1 = listService.getList1("false", list_currentPage, searchCount, searchId, searchtime_s,
 					searchtime_e, searchcontain_check, searchcontain, searchkeiban, searchedaban, search_arrival_japan,
-					search_arrival_soko, radio_soko0, radio_soko1, radio_soko2, radio_soko3);
+					search_arrival_jikan, search_arrival_flag, search_arrival_soko, radio_soko0, radio_soko1,
+					radio_soko2, radio_soko3);
 
 			object.put("total", total);
 			object.put("rows", list1);
@@ -119,6 +123,10 @@ public class listController {
 			String searchedaban = new String(request.getParameter("searchedaban").getBytes("ISO-8859-1"), "UTF-8");
 			String search_arrival_japan = new String(
 					request.getParameter("search_arrival_japan").getBytes("ISO-8859-1"), "UTF-8");
+			String search_arrival_jikan = new String(
+					request.getParameter("search_arrival_jikan").getBytes("ISO-8859-1"), "UTF-8");
+			String search_arrival_flag = new String(request.getParameter("search_arrival_flag").getBytes("ISO-8859-1"),
+					"UTF-8");
 			String search_arrival_soko = new String(request.getParameter("search_arrival_soko").getBytes("ISO-8859-1"),
 					"UTF-8");
 			String radio_soko0 = new String(request.getParameter("radio_soko0").getBytes("ISO-8859-1"), "UTF-8");
@@ -126,9 +134,10 @@ public class listController {
 			String radio_soko2 = new String(request.getParameter("radio_soko2").getBytes("ISO-8859-1"), "UTF-8");
 			String radio_soko3 = new String(request.getParameter("radio_soko3").getBytes("ISO-8859-1"), "UTF-8");
 
-			List<list1> list1 = listService.getList1("true", 0, 0, searchId, searchtime_s,
-					searchtime_e, searchcontain_check, searchcontain, searchkeiban, searchedaban, search_arrival_japan,
-					search_arrival_soko, radio_soko0, radio_soko1, radio_soko2, radio_soko3);
+			List<list1> list1 = listService.getList1("true", 0, 0, searchId, searchtime_s, searchtime_e,
+					searchcontain_check, searchcontain, searchkeiban, searchedaban, search_arrival_japan,
+					search_arrival_jikan, search_arrival_flag, search_arrival_soko, radio_soko0, radio_soko1,
+					radio_soko2, radio_soko3);
 
 			object.put("rows", list1);
 			response.setHeader("Access-Control-Allow-Origin", "*");
@@ -142,7 +151,8 @@ public class listController {
 
 	@ResponseBody
 	@RequestMapping(value = "/exportList1_2", method = RequestMethod.POST)
-	private JSONObject exportList1_2(HttpServletResponse response, HttpServletRequest request) throws UnsupportedEncodingException {
+	private JSONObject exportList1_2(HttpServletResponse response, HttpServletRequest request)
+			throws UnsupportedEncodingException {
 		JSONObject object = new JSONObject();
 		List<list1> list1 = listService.getList1_all();
 
@@ -210,9 +220,10 @@ public class listController {
 
 					syouhin syouhin = syohnodes.get(i);
 
-					// ------------------------------- ここ修正したら下のも修正してください  start -------------------------------
+					// ------------------------------- ここ修正したら下のも修正してください start
+					// -------------------------------
 
-					if(syouhin_ != null && syouhin_.size() > 0) {
+					if (syouhin_ != null && syouhin_.size() > 0) {
 						if (syouhin_.get(0).getImg() != null && !"".equals(syouhin_.get(0).getImg())) {
 							isHasImg = true;
 						}
@@ -311,7 +322,8 @@ public class listController {
 						}
 					}
 
-					// ------------------------------- ここ修正したら下のも修正してください  end -------------------------------
+					// ------------------------------- ここ修正したら下のも修正してください end
+					// -------------------------------
 
 					syouhin.setUpdatetime(now);
 					syouhinService.insertSyoh(syouhin);
@@ -348,7 +360,8 @@ public class listController {
 			Date now = new Date();
 
 			StringBuffer buf = new StringBuffer();
-			buf = buf.append("UPDATElist1SETlockuser=del|updater=").append(loginuser).append(",`updater-id` =").append(loginuser_id).append("WHERElist1.ID=").append(id);
+			buf = buf.append("UPDATElist1SETlockuser=del|updater=").append(loginuser).append(",`updater-id` =")
+					.append(loginuser_id).append("WHERElist1.ID=").append(id);
 			list3 list3 = new list3();
 			list3.setUpdate(now);
 			list3.setMessage(buf.toString());
@@ -357,7 +370,6 @@ public class listController {
 			list3.setUser_id(loginuser_id);
 			list3.setFunction("listService.deleteList1");
 			listService.insertList3(list3);
-
 
 			result result = new result();
 			result.setState(1);
@@ -412,6 +424,11 @@ public class listController {
 			if (request.getParameter("arrival_jikan") != null && !"".equals(request.getParameter("arrival_jikan"))) {
 				arrival_jikan = Integer
 						.parseInt(new String(request.getParameter("arrival_jikan").getBytes("ISO-8859-1"), "UTF-8"));
+			}
+			int arrival_flag = 0;
+			if (request.getParameter("arrival_flag") != null && !"".equals(request.getParameter("arrival_flag"))) {
+				arrival_flag = Integer
+						.parseInt(new String(request.getParameter("arrival_flag").getBytes("ISO-8859-1"), "UTF-8"));
 			}
 			int fba_stock = 0;
 			if (request.getParameter("fba_stock") != null && !"".equals(request.getParameter("fba_stock"))) {
@@ -498,6 +515,7 @@ public class listController {
 			list1.setDeparture(departure);
 			list1.setArrival(arrival);
 			list1.setArrival_jikan(arrival_jikan);
+			list1.setArrival_flag(arrival_flag);
 			list1.setFba_stock(fba_stock);
 			list1.setUnit_ch(unit_ch);
 			list1.setTotal_ch(total_ch);
@@ -548,15 +566,15 @@ public class listController {
 			syouhin.setDepth(depth);
 			syouhin.setDoru(ne_stock);
 
-
-			// ------------------------------- ここ修正したら上のも修正してください  start -------------------------------
+			// ------------------------------- ここ修正したら上のも修正してください start
+			// -------------------------------
 			List<syouhin> syouhin_ = syouhinService.getSyohinByCode(code);
 
 			boolean isHasImg = false;
 			boolean isHasSubCode = false;
 			boolean isHasItemName = false;
 
-			if(syouhin_ != null && syouhin_.size() > 0) {
+			if (syouhin_ != null && syouhin_.size() > 0) {
 				if (syouhin_.get(0).getImg() != null && !"".equals(syouhin_.get(0).getImg())) {
 					isHasImg = true;
 				}
@@ -655,7 +673,8 @@ public class listController {
 				}
 			}
 
-			// ------------------------------- ここ修正したら上のも修正してください  start -------------------------------
+			// ------------------------------- ここ修正したら上のも修正してください start
+			// -------------------------------
 
 			syouhinService.insertSyoh(syouhin);
 

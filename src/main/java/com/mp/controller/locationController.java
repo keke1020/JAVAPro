@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -33,6 +35,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,9 +48,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.alibaba.fastjson.JSONObject;
 import com.mp.common.DynamicDataSourceHolder;
 import com.mp.dto.result;
+import com.mp.dto.system;
 import com.mp.entity.location;
 import com.mp.entity.location_up;
 import com.mp.service.locationService;
+import com.mp.util.CommonUtil;
 import com.mp.util.CsvExportUtil;
 import com.mp.util.FileCharDetecter;
 import com.mp.util.FileUtil;
@@ -110,8 +115,6 @@ public class locationController {
 				updateFlag = true;
 			}
 
-			result result = new result();
-
 			DynamicDataSourceHolder.setDataSource("jrt_dataSource");
 
 			int changeCount_ = 0;
@@ -125,7 +128,7 @@ public class locationController {
 				Files.copy(path_masterDB, path_file, StandardCopyOption.REPLACE_EXISTING);
 
 //				int error_no = UpdateLocationByCsv(1, file_name, loginuser_id, loginuser);
-				location_up location_up = UpdateLocationByCsv(1, file_name, null,  loginuser_id, loginuser);
+				location_up location_up = UpdateLocationByCsv(1, file_name, null, loginuser_id, loginuser);
 
 				Date master_d = Date.from(instant_master);
 				SimpleDateFormat formatter = new SimpleDateFormat("MMMM-dd-yyyy HH:mm:ss", Locale.ENGLISH);
@@ -140,21 +143,15 @@ public class locationController {
 					out.flush();
 					out.close();
 				} else if (location_up.getErrorno() == 1) {
-					result.setState(1);
-					result.setMsg("csvファイルをアップロードしてください。");
-					object.put("result", result);
-					return object;
+					object.put("resultMsg", "csvファイルをアップロードしてください。");
 				} else if (location_up.getErrorno() == 2) {
-					result.setState(1);
-					result.setMsg("ファイルの種類が異なるため更新できません。");
-					object.put("result", result);
-					return object;
+					object.put("resultMsg", "ファイルの種類が異なるため更新できません。");
 				}
 
 				changeCount_ = location_up.getChangeCount();
 				newCount_ = location_up.getNewCount();
+				object.put("updateFlag", "true");
 			}
-
 
 			String searchFlag = request.getParameter("searchFlag");
 			String istana = request.getParameter("istana");
@@ -174,8 +171,9 @@ public class locationController {
 					.parseInt(new String(request.getParameter("list_currentPage").getBytes("ISO-8859-1"), "UTF-8"));
 			list_currentPage = (list_currentPage - 1) * searchCount;
 
-			List<location> locations = locationService.getlocation(searchFlag, istana, orderSC, t_kbn, singuZaiko,
-					codeSc, containerSc, kaisosc, tanaSc, kosuSC1, kosuSC2, "true", list_currentPage, searchCount);
+			List<location> locations = locationService.getlocation(searchFlag, "false", istana, orderSC, t_kbn,
+					singuZaiko, codeSc, containerSc, kaisosc, tanaSc, kosuSC1, kosuSC2, "true", list_currentPage,
+					searchCount);
 			for (int i = 0; i < locations.size(); i++) {
 				locations.get(i).setChk(false);
 			}
@@ -188,15 +186,14 @@ public class locationController {
 			object.put("total", total);
 			object.put("changeCount", changeCount);
 			if (updateFlag) {
-				String mDate = sf3.format(masterDate);
-				object.put("mDate", mDate);
-
-				object.put("updateFlag", 1);
 				object.put("changeCount_", changeCount_);
 				StringBuffer sb = new StringBuffer();
 				sb.append(changeCount_).append("件 修正しました。\n").append(newCount_).append("件 登録しました。");
-
-				object.put("update_msg", sb.toString());
+				object.put("resultMsg", sb.toString());
+			} else {
+				String mDate = sf3.format(masterDate);
+				object.put("mDate", mDate);
+				object.put("updateFlag", "false");
 			}
 		} catch (Exception e) {
 			// TODO 自動生成された catch ブロック
@@ -278,34 +275,134 @@ public class locationController {
 
 			location_up location_up = new location_up();
 
-			if("ネクストエンジンcsv登録".equals(uploadType)) {
-
+			if ("ネクストエンジンcsv登録".equals(uploadType)) {
+				location_up = UpdateLocationByCsv(3, "", csvfile, loginuser_id, loginuser);
 			} else if ("「項目全て」登録編集".equals(uploadType)) {
-				location_up = UpdateLocationByCsv(2, "", csvfile ,loginuser_id, loginuser);
-
-
+				location_up = UpdateLocationByCsv(2, "", csvfile, loginuser_id, loginuser);
 			} else if ("csvで「削除」する".equals(uploadType)) {
-
+				location_up = UpdateLocationByCsv(4, "", csvfile, loginuser_id, loginuser);
+			} else if ("ネクストエンジン在庫".equals(uploadType)) {
+				location_up = UpdateLocationByCsv(5, "", csvfile, loginuser_id, loginuser);
 			}
 
 			if (location_up.getErrorno() == 1) {
-				result.setState(1);
-				result.setMsg("csvファイルをアップロードしてください。");
-				object.put("rows", result);
+				object.put("resultMsg", "csvファイルをアップロードしてください。");
 				return object;
 			} else if (location_up.getErrorno() == 2) {
-				result.setState(1);
-				result.setMsg("ファイルの種類が異なるため更新できません。");
+				object.put("resultMsg", "ファイルの種類が異なるため更新できません。");
+				return object;
+			}
+
+			String move_Path = test_pl + "xampp\\htdocs\\ordery\\upload\\sf" + sf2.format(new Date()) + ".csv";
+			Path path_move = Paths.get(move_Path);
+			Files.copy(csvfile.getInputStream(), path_move, StandardCopyOption.REPLACE_EXISTING);
+
+			int changeCount_ = location_up.getChangeCount();
+			int newCount_ = location_up.getNewCount();
+			int delCount_ = location_up.getDelCount();
+			StringBuffer sb = new StringBuffer();
+			sb.append(changeCount_).append("件 修正しました。\n").append(newCount_).append("件 登録しました。\n").append(delCount_)
+					.append("件 削除しました。");
+			object.put("resultMsg", sb.toString());
+			object.put("rows", result);
+			return object;
+		} catch (Exception e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+		return object;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/uploadCsv_Loc2", method = RequestMethod.POST)
+	private JSONObject uploadCsv_Loc2(HttpServletResponse response, HttpServletRequest request,
+			@RequestParam(value = "csvfile") MultipartFile csvfile) {
+		JSONObject object = new JSONObject();
+		try {
+			request.setCharacterEncoding("utf-8");
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+			result result = new result();
+
+			int loginuser_id = Integer
+					.parseInt(new String(request.getParameter("loginuser_id").getBytes("ISO-8859-1"), "UTF-8"));
+//			String loginuser = java.net.URLDecoder.decode(request.getParameter("loginuser"), "UTF-8");
+
+			if (!"csv".equals(FileUtil.getFileType(csvfile.getOriginalFilename()))) {
+				result.setMsg("csvファイルをアップロードしてください。");
 				object.put("rows", result);
 				return object;
 			}
 
-			String move_Path = "D:\\xampp\\htdocs\\ordery\\upload\\sf" + sf2.format(new Date()) + ".csv";
-			Path path_move = Paths.get(move_Path);
-			Files.copy(csvfile.getInputStream(), path_move, StandardCopyOption.REPLACE_EXISTING);
+			location lo = new location();
 
-			result.setState(1);
-			result.setMsg("アップロードしました！");
+			InputStream is = null;
+			is = csvfile.getInputStream();
+			InputStreamReader isr = new InputStreamReader(is);
+			String encode = isr.getEncoding();
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+			if ("SHIFT_JIS".equals(encode) || "MS932".equals(encode)) {
+				reader = new BufferedReader(new InputStreamReader(is, "SHIFT_JIS"));
+			}
+
+			DynamicDataSourceHolder.setDataSource("jrt_dataSource");
+			int num = 0;
+			String line = null;
+			Integer codeNo = null;
+			Integer zaikoNo = null;
+			List<String> codes_ = new ArrayList<String>();
+
+			while ((line = reader.readLine()) != null) {
+				String item[] = line.split(",");
+
+				if (num == 0) {// ヘッダー取込
+					if (!CommonUtil.isHave(item, "") || !CommonUtil.isHave(item, "syohin_code")
+							|| !CommonUtil.isHave(item, "zaiko_su")) {
+						result.setMsg("ファイルの種類が異なるため更新できません。");
+						object.put("rows", result);
+						return object;
+					}
+					for (int i = 0; i < item.length; i++) {
+						if ("syohin_code".equals(getValue(item, i))) {
+							codeNo = i;
+						} else if ("zaiko_su".equals(getValue(item, i))) {
+							zaikoNo = i;
+						}
+					}
+				} else {
+					String code = getValue(item, codeNo).toLowerCase();
+					String sZaiko = getValue(item, zaikoNo);
+
+					if (!CommonUtil.isInteger(sZaiko)) {
+						result.setMsg("検品済みが数値ではないため更新できません。");
+						object.put("rows", result);
+						return object;
+					} else {
+						lo.setCode(code);
+						lo.setsZaiko(Integer.parseInt(sZaiko));
+						lo.setUser_id(loginuser_id);
+						codes_.add(code);
+					}
+				}
+				num++;
+			}
+
+			String[] codes = new String[codes_.size()];
+			codes_.toArray(codes);
+			int count = locationService.getLocationCountByCodes(codes);
+			if (count != codes_.size()) {
+				result.setMsg("該当データが無いため更新できません。");
+				object.put("rows", result);
+				return object;
+			}
+
+			List<location> lo_ = Arrays.asList(lo);
+			for (int i = 0; i < lo_.size(); i++) {
+				locationService.updateShinguByCode(lo_.get(i));
+			}
+
+			result.setMsg(lo_.size() + "件 変更しました。");
 			object.put("rows", result);
 			return object;
 		} catch (Exception e) {
@@ -355,8 +452,8 @@ public class locationController {
 		JSONObject object = new JSONObject();
 		try {
 			DynamicDataSourceHolder.setDataSource("jrt_dataSource");
-			List<location> lo = locationService.getlocation("false", "", "コード昇順", "", "", "", "", "", "", "", "",
-					"false", 0, 0);
+			List<location> lo = locationService.getlocation("false", "false", "", "コード昇順", "", "", "", "", "", "", "",
+					"", "false", 0, 0);
 
 			object.put("rows", lo);
 			response.setHeader("Access-Control-Allow-Origin", "*");
@@ -397,8 +494,8 @@ public class locationController {
 	private void bakupLogi() {
 		try {
 			DynamicDataSourceHolder.setDataSource("jrt_dataSource");
-			List<location> lo = locationService.getlocation("false", "", "コード昇順", "", "", "", "", "", "", "", "",
-					"false", 0, 0);
+			List<location> lo = locationService.getlocation("false", "false", "", "コード昇順", "", "", "", "", "", "", "",
+					"", "false", 0, 0);
 			// 构造导出数据结构
 			String titles = "商品コード,商品名,商品分類タグ,代表商品コード,ship-weight,ロケーション,梱包サイズ,特殊,sw2"; // 设置表头
 			String keys = "code,name,tag,dcode,sw,kaisou,ksize,sp,sw2"; // 设置每列字段
@@ -436,40 +533,50 @@ public class locationController {
 
 	// csvでアップデート
 	// type=> 1:ネクストエンジン在庫 2:「項目全て」登録編集 3:ネクストエンジンcsv登録 4:csvで「削除」する
-	private location_up UpdateLocationByCsv(Integer type, String file_name, MultipartFile csvfile,int loginuser_id, String loginuser) {
+	private location_up UpdateLocationByCsv(Integer type, String file_name, MultipartFile csvfile, int loginuser_id,
+			String loginuser) throws Exception {
 		location_up location_up = new location_up();
 		File newfile = null;
 		InputStream is = null;
-		try {
-			if(type == 1) {
-				if (!file_name.endsWith("csv")) {
-					location_up.setErrorno(1);
-					return location_up;
-				}
-				newfile = new File(file_name);
-				Path path_file = Paths.get(file_name);
 
-				String dest = place + "xampp\\htdocs\\ordery\\upload\\" + newfile.getName();
-				File destfile = new File(dest);
-				if (!destfile.exists()) {
-					destfile.createNewFile();
-					Path path_dest = Paths.get(dest);
-					Files.copy(path_file, path_dest, StandardCopyOption.REPLACE_EXISTING);
-					file_name = dest;
-				}
-				is = new FileInputStream(file_name);
-			} else {
-				is = csvfile.getInputStream();
+		if (type == 1) {
+			if (!file_name.endsWith("csv")) {
+				location_up.setErrorno(1);
+				return location_up;
 			}
+			newfile = new File(file_name);
+			Path path_file = Paths.get(file_name);
 
-			String encode = FileCharDetecter.detector(is);
+			String dest = place + "xampp\\htdocs\\ordery\\upload\\" + newfile.getName();
+			File destfile = new File(dest);
+			if (!destfile.exists()) {
+				destfile.createNewFile();
+				Path path_dest = Paths.get(dest);
+				Files.copy(path_file, path_dest, StandardCopyOption.REPLACE_EXISTING);
+				file_name = dest;
+			}
+			is = new FileInputStream(file_name);
+		} else {
+			is = csvfile.getInputStream();
+		}
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(is, encode));
+		InputStreamReader isr = new InputStreamReader(is);
+		String encode = isr.getEncoding();
 
+//		String encode = FileCharDetecter.detector();
+//		System.out.println(encode);//SHIFT_JIS
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		if ("SHIFT_JIS".equals(encode) || "MS932".equals(encode)) {
+			reader = new BufferedReader(new InputStreamReader(is, "SHIFT_JIS"));
+		}
+//		InputStreamReader in = new InputStreamReader(is, "SHIFT_JIS");
+//		BufferedReader reader = new BufferedReader(new InputStreamReader(is, "SHIFT_JIS"));
+		try {
 //			https://www.cnblogs.com/bretgui/p/10156141.html
 			DynamicDataSourceHolder.setDataSource("jrt_dataSource");
-			List<location> lo = locationService.getlocation("false", "", "コード昇順", "", "", "", "", "", "", "", "",
-					"false", 0, 0);
+			List<location> lo = locationService.getlocation("false", "true", "", "コード昇順", "", "", "", "", "", "", "",
+					"", "false", 0, 0);
 			String[] checkCodeArray = new String[lo.size()]; // 商品コードをチェック用配列に入れる
 			String[] checkStrArray = new String[lo.size()]; // 修正があるかチェックする配列
 			String[] checkLocationArray = new String[lo.size()]; // ロケーションのチェック配列
@@ -479,72 +586,72 @@ public class locationController {
 				StringBuffer sb2 = new StringBuffer();
 				if (type == 2) {
 					sb.append(lo.get(i).getCode().toLowerCase());
-					if(lo.get(i).getName() != null) {
+					if (lo.get(i).getName() != null) {
 						sb.append(lo.get(i).getName());
 					}
-					if(lo.get(i).getTag() != null) {
+					if (lo.get(i).getTag() != null) {
 						sb.append(lo.get(i).getTag());
-										}
-					if(lo.get(i).getDcode() != null) {
+					}
+					if (lo.get(i).getDcode() != null) {
 						sb.append(lo.get(i).getDcode());
 					}
-					if(lo.get(i).getSw() != null) {
+					if (lo.get(i).getSw() != null) {
 						sb.append(lo.get(i).getSw());
 					}
-					if(lo.get(i).getKaisou() != null) {
+					if (lo.get(i).getKaisou() != null) {
 						sb.append(lo.get(i).getKaisou());
 					}
-					if(lo.get(i).getTana() != null) {
+					if (lo.get(i).getTana() != null) {
 						sb.append(lo.get(i).getTana());
 					}
-					if(lo.get(i).getKsize() != null) {
+					if (lo.get(i).getKsize() != null) {
 						sb.append(lo.get(i).getKsize());
 					}
-					if(lo.get(i).getSp() != null) {
+					if (lo.get(i).getSp() != null) {
 						sb.append(lo.get(i).getSp());
 					}
-					if(lo.get(i).getsZaiko() != null) {
+					if (lo.get(i).getsZaiko() != null) {
 						sb.append(lo.get(i).getsZaiko());
 					}
-					if(lo.get(i).getsBikou() != null) {
+					if (lo.get(i).getsBikou() != null) {
 						sb.append(lo.get(i).getsBikou());
 					}
 
 					checkStrArray[i] = sb.toString();
 				} else if (type == 1) {
 					sb.append(lo.get(i).getCode().toLowerCase());
-					if(lo.get(i).getZaiko() != null) {
+					if (lo.get(i).getZaiko() != null) {
 						sb.append(lo.get(i).getZaiko());
 					}
-					if(lo.get(i).getHikiate() != null) {
+					if (lo.get(i).getHikiate() != null) {
 						sb.append(lo.get(i).getHikiate());
 					}
-					if(lo.get(i).getYoyaku() != null) {
+					if (lo.get(i).getYoyaku() != null) {
 						sb.append(lo.get(i).getYoyaku());
 					}
-					if(lo.get(i).getT_kbn() != null) {
+					if (lo.get(i).getT_kbn() != null) {
 						sb.append(lo.get(i).getT_kbn());
 					}
 					checkStrArray[i] = sb.toString();
 				} else {
 					sb.append(lo.get(i).getCode().toLowerCase());
-					if(lo.get(i).getName() != null) {
+					if (lo.get(i).getName() != null) {
 						sb.append(lo.get(i).getName());
 					}
-					if(lo.get(i).getTag() != null) {
+					if (lo.get(i).getTag() != null) {
 						sb.append(lo.get(i).getTag());
 					}
-					if(lo.get(i).getDcode() != null) {
+					if (lo.get(i).getDcode() != null) {
 						sb.append(lo.get(i).getDcode());
 					}
 					checkStrArray[i] = sb.toString();
 				}
 
 				sb2.append(lo.get(i).getCode().toLowerCase());
-				if(lo.get(i).getKaisou() != null) {
+				if (lo.get(i).getKaisou() != null) {
 					sb2.append(lo.get(i).getKaisou());
 				}
-				if(lo.get(i).getTana() != null) {
+				if (lo.get(i).getTana() != null) {
 					sb2.append(lo.get(i).getTana());
 				}
 				checkLocationArray[i] = sb2.toString();
@@ -579,25 +686,32 @@ public class locationController {
 			while ((line = reader.readLine()) != null) {
 				String item[] = line.split(",");// CSV格式文件为逗号分隔符文件，这里根据逗号切分
 //				System.out.println(getValue(item, 0));
-				if (type == 1 || type == 2 || type == 3) {
+				if (type == 1 || type == 2 || type == 3 || type == 5) {
 					if (num == 0) {// ヘッダー取込
-						if (type == 1) {// ネクストエンジン在庫
-							if (!Arrays.asList(item).contains("ship-weight") || !Arrays.asList(item).contains("ロケーション")) {
+						if (type == 1 || type == 5) {// ネクストエンジン在庫
+							if (!CommonUtil.isHave(item, "") || !CommonUtil.isHave(item, "商品名")
+									|| !CommonUtil.isHave(item, "売価") || !CommonUtil.isHave(item, "原価")
+									|| !CommonUtil.isHave(item, "商品区分") || !CommonUtil.isHave(item, "取扱区分")
+									|| !CommonUtil.isHave(item, "在庫数") || !CommonUtil.isHave(item, "引当数")
+									|| !CommonUtil.isHave(item, "フリー在庫") || !CommonUtil.isHave(item, "予約在庫")
+									|| !CommonUtil.isHave(item, "予約引当") || !CommonUtil.isHave(item, "予約フリー")
+									|| !CommonUtil.isHave(item, "JANコード") || !CommonUtil.isHave(item, "型番")
+									|| !CommonUtil.isHave(item, "商品分類タグ") || !CommonUtil.isHave(item, "代表商品コード")) {
 								location_up.setErrorno(2);
 								return location_up;
 							}
 						} else if (type == 2) {
-							if (!Arrays.asList(item).contains("商品コード") && !Arrays.asList(item).contains("商品名")&& !Arrays.asList(item).contains("商品分類タグ")&& !Arrays.asList(item).contains("代表商品コード")&& !Arrays.asList(item).contains("型番")&& !Arrays.asList(item).contains("ロケーション")&& !Arrays.asList(item).contains("梱包サイズ")&& !Arrays.asList(item).contains("特殊")) {
+							if (!CommonUtil.isHave(item, "商品コード") || !CommonUtil.isHave(item, "商品名")
+									|| !CommonUtil.isHave(item, "商品分類タグ") || !CommonUtil.isHave(item, "代表商品コード")
+									|| !CommonUtil.isHave(item, "型番") || !CommonUtil.isHave(item, "ロケーション")
+									|| !CommonUtil.isHave(item, "梱包サイズ") || !CommonUtil.isHave(item, "特殊")) {
 								location_up.setErrorno(2);
 								return location_up;
 							}
-						}  else if (type == 3) {
-							if (!Arrays.asList(item).contains("フリー在庫") || !Arrays.asList(item).contains("型番")) {
-								location_up.setErrorno(2);
-								return location_up;
-							}
-						} else if (type == 4) {// csvで「削除」する
-							if (!Arrays.asList(item).contains("商品コード")) {
+						} else if (type == 3) {
+							if (!CommonUtil.isHave(item, "商品コード") || !CommonUtil.isHave(item, "商品名")
+									|| !CommonUtil.isHave(item, "型番") || !CommonUtil.isHave(item, "商品分類タグ")
+									|| !CommonUtil.isHave(item, "代表商品コード")) {
 								location_up.setErrorno(2);
 								return location_up;
 							}
@@ -642,79 +756,79 @@ public class locationController {
 						String code = getValue(item, codeNo).toLowerCase();
 						String name = getValue(item, nameNo);
 						String tag = "";
-						if(tagNo != null) {
+						if (tagNo != null) {
 							tag = getValue(item, tagNo);
 						}
 
 						String dcode = "";
-						if(dcodeNo != null) {
+						if (dcodeNo != null) {
 							dcode = getValue(item, dcodeNo);
 						}
 
 						String kataban = "";
-						if(katabanNo != null) {
+						if (katabanNo != null) {
 							kataban = getValue(item, katabanNo);
 						}
 
 						String loca = "";
-						if(locaNo != null) {
+						if (locaNo != null) {
 							loca = getValue(item, locaNo);
 						}
 
 						String ksize = "";
-						if(ksizeNo != null) {
+						if (ksizeNo != null) {
 							ksize = getValue(item, ksizeNo);
 						}
 
 						String sp = "";
-						if(spNo != null) {
+						if (spNo != null) {
 							sp = getValue(item, spNo);
 						}
 
 						Integer zaiko = null;
-						if(zaikoNo != null) {
+						if (zaikoNo != null) {
 							zaiko = Integer.parseInt(getValue(item, zaikoNo));
 						}
 
 						Integer hikiate = null;
-						if(hikiateNo != null) {
+						if (hikiateNo != null) {
 							hikiate = Integer.parseInt(getValue(item, hikiateNo));
 						}
 
 						String yoyaku = "";
-						if(yoyakuNo != null) {
+						if (yoyakuNo != null) {
 							yoyaku = getValue(item, yoyakuNo);
 						}
 
 						String t_kbn = "";
-						if(t_kbnNo != null) {
+						if (t_kbnNo != null) {
 							t_kbn = getValue(item, t_kbnNo);
 						}
 
 						Integer sZaiko = null;
-						if(sZaikoNo != null) {
+						if (sZaikoNo != null) {
 							sZaiko = Integer.parseInt(getValue(item, sZaikoNo));
 						}
 
 						String sBikou = "";
-						if(sBikouNo != null) {
+						if (sBikouNo != null) {
 							sBikou = getValue(item, sBikouNo);
 						}
 
 						if (type == 2) {
 							sb.append(code).append(name).append(tag).append(dcode).append(kataban).append(loca)
 									.append(ksize).append(sp);
-							if(sZaiko != null) {
+							if (sZaiko != null) {
 								sb.append(sZaiko);
 							}
 							sb.append(sBikou);
 							chStr = sb.toString();
-						} else if (type == 1) {
+						} else if (type == 1 || type == 5) {
 							sb.append(code);
-							if(zaiko != null) {
+							if (zaiko != null) {
 								sb.append(zaiko);
 							}
-							if(hikiate != null) {
+							if (hikiate != null) {
 								sb.append(hikiate);
 							}
 							sb.append(yoyaku).append(t_kbn);
@@ -737,9 +851,14 @@ public class locationController {
 								location lo_update_ = new location();
 								lo_update_.setUser(loginuser);
 								lo_update_.setUser_id(loginuser_id);
+								lo_update_.setUpdate(nowtime);
 								if (type == 2) {
-									String kaisouStr = loca.substring(0, 2);
-									String tanaStr = loca.substring(2, 3);
+									String kaisouStr = "";
+									String tanaStr = "";
+									if (loca.length() > 4) {
+										kaisouStr = loca.substring(0, 2);
+										tanaStr = loca.substring(2, 3);
+									}
 									lo_update_.setCode(code);
 									lo_update_.setName(name);
 									lo_update_.setTag(tag);
@@ -751,18 +870,26 @@ public class locationController {
 									lo_update_.setSp(sp);
 									lo_update_.setsZaiko(sZaiko);
 									lo_update_.setsBikou(sBikou);
-								} else if (type == 1) {
+								} else if (type == 1 || type == 5) {
 									lo_update_.setCode(code);
 									lo_update_.setZaiko(zaiko);
 									lo_update_.setHikiate(hikiate);
 									lo_update_.setYoyaku(yoyaku);
 									lo_update_.setT_kbn(t_kbn);
 									lo_update_.setZaiko_update(nowtime);
-								} else {
+								} else if (type == 3) {
+									String kaisouStr = "";
+									String tanaStr = "";
+									if (loca.length() > 4) {
+										kaisouStr = loca.substring(0, 2);
+										tanaStr = loca.substring(2, 3);
+									}
 									lo_update_.setCode(code);
 									lo_update_.setName(name);
 									lo_update_.setTag(tag);
 									lo_update_.setDcode(dcode);
+									lo_update_.setKaisou(kaisouStr);
+									lo_update_.setTana(tanaStr);
 								}
 								if (tag.indexOf("物流倉庫") != -1) {
 									lo_update_.setKaisou("BS");
@@ -780,8 +907,12 @@ public class locationController {
 							lo_add_.setUser(loginuser);
 							lo_add_.setUser_id(loginuser_id);
 							if (type == 2) {// 「項目全て」登録編集
-								String kaisouStr = loca.substring(0, 2);
-								String tanaStr = loca.substring(2, 3);
+								String kaisouStr = "";
+								String tanaStr = "";
+								if (loca.length() > 4) {
+									kaisouStr = loca.substring(0, 2);
+									tanaStr = loca.substring(2, 3);
+								}
 								lo_add_.setCode(code);
 								lo_add_.setName(name);
 								lo_add_.setTag(tag);
@@ -793,13 +924,13 @@ public class locationController {
 								lo_add_.setSp(sp);
 								lo_add_.setsZaiko(sZaiko);
 								lo_add_.setsBikou(sBikou);
-							} else if (type == 1) {
+							} else if (type == 1 || type == 5) {
 								lo_add_.setCode(code);
 								lo_add_.setZaiko(zaiko);
 								lo_add_.setHikiate(hikiate);
 								lo_add_.setYoyaku(yoyaku);
 								lo_add_.setT_kbn(t_kbn);
-							} else {
+							} else if (type == 3) {
 								String ln = code + chtag;
 								if (tag.indexOf("物流倉庫") != -1) {
 									if (!Arrays.asList(checkLocationArray).contains(ln)) {
@@ -833,20 +964,33 @@ public class locationController {
 						}
 					}
 				} else if (type == 4) {
-					String code = getValue(item, codeNo);
-					if (Arrays.asList(checkCodeArray).contains(code)) {
-						location lo_del_ = new location();
-						lo_del_.setCode(code);
-						lo_del.add(lo_del_);
-						delCount++;
+					if (num == 0) {// ヘッダー取込
+						if (type == 4) {// csvで「削除」する
+							if (!Arrays.asList(item).contains("商品コード")) {
+								location_up.setErrorno(2);
+								return location_up;
+							}
+						}
+						for (int i = 0; i < item.length; i++) {
+							if ("商品コード".equals(getValue(item, i))) {
+								codeNo = i;
+							}
+						}
+					} else {
+						String code = getValue(item, codeNo);
+						if (Arrays.asList(checkCodeArray).contains(code)) {
+							location lo_del_ = new location();
+							lo_del_.setCode(code);
+							lo_del.add(lo_del_);
+							delCount++;
+						}
 					}
 				}
 				num++;
 			}
-			reader.close();
 
 			if (lo_update != null && lo_update.size() > 0) {
-				if(type == 1) {
+				if (type == 1 || type == 5) {
 //					DynamicDataSourceHolder.setDataSource("jrt_dataSource");
 					locationService.updateByCSV1(lo_update);
 				} else if (type == 2) {
@@ -859,7 +1003,7 @@ public class locationController {
 			}
 
 			if (lo_add != null && lo_add.size() > 0) {
-				if(type == 2) {
+				if (type == 2) {
 					locationService.insertByCSV2(lo_add);
 				} else {
 					locationService.insertByCSV1(lo_add);
@@ -876,6 +1020,10 @@ public class locationController {
 		} catch (Exception e) {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
+		} finally {
+			is.close();
+			isr.close();
+			reader.close();
 		}
 		return location_up;
 	}
@@ -907,7 +1055,7 @@ public class locationController {
 		} else if (item.length > index) {
 			value = item[index].replace("\"", "");
 		}
-		if("null".equals(value)) {
+		if ("null".equals(value)) {
 			value = "";
 		}
 		return value;

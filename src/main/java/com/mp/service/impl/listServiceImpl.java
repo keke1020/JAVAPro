@@ -19,21 +19,23 @@ public class listServiceImpl implements listService {
 	@Autowired
 	private listDao listDao;
 
-	public List<list1> getList1(String exportFlag, int offset, int limit, String searchId, String searchtime_s, String searchtime_e,
-			String searchcontain_check, String searchcontain, String searchkeiban, String searchedaban,
-			String search_arrival_japan, String search_arrival_soko, String radio_soko0, String radio_soko1, String radio_soko2,
+	public List<list1> getList1(String exportFlag, int offset, int limit, String searchId, String searchtime_s,
+			String searchtime_e, String searchcontain_check, String searchcontain, String searchkeiban,
+			String searchedaban, String search_arrival_japan, String search_arrival_jikan, String search_arrival_flag,
+			String search_arrival_soko, String radio_soko0, String radio_soko1, String radio_soko2,
 			String radio_soko3) {
-		return listDao.getList1(exportFlag, offset, limit, searchId, searchtime_s, searchtime_e, searchcontain_check, searchcontain,
-				searchkeiban, searchedaban, search_arrival_japan, search_arrival_soko, radio_soko0, radio_soko1, radio_soko2,
-				radio_soko3);
+		return listDao.getList1(exportFlag, offset, limit, searchId, searchtime_s, searchtime_e, searchcontain_check,
+				searchcontain, searchkeiban, searchedaban, search_arrival_japan, search_arrival_jikan,
+				search_arrival_flag, search_arrival_soko, radio_soko0, radio_soko1, radio_soko2, radio_soko3);
 	}
 
 	public int getCountAll(String searchId, String searchtime_s, String searchtime_e, String searchcontain_check,
 			String searchcontain, String searchkeiban, String searchedaban, String search_arrival_japan,
-			String search_arrival_soko, String radio_soko0, String radio_soko1, String radio_soko2, String radio_soko3) {
+			String search_arrival_jikan, String search_arrival_flag, String search_arrival_soko, String radio_soko0,
+			String radio_soko1, String radio_soko2, String radio_soko3) {
 		return listDao.getCountAll(searchId, searchtime_s, searchtime_e, searchcontain_check, searchcontain,
-				searchkeiban, searchedaban, search_arrival_japan, search_arrival_soko, radio_soko0, radio_soko1, radio_soko2,
-				radio_soko3);
+				searchkeiban, searchedaban, search_arrival_japan, search_arrival_jikan, search_arrival_flag,
+				search_arrival_soko, radio_soko0, radio_soko1, radio_soko2, radio_soko3);
 	}
 
 	public List<list1> getList1ById(String id) {
@@ -49,7 +51,7 @@ public class listServiceImpl implements listService {
 	}
 
 	public void deleteList1(int id, int loginuser_id, String loginuser) {
-		listDao.deleteList1(id,loginuser_id,loginuser);
+		listDao.deleteList1(id, loginuser_id, loginuser);
 	}
 
 	public void insertList3(list3 list3) {

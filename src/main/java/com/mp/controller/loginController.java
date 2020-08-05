@@ -16,6 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mp.entity.user;
+import com.mp.common.DynamicDataSourceHolder;
 import com.mp.dto.result;
 import com.mp.service.userService;
 
@@ -41,6 +42,8 @@ public class loginController {
 			@Param("password") String password) throws UnsupportedEncodingException {
 		request.setCharacterEncoding("utf-8");
 		response.setCharacterEncoding("utf-8");
+
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
 //		ModelAndView mv = new ModelAndView();
 		JSONObject object = new JSONObject();
 		result result = new result();

@@ -26,6 +26,7 @@ public class list1 {
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date arrival;
 	private int arrival_jikan;
+	private int arrival_flag;
 	private double unit_ch;
 	private double total_ch;
 	private int unit_jp;
@@ -145,6 +146,15 @@ public class list1 {
 
 	public void setArrival_jikan(int arrival_jikan) {
 		this.arrival_jikan = arrival_jikan;
+	}
+
+
+	public int getArrival_flag() {
+		return arrival_flag;
+	}
+
+	public void setArrival_flag(int arrival_flag) {
+		this.arrival_flag = arrival_flag;
 	}
 
 	public void setArrival_depo(String arrival_depo) {
