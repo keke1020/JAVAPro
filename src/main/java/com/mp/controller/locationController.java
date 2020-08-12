@@ -51,7 +51,9 @@ import com.mp.dto.result;
 import com.mp.dto.system;
 import com.mp.entity.location;
 import com.mp.entity.location_up;
+import com.mp.entity.zaikorireki;
 import com.mp.service.locationService;
+import com.mp.service.zaikorirekiService;
 import com.mp.util.CommonUtil;
 import com.mp.util.CsvExportUtil;
 import com.mp.util.FileCharDetecter;
@@ -62,14 +64,19 @@ public class locationController {
 	@Autowired
 	private locationService locationService;
 
+	@Autowired
+	private zaikorirekiService zaikorirekiService;
+
 	SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	SimpleDateFormat sf2 = new SimpleDateFormat("yyyyMMddHHmmss");
 	SimpleDateFormat sf3 = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	SimpleDateFormat sf4 = new SimpleDateFormat("yyyyMMddHH");
+	SimpleDateFormat sf5 = new SimpleDateFormat("yyyyMMddHHmmss");
 
 	String test_pl = "D:\\";
 	String server_pl = "E:\\";
-	String place = test_pl;
+	String place = test_pl; // *
+	String place_zaiko = place + "xampp\\htdocs\\ordery\\logi\\zaiko\\update\\";
 
 	@ResponseBody
 	@RequestMapping(value = "/getLocation", method = RequestMethod.POST)
@@ -326,7 +333,7 @@ public class locationController {
 
 			int loginuser_id = Integer
 					.parseInt(new String(request.getParameter("loginuser_id").getBytes("ISO-8859-1"), "UTF-8"));
-//			String loginuser = java.net.URLDecoder.decode(request.getParameter("loginuser"), "UTF-8");
+			String loginuser = java.net.URLDecoder.decode(request.getParameter("loginuser"), "UTF-8");
 
 			if (!"csv".equals(FileUtil.getFileType(csvfile.getOriginalFilename()))) {
 				result.setMsg("csvファイルをアップロードしてください。");
@@ -334,8 +341,10 @@ public class locationController {
 				return object;
 			}
 
-			location lo = new location();
+			List<location> los = new ArrayList<location>();
+			List<zaikorireki> zaikorirekis = new ArrayList<zaikorireki>();
 
+			Date nowtime = new Date();
 			InputStream is = null;
 			is = csvfile.getInputStream();
 			InputStreamReader isr = new InputStreamReader(is);
@@ -379,9 +388,12 @@ public class locationController {
 						object.put("rows", result);
 						return object;
 					} else {
+						location lo = new location();
 						lo.setCode(code);
 						lo.setsZaiko(Integer.parseInt(sZaiko));
 						lo.setUser_id(loginuser_id);
+						lo.setUpdate(nowtime);
+						los.add(lo);
 						codes_.add(code);
 					}
 				}
@@ -397,12 +409,34 @@ public class locationController {
 				return object;
 			}
 
-			List<location> lo_ = Arrays.asList(lo);
-			for (int i = 0; i < lo_.size(); i++) {
-				locationService.updateShinguByCode(lo_.get(i));
+			for (int i = 0; i < los.size(); i++) {
+				zaikorireki z_rireki = new zaikorireki();
+				location lo_old = locationService.getLocationByCode(los.get(i).getCode());
+				z_rireki.setUpdate(nowtime);
+				StringBuffer sb_msg = new StringBuffer();
+				sb_msg.append(los.get(i).getCode() + " ");
+				if (lo_old != null) {
+					sb_msg.append(lo_old.getsZaiko());
+				} else {
+					sb_msg.append("null");
+				}
+				sb_msg.append(">").append(los.get(i).getsZaiko());
+				z_rireki.setMessage(sb_msg.toString());
+				z_rireki.setUser(loginuser);
+				z_rireki.setUser_id(loginuser_id);
+				z_rireki.setType("shingu");
+				zaikorirekis.add(z_rireki);
+
+				locationService.updateShinguByCode(los.get(i));
 			}
 
-			result.setMsg(lo_.size() + "件 変更しました。");
+			if (zaikorirekis.size() > 0) {
+				for (int i = 0; i < zaikorirekis.size(); i++) {
+					zaikorirekiService.insert(zaikorirekis.get(i));
+				}
+			}
+
+			result.setMsg(los.size() + "件 変更しました。");
 			object.put("rows", result);
 			return object;
 		} catch (Exception e) {
@@ -415,27 +449,74 @@ public class locationController {
 	@ResponseBody
 	@RequestMapping(value = "/editLocation", method = RequestMethod.POST)
 	private JSONObject editLocation(HttpServletResponse response, HttpServletRequest request,
-			@RequestBody String params, String router_index) {
+			@RequestBody String params, int active) {
 		JSONObject object = new JSONObject();
 
 		try {
 			request.setCharacterEncoding("utf-8");
+			Date nowtime = new Date();
 			int loginuser_id = Integer
 					.parseInt(new String(request.getParameter("loginuser_id").getBytes("ISO-8859-1"), "UTF-8"));
 			String loginuser = java.net.URLDecoder.decode(request.getParameter("loginuser"), "UTF-8");
 			JSONObject j1 = JSONObject.parseObject(params);
 			List<location> locationNodes = JSONObject.parseArray(j1.getJSONArray("params").toJSONString(),
 					location.class);
+			List<zaikorireki> zaikorirekis = new ArrayList<zaikorireki>();
+			List<location> zaiko_lo = new ArrayList<location>();
 			if (locationNodes.size() > 0 && locationNodes != null) {
-				Date update = new Date();
 				DynamicDataSourceHolder.setDataSource("jrt_dataSource");
 				for (int i = 0; i < locationNodes.size(); i++) {
 					location lo = locationNodes.get(i);
+
+					// 新宮
+					if (active == 2) {
+						zaikorireki z_rireki = new zaikorireki();
+						location lo_old = locationService.getLocationByCode(lo.getCode());
+						z_rireki.setUpdate(nowtime);
+						StringBuffer sb_msg = new StringBuffer();
+						sb_msg.append(lo.getCode() + " ");
+						if (lo_old != null) {
+							sb_msg.append(lo_old.getsZaiko());
+						} else {
+							sb_msg.append("null");
+						}
+						sb_msg.append(">").append(lo.getsZaiko());
+						z_rireki.setMessage(sb_msg.toString());
+						z_rireki.setUser(loginuser);
+						z_rireki.setUser_id(loginuser_id);
+						z_rireki.setType("shingu");
+						zaikorirekis.add(z_rireki);
+					}
+
 					lo.setUser(loginuser);
 					lo.setUser_id(loginuser_id);
-					lo.setUpdate(update);
-					lo.setRouter_index(router_index);
+					lo.setUpdate(nowtime);
+					lo.setRouter_index(active);
 					locationService.editlocation(lo);
+
+					// 在庫変更
+					if (active == 3) {
+						zaiko_lo.add(lo);
+					}
+				}
+
+				if (zaikorirekis.size() > 0) {
+					for (int i = 0; i < zaikorirekis.size(); i++) {
+						zaikorirekiService.insert(zaikorirekis.get(i));
+					}
+				}
+
+				List<String> zaiko_list = new ArrayList<String>();
+				if (zaiko_lo.size() > 0) {
+					for (int i = 0; i < zaiko_lo.size(); i++) {
+						StringBuffer sb = new StringBuffer();
+						String now = sf5.format(new Date());
+						sb.append("update,").append(zaiko_lo.get(i).getCode()).append(",")
+								.append(zaiko_lo.get(i).getZaiko()).append(",").append(loginuser).append(",")
+								.append(now);
+						zaiko_list.add(sb.toString());
+						CommonUtil.writeDataHubData(zaiko_list, place_zaiko + zaiko_lo.get(i).getCode() + "_" + now);
+					}
 				}
 			}
 			return object;
@@ -1047,6 +1128,67 @@ public class locationController {
 //			}
 //		}
 //	}
+
+	@ResponseBody
+	@RequestMapping(value = "/getShiGuRireki", method = RequestMethod.POST)
+	private JSONObject getShiGuRireki(HttpServletResponse response, HttpServletRequest request,
+			String rireki_shingu_view, int rireki_shingu_num) {
+		JSONObject object = new JSONObject();
+		try {
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+			DynamicDataSourceHolder.setDataSource("jrt_dataSource");
+
+			List<zaikorireki> zaikorirekis = zaikorirekiService.getShiGuRirekiByView(rireki_shingu_view,
+					rireki_shingu_num);
+			if (zaikorirekis.size() > 0) {
+				for (int i = 0; i < zaikorirekis.size(); i++) {
+					zaikorirekis.get(i).setUser(zaikorirekis.get(i).getUser().substring(0, 2));
+				}
+			}
+
+			object.put("rows", zaikorirekis);
+		} catch (Exception e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+		return object;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/getRireki", method = RequestMethod.POST)
+	private JSONObject getRireki(HttpServletResponse response, HttpServletRequest request, String rireki_view,
+			int rireki_num) {
+		JSONObject object = new JSONObject();
+		try {
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+			DynamicDataSourceHolder.setDataSource("jrt_dataSource");
+
+			List<zaikorireki> zaikorirekis = zaikorirekiService.getRirekiByView(rireki_view, rireki_num);
+			if (zaikorirekis.size() > 0) {
+				for (int i = 0; i < zaikorirekis.size(); i++) {
+					zaikorirekis.get(i).setUser(zaikorirekis.get(i).getUser().substring(0, 2));
+//					if(zaikorirekis.get(i).getResult() != null) {
+//						zaikorirekis.get(i).setResult(zaikorirekis.get(i).getResult().trim());
+//					} else {
+//						zaikorirekis.get(i).setResult("");
+//					}
+					if (zaikorirekis.get(i).getResult() != null) {
+						zaikorirekis.get(i).setResult(zaikorirekis.get(i).getResult().replace(" ", "").replace("\r\n", ""));
+					} else {
+						zaikorirekis.get(i).setResult("");
+					}
+				}
+			}
+
+			object.put("rows", zaikorirekis);
+		} catch (Exception e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+		return object;
+	}
 
 	public static String getValue(String[] item, int index) {
 		String value = "";

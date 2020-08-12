@@ -8,7 +8,7 @@ public class syouhin {
 	private int ID;
 	private String updater;
 
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Tokyo")
 	private Date updatetime;
 
 	private String code;

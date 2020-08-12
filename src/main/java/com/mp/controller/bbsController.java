@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
+import com.mp.common.DynamicDataSourceHolder;
 import com.mp.dto.result;
 import com.mp.entity.bbs;
 import com.mp.service.bbsService;
@@ -33,6 +34,7 @@ public class bbsController {
 	@ResponseBody
 	private JSONObject getBBS(HttpServletResponse response, int currentPage, String bbs_update_s, String bbs_update_e, String bbs_keyword, String bbs_user) {
 		// pagelist:use bootstrap framework
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
 		int startIndex = (currentPage - 1) * 5;
 		if(bbs_update_s != null && !"".equals(bbs_update_s)) {
 			bbs_update_s = bbs_update_s + " 00:00:00";
@@ -53,7 +55,7 @@ public class bbsController {
 	@RequestMapping(value = "/insertBBS", method = RequestMethod.POST)
 	@ResponseBody
 	private JSONObject insertBBS(HttpServletResponse response, HttpServletRequest request) {
-
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
 		JSONObject object = new JSONObject();
 		try {
 			String loginuser = request.getParameter("loginuser");
@@ -87,6 +89,7 @@ public class bbsController {
 	@ResponseBody
 	@RequestMapping(value = "/deleteBBS", method = RequestMethod.POST)
 	private JSONObject deleteBBS(HttpServletResponse response, HttpServletRequest request, @Param("ID") int ID) {
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
 		JSONObject object = new JSONObject();
 		bbsService.deleteBBS(ID);
 		result result = new result();

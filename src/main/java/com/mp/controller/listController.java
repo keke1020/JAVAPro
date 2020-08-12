@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
+import com.mp.common.DynamicDataSourceHolder;
 import com.mp.dto.result;
 import com.mp.entity.list1;
 import com.mp.entity.list3;
@@ -46,6 +47,7 @@ public class listController {
 	@ResponseBody
 	@RequestMapping(value = "/getList1", method = RequestMethod.POST)
 	private JSONObject getList1(HttpServletResponse response, HttpServletRequest request) {
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
 		JSONObject object = new JSONObject();
 		try {
 			// ID
@@ -104,6 +106,7 @@ public class listController {
 	@ResponseBody
 	@RequestMapping(value = "/exportList1_1", method = RequestMethod.POST)
 	private JSONObject exportList1_1(HttpServletResponse response, HttpServletRequest request) {
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
 		JSONObject object = new JSONObject();
 		try {
 			// ID
@@ -153,6 +156,7 @@ public class listController {
 	@RequestMapping(value = "/exportList1_2", method = RequestMethod.POST)
 	private JSONObject exportList1_2(HttpServletResponse response, HttpServletRequest request)
 			throws UnsupportedEncodingException {
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
 		JSONObject object = new JSONObject();
 		List<list1> list1 = listService.getList1_all();
 
@@ -165,6 +169,7 @@ public class listController {
 	@ResponseBody
 	@RequestMapping(value = "/getList1ById", method = RequestMethod.POST)
 	private JSONObject getList1ById(HttpServletResponse response, HttpServletRequest request) {
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
 		JSONObject object = new JSONObject();
 		try {
 			String searchId = new String(request.getParameter("searchId").getBytes("ISO-8859-1"), "UTF-8");
@@ -183,6 +188,7 @@ public class listController {
 	@RequestMapping(value = "/insertList1", method = RequestMethod.POST)
 	private JSONObject insertList1(HttpServletResponse response, HttpServletRequest request, @RequestBody String params)
 			throws Exception {
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
 		JSONObject object = new JSONObject();
 
 		try {
@@ -347,6 +353,7 @@ public class listController {
 	@ResponseBody
 	@RequestMapping(value = "/deleteList1", method = RequestMethod.POST)
 	private JSONObject deleteList1(HttpServletResponse response, HttpServletRequest request) throws Exception {
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
 		request.setCharacterEncoding("utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		response.setHeader("Cache-Control", "no-cache");
@@ -386,6 +393,7 @@ public class listController {
 	@ResponseBody
 	@RequestMapping(value = "/updateList1", method = RequestMethod.POST)
 	private JSONObject updateList1(HttpServletResponse response, HttpServletRequest request) throws Exception {
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
 		JSONObject object = new JSONObject();
 		try {
 			request.setCharacterEncoding("utf-8");

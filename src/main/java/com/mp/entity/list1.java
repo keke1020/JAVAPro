@@ -20,10 +20,10 @@ public class list1 {
 	private int inspect_count;
 	private String arrival_depo;
 
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Tokyo")
 	private Date departure;
 
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Tokyo")
 	private Date arrival;
 	private int arrival_jikan;
 	private int arrival_flag;

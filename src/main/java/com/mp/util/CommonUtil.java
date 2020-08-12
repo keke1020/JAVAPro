@@ -1,5 +1,11 @@
 package com.mp.util;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class CommonUtil {
@@ -21,6 +27,50 @@ public class CommonUtil {
         return pattern.matcher(str).matches();
 	}
 
-
+//	写入txt文件
+	@SuppressWarnings("finally")
+	public static boolean writeDataHubData(List<String> result, String fileName) {
+//        long start = System.currentTimeMillis();
+//        StringBuilder content = new StringBuilder();
+        boolean flag = false;
+        BufferedWriter out = null;
+        try {
+            if (result != null && !result.isEmpty() && !"".equals(fileName)) {
+//                fileName += "_" + System.currentTimeMillis() + ".txt";
+                fileName += ".txt";
+//                File pathFile = new File(fileName);
+//                if (!pathFile.exists()) {
+//                    pathFile.mkdirs();
+//                }
+                File file = new File(fileName);
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "Shift-JIS"));
+//                //标题头
+//                out.write("curr_time,link_id,travel_time,speed,reliabilitycode,link_len,adcode,time_stamp,state,public_rec_time,ds");
+//                out.newLine();
+                for (String info : result) {
+                    out.write(info);
+                    out.newLine();
+                }
+                flag = true;
+//                logger.info("写入文件耗时：*********************************" + (System.currentTimeMillis() - start) + "毫秒");
+//                System.out.println("写入文件耗时：*********************************" + (System.currentTimeMillis() - start) + "毫秒");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (out != null) {
+                try {
+                    out.flush();
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return flag;
+        }
+    }
 
 }

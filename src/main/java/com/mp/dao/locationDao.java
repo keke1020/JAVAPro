@@ -25,6 +25,7 @@ public interface locationDao {
 	int getLocationCountById(@Param("id") String id);
 	int getLocationCountByIds(@Param("ids") String[] ids);
 	int getLocationCountByCodes(@Param("codes") String[] codes);
+	location getLocationByCode(@Param("code") String code);
 	List<location> getLocationById(@Param("id") String id);
 	List<location> getLocationByIds(@Param("ids") String[] ids);
 	void deleteLocationByIds(@Param("ids") String[] ids);

@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class location {
 	private int ID;
-	private String router_index;
+	private int router_index;
 	private boolean chk;
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Tokyo")
 	private Date update;
 	private String code;
 	private String name;
@@ -29,7 +29,7 @@ public class location {
 	private Integer zaiko;
 	private Integer hikiate;
 	private String yoyaku;
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Tokyo")
 	private Date zaiko_update;
 	private Integer sZaiko;
 	private String sBikou;
@@ -44,11 +44,11 @@ public class location {
 		ID = iD;
 	}
 
-	public String getRouter_index() {
+	public int getRouter_index() {
 		return router_index;
 	}
 
-	public void setRouter_index(String router_index) {
+	public void setRouter_index(int router_index) {
 		this.router_index = router_index;
 	}
 

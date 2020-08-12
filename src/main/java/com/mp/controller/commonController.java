@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
+import com.mp.common.DynamicDataSourceHolder;
 import com.mp.dto.option;
 import com.mp.service.commonService;
 
@@ -25,6 +26,7 @@ public class commonController {
 	private JSONObject getCommonLoad(HttpServletResponse response, HttpServletRequest request) {
 		JSONObject object = new JSONObject();
 
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
 		List<option> option1 = commonService.getArrival_japan();
 		object.put("Arrival_japan_rows", option1);
 

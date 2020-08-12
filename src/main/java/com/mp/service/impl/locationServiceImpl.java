@@ -48,6 +48,10 @@ public class locationServiceImpl implements locationService {
 		return locationDao.getLocationCountByCodes(codes);
 	}
 
+	public location getLocationByCode(String code) {
+		return locationDao.getLocationByCode(code);
+	}
+
 	public List<location> getLocationById(String id) {
 		return locationDao.getLocationById(id);
 	}
@@ -87,6 +91,8 @@ public class locationServiceImpl implements locationService {
 	public void updateShinguByCode(location lo) {
 		locationDao.updateShinguByCode(lo);
 	}
+
+
 
 
 
