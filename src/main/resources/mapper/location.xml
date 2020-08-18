@@ -326,16 +326,18 @@
 			<!-- when test="router_index == 'one'"> -->
 			`update` = #{update},
 			`kaisou` = #{kaisou},
-			`tana` =
-			#{tana},
-			`sw` =
-			#{sw},
+			`tana` = #{tana},
+			`sw` = #{sw},
 			`user` = #{user},
 			`moto` = #{moto},
 			`sZaiko` = #{sZaiko},
 			`sBikou` = #{sBikou},
 			<if test="router_index == 3">
 				`zaiko` = #{zaiko},
+			</if>
+			<if test="router_index == 4">
+				`ksize` = #{ksize},
+				`sp` = #{sp},
 			</if>
 		</trim>
 		WHERE `ID` = #{ID}

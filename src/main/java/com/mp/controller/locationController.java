@@ -158,6 +158,7 @@ public class locationController {
 				changeCount_ = location_up.getChangeCount();
 				newCount_ = location_up.getNewCount();
 				object.put("updateFlag", "true");
+				bakupLogi();
 			}
 
 			String searchFlag = request.getParameter("searchFlag");
@@ -312,6 +313,7 @@ public class locationController {
 					.append("件 削除しました。");
 			object.put("resultMsg", sb.toString());
 			object.put("rows", result);
+			bakupLogi();
 			return object;
 		} catch (Exception e) {
 			// TODO 自動生成された catch ブロック
@@ -438,6 +440,7 @@ public class locationController {
 
 			result.setMsg(los.size() + "件 変更しました。");
 			object.put("rows", result);
+			bakupLogi();
 			return object;
 		} catch (Exception e) {
 			// TODO 自動生成された catch ブロック
@@ -468,10 +471,10 @@ public class locationController {
 				for (int i = 0; i < locationNodes.size(); i++) {
 					location lo = locationNodes.get(i);
 
+					location lo_old = locationService.getLocationByCode(lo.getCode());
 					// 新宮
 					if (active == 2) {
 						zaikorireki z_rireki = new zaikorireki();
-						location lo_old = locationService.getLocationByCode(lo.getCode());
 						z_rireki.setUpdate(nowtime);
 						StringBuffer sb_msg = new StringBuffer();
 						sb_msg.append(lo.getCode() + " ");
@@ -497,6 +500,21 @@ public class locationController {
 					// 在庫変更
 					if (active == 3) {
 						zaiko_lo.add(lo);
+						zaikorireki z_rireki = new zaikorireki();
+						z_rireki.setUpdate(nowtime);
+						StringBuffer sb_msg = new StringBuffer();
+						sb_msg.append(lo.getCode() + " ");
+						if (lo_old != null) {
+							sb_msg.append(lo_old.getZaiko());
+						} else {
+							sb_msg.append("null");
+						}
+						sb_msg.append(">").append(lo.getZaiko());
+						z_rireki.setMessage(sb_msg.toString());
+						z_rireki.setUser(loginuser);
+						z_rireki.setUser_id(loginuser_id);
+						z_rireki.setType("zaiko");
+						zaikorirekis.add(z_rireki);
 					}
 				}
 
@@ -519,6 +537,7 @@ public class locationController {
 					}
 				}
 			}
+			bakupLogi();
 			return object;
 		} catch (Exception e) {
 			// TODO 自動生成された catch ブロック
