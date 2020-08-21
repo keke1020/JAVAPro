@@ -22,6 +22,7 @@
 		`result` REGEXP #{condition} OR
 		`user` REGEXP #{condition})
 		ORDER BY `update` DESC
+		LIMIT #{count}
 	</select>
 
 	<insert id="insert" parameterType="com.mp.entity.zaikorireki"
@@ -42,5 +43,17 @@
 		#{type}
 		)
 	</insert>
+
+	<select id="getRirekiByView" resultMap="zaikorirekiResult">
+		SELECT * FROM
+		`zaikorireki` WHERE `type` = 'zaiko' AND
+		(`update` REGEXP #{condition}
+		OR `message` REGEXP #{condition} OR
+		`result` REGEXP #{condition} OR
+		`user` REGEXP #{condition})
+		ORDER BY `update` DESC
+		LIMIT #{count}
+	</select>
+
 
 </mapper>

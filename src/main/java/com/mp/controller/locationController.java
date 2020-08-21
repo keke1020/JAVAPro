@@ -84,12 +84,18 @@ public class locationController {
 		JSONObject object = new JSONObject();
 
 		String masterPath = place + "xampp\\htdocs\\orderA\\dl_master\\master.csv";
-		String masterDatePath = place + "xampp\\htdocs\\ordery\\data\\souko_master.txt";
-		String masterDB_Path = place + "xampp\\htdocs\\ordery\\soukoDB\\master.csv";
+
+//		String masterDatePath = place + "xampp\\htdocs\\ordery\\data\\souko_master.txt";
+//		String masterDB_Path = place + "xampp\\htdocs\\ordery\\soukoDB\\master.csv";
+
+//		test
+		String masterDatePath = place + "xampp\\htdocs\\ordery\\data\\souko_master_wanfang.txt";
+		String masterDB_Path = place + "xampp\\htdocs\\ordery\\soukoDB\\master_wanfang.csv";
 
 		File masterDatePath_file = new File(masterDatePath);
 
 		try {
+			request.setCharacterEncoding("utf-8");
 			int loginuser_id = Integer
 					.parseInt(new String(request.getParameter("loginuser_id").getBytes("ISO-8859-1"), "UTF-8"));
 			String loginuser = java.net.URLDecoder.decode(request.getParameter("loginuser"), "UTF-8");
@@ -908,6 +914,8 @@ public class locationController {
 						Integer sZaiko = null;
 						if (sZaikoNo != null) {
 							sZaiko = Integer.parseInt(getValue(item, sZaikoNo));
+						} else {
+							sZaiko = 0;
 						}
 
 						String sBikou = "";
@@ -952,45 +960,74 @@ public class locationController {
 								lo_update_.setUser(loginuser);
 								lo_update_.setUser_id(loginuser_id);
 								lo_update_.setUpdate(nowtime);
-								if (type == 2) {
-									String kaisouStr = "";
-									String tanaStr = "";
-									if (loca.length() > 4) {
-										kaisouStr = loca.substring(0, 2);
-										tanaStr = loca.substring(2, 3);
-									}
-									lo_update_.setCode(code);
-									lo_update_.setName(name);
-									lo_update_.setTag(tag);
-									lo_update_.setDcode(dcode);
-									lo_update_.setSw(kataban);
-									lo_update_.setKaisou(kaisouStr);
-									lo_update_.setTana(tanaStr);
-									lo_update_.setKsize(ksize);
-									lo_update_.setSp(sp);
-									lo_update_.setsZaiko(sZaiko);
-									lo_update_.setsBikou(sBikou);
-								} else if (type == 1 || type == 5) {
-									lo_update_.setCode(code);
-									lo_update_.setZaiko(zaiko);
-									lo_update_.setHikiate(hikiate);
-									lo_update_.setYoyaku(yoyaku);
-									lo_update_.setT_kbn(t_kbn);
-									lo_update_.setZaiko_update(nowtime);
-								} else if (type == 3) {
-									String kaisouStr = "";
-									String tanaStr = "";
-									if (loca.length() > 4) {
-										kaisouStr = loca.substring(0, 2);
-										tanaStr = loca.substring(2, 3);
-									}
-									lo_update_.setCode(code);
-									lo_update_.setName(name);
-									lo_update_.setTag(tag);
-									lo_update_.setDcode(dcode);
-									lo_update_.setKaisou(kaisouStr);
-									lo_update_.setTana(tanaStr);
+//								if (type == 2) {
+//									String kaisouStr = "";
+//									String tanaStr = "";
+//									if (loca.length() > 4) {
+//										kaisouStr = loca.substring(0, 2);
+//										tanaStr = loca.substring(2, 3);
+//									}
+//									lo_update_.setCode(code);
+//									lo_update_.setName(name);
+//									lo_update_.setTag(tag);
+//									lo_update_.setDcode(dcode);
+//									lo_update_.setSw(kataban);
+//									lo_update_.setKaisou(kaisouStr);
+//									lo_update_.setTana(tanaStr);
+//									lo_update_.setKsize(ksize);
+//									lo_update_.setSp(sp);
+//									lo_update_.setsZaiko(sZaiko);
+//									lo_update_.setsBikou(sBikou);
+//								} else if (type == 1 || type == 5) {
+//									lo_update_.setCode(code);
+//									lo_update_.setZaiko(zaiko);
+//									lo_update_.setHikiate(hikiate);
+//									lo_update_.setYoyaku(yoyaku);
+//									lo_update_.setT_kbn(t_kbn);
+//									lo_update_.setZaiko_update(nowtime);
+//								} else if (type == 3) {
+//									String kaisouStr = "";
+//									String tanaStr = "";
+//									if (loca.length() > 4) {
+//										kaisouStr = loca.substring(0, 2);
+//										tanaStr = loca.substring(2, 3);
+//									}
+//									lo_update_.setCode(code);
+//									lo_update_.setName(name);
+//									lo_update_.setTag(tag);
+//									lo_update_.setDcode(dcode);
+//									lo_update_.setKaisou(kaisouStr);
+//									lo_update_.setTana(tanaStr);
+//								}
+
+								String kaisouStr = "";
+								String tanaStr = "";
+								if (loca.length() > 4) {
+									kaisouStr = loca.substring(0, 2);
+									tanaStr = loca.substring(2, 3);
 								}
+
+								lo_update_.setCode(code);
+								lo_update_.setName(name);
+
+								lo_update_.setTag(tag);
+								lo_update_.setDcode(dcode);
+								lo_update_.setSw(kataban);
+								lo_update_.setKaisou(kaisouStr);
+								lo_update_.setTana(tanaStr);
+								lo_update_.setKsize(ksize);
+								lo_update_.setSp(sp);
+								lo_update_.setsZaiko(sZaiko);
+								lo_update_.setsBikou(sBikou);
+
+								lo_update_.setZaiko(zaiko);
+								lo_update_.setHikiate(hikiate);
+								lo_update_.setYoyaku(yoyaku);
+								lo_update_.setT_kbn(t_kbn);
+								lo_update_.setZaiko_update(nowtime);
+
+								lo_update_.setKaisou(kaisouStr);
+
 								if (tag.indexOf("物流倉庫") != -1) {
 									lo_update_.setKaisou("BS");
 									lo_update_.setTana("99");
@@ -1089,20 +1126,17 @@ public class locationController {
 				num++;
 			}
 
-			if (lo_update != null && lo_update.size() > 0) {
+			if (lo_update.size() > 0) {
 				if (type == 1 || type == 5) {
-//					DynamicDataSourceHolder.setDataSource("jrt_dataSource");
 					locationService.updateByCSV1(lo_update);
 				} else if (type == 2) {
-//					DynamicDataSourceHolder.setDataSource("jrt_dataSource");
 					locationService.updateByCSV2(lo_update);
 				} else if (type == 3) {
-//					DynamicDataSourceHolder.setDataSource("jrt_dataSource");
 					locationService.updateByCSV3(lo_update);
 				}
 			}
 
-			if (lo_add != null && lo_add.size() > 0) {
+			if (lo_add.size() > 0) {
 				if (type == 2) {
 					locationService.insertByCSV2(lo_add);
 				} else {
@@ -1194,7 +1228,8 @@ public class locationController {
 //						zaikorirekis.get(i).setResult("");
 //					}
 					if (zaikorirekis.get(i).getResult() != null) {
-						zaikorirekis.get(i).setResult(zaikorirekis.get(i).getResult().replace(" ", "").replace("\r\n", ""));
+						zaikorirekis.get(i)
+								.setResult(zaikorirekis.get(i).getResult().replace(" ", "").replace("\r\n", ""));
 					} else {
 						zaikorirekis.get(i).setResult("");
 					}

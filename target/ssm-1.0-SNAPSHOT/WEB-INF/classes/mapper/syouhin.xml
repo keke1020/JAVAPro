@@ -5,6 +5,7 @@
 <mapper namespace="com.mp.dao.syouhinDao">
 	<resultMap type="com.mp.entity.syouhin" id="syouhinResult">
 		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<result column="updater-id" property="updater_id" jdbcType="INTEGER" />
 		<result column="updater" property="updater" jdbcType="CLOB" />
 		<result column="updatetime" property="updatetime" jdbcType="DATE" />
 		<result column="code" property="code" jdbcType="CLOB" />
@@ -26,6 +27,7 @@
 	<select id="getSyohinByCode" parameterType="com.mp.entity.syouhin" resultMap="syouhinResult">
 		SELECT
 			ID,
+			updater-id,
 			updater,
 			code,
 			`sub-code`,
@@ -49,8 +51,9 @@
 
 	<insert id="insertSyoh">
 	  INSERT INTO `syouhin`
-		(`code`,`updatetime`,`updater`,`sub-code`,`img`,`item-name`,`unit-ch`,`rate`,`kg`,`material`,`material-ch`,`height`,`width`,`depth`,`doru`)
+		(`updater-id`,`code`,`updatetime`,`updater`,`sub-code`,`img`,`item-name`,`unit-ch`,`rate`,`kg`,`material`,`material-ch`,`height`,`width`,`depth`,`doru`)
 	  values(
+	  #{updater_id},
 	   #{code},
 	   #{updatetime},
 	   #{updater},
@@ -68,7 +71,7 @@
 	   #{doru}
 	)
 	 ON DUPLICATE KEY UPDATE
-		`updatetime`=VALUES(`updatetime`),`updater`=VALUES(`updater`),`sub-code`=VALUES(`sub-code`),`img`=VALUES(`img`),`item-name`=VALUES(`item-name`),
+		`updatetime`=VALUES(`updatetime`),`updater-id`=VALUES(`updater-id`),`updater`=VALUES(`updater`),`sub-code`=VALUES(`sub-code`),`img`=VALUES(`img`),`item-name`=VALUES(`item-name`),
 		`unit-ch`=VALUES(`unit-ch`),`rate`=VALUES(`rate`),`kg`=VALUES(`kg`), `material`=VALUES(`material`),`material-ch`=VALUES(`material-ch`),`height`=VALUES(`height`),
 		`width`=VALUES(`width`),`depth`=VALUES(`depth`),`doru`=VALUES(`doru`)
 	</insert>

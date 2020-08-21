@@ -357,6 +357,12 @@
 	<insert id="updateByCSV1" parameterType="java.util.ArrayList">
 		insert into `location`
 		(
+		`update`,
+		`name`,
+		`tag`,
+		`dcode`,
+		`user`,
+		`sZaiko`,
 		`zaiko_update`,
 		`code`,
 		`zaiko`,
@@ -368,6 +374,12 @@
 		<foreach collection="list" item="item" index="index"
 			separator=",">
 			(
+			#{item.update},
+			#{item.name},
+			#{item.tag},
+			#{item.dcode},
+			#{item.user},
+			#{item.sZaiko},
 			#{item.zaiko_update},
 			#{item.code},
 			#{item.zaiko},
@@ -393,6 +405,8 @@
 		`tana`,
 		`ksize`,
 		`sp`,
+		`zaiko`,
+		`hikiate`,
 		`sZaiko`,
 		`sBikou`,
 		`user`,
@@ -412,6 +426,8 @@
 			#{item.tana},
 			#{item.ksize},
 			#{item.sp},
+			#{item.zaiko},
+			#{item.hikiate},
 			#{item.sZaiko},
 			#{item.sBikou},
 			#{item.user},
@@ -433,6 +449,9 @@
 		`tag`,
 		`kaisou`,
 		`tana`,
+		`zaiko`,
+		`hikiate`,
+		`sZaiko`,
 		`user`,
 		`user_id`
 		)
@@ -447,6 +466,9 @@
 			#{item.tag},
 			#{item.kaisou},
 			#{item.tana},
+			#{item.zaiko},
+			#{item.hikiate},
+			#{item.sZaiko},
 			#{item.user},
 			#{item.user_id}
 			)

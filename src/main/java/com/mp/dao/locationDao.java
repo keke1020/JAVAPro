@@ -29,6 +29,7 @@ public interface locationDao {
 	List<location> getLocationById(@Param("id") String id);
 	List<location> getLocationByIds(@Param("ids") String[] ids);
 	void deleteLocationByIds(@Param("ids") String[] ids);
+	void updateByCSV(@Param("list") List<location> lo);
 	void updateByCSV1(@Param("list") List<location> lo);
 	void updateByCSV2(@Param("list") List<location> lo);
 	void updateByCSV3(@Param("list") List<location> lo);

@@ -194,6 +194,7 @@ public class listController {
 		try {
 			request.setCharacterEncoding("utf-8");
 			JSONObject j1 = JSONObject.parseObject(params);
+
 			List<list1> listnodes = JSONObject.parseArray(j1.getJSONArray("params").toJSONString(), list1.class);
 			List<syouhin> syohnodes = JSONObject.parseArray(j1.getJSONArray("params").toJSONString(), syouhin.class);
 			Date now = new Date();
@@ -573,6 +574,7 @@ public class listController {
 			syouhin.setWidth(width);
 			syouhin.setDepth(depth);
 			syouhin.setDoru(ne_stock);
+			syouhin.setUpdater_id(loginuser_id);
 
 			// ------------------------------- ここ修正したら上のも修正してください start
 			// -------------------------------

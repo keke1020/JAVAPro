@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mp.dao.fileDao">
+	<resultMap type="file" id="fileResult">
+		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<result column="type" property="type" jdbcType="VARCHAR" />
+		<result column="parentId" property="parentId"
+			jdbcType="VARCHAR" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="originalFileName" property="originalFileName"
+			jdbcType="VARCHAR" />
+		<result column="path" property="path" jdbcType="VARCHAR" />
+		<result column="user_id" property="user_id" jdbcType="INTEGER" />
+		<result column="updatetime" property="updatetime"
+			jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<insert id="insert" parameterType="com.mp.entity.file"
+		useGeneratedKeys="true" keyProperty="ID" keyColumn="ID">
+		insert into file(`type`,
+		`parentId`, `name`, `originalFileName`, `path`, `user_id`, `updatetime`)
+		values(
+		#{type},
+		#{parentId},
+		#{name},
+		#{originalFileName},
+		#{path},
+		#{user_id},
+		#{updatetime}
+		)
+	</insert>
+
+	<update id="updateParentId" parameterType="com.mp.entity.file">
+		UPDATE `file`
+		<trim prefix="set" suffixOverrides=",">
+			`parentId` = #{id},
+		</trim>
+		WHERE
+		`ID` in
+		<foreach collection="ids" item="id" index="index" open="("
+			close=")" separator=",">
+			#{id}
+		</foreach>
+	</update>
+
+
+
+
+
+</mapper>
