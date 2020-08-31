@@ -6,17 +6,19 @@
 	<resultMap type="bbs" id="bbsResult">
 		<id column="ID" property="ID" jdbcType="INTEGER" />
 		<id column="user_id" property="user_id" jdbcType="INTEGER" />
-		<result column="username" property="username" jdbcType="VARCHAR" />
+		<result column="username" property="username"
+			jdbcType="VARCHAR" />
 		<result column="update" property="update" jdbcType="TIMESTAMP" />
 		<result column="message" property="message" jdbcType="VARCHAR" />
 	</resultMap>
 
 	<!-- dao接口方法提供sql语句配置 -->
 	<select id="getBBS" resultMap="bbsResult">
-		 SELECT * FROM list2
+		SELECT * FROM list2
 		<choose>
 			<when test="bbs_update_e != null and bbs_update_e != ''">
-				WHERE `update` &gt;= #{bbs_update_s} and `update` &lt;= #{bbs_update_e}
+				WHERE `update` &gt;= #{bbs_update_s} and `update`
+				&lt;= #{bbs_update_e}
 			</when>
 			<otherwise>
 				WHERE `update` &gt;= '0000-00-00'
@@ -28,29 +30,31 @@
 		<if test="bbs_keyword != null and bbs_keyword != ''">
 			AND `message` like concat('%', #{bbs_keyword} ,'%')
 		</if>
-		 ORDER BY ID DESC
-		 LIMIT #{offset}, #{limit}
+		ORDER BY ID DESC
+		LIMIT #{offset}, #{limit}
 	</select>
 
 	<insert id="insertBBS">
-	  insert into list2(`user_id`, `username`, `update`, `message`)
-	  values(
+		insert into list2(`user_id`, `username`, `update`, `message`)
+		values(
 		#{user_id},
 		#{username},
 		#{update},
 		#{message}
-	)
+		)
 	</insert>
 
 	<delete id="deleteBBS" parameterType="bbs">
-		DELETE FROM list2 WHERE ID = #{ID}
+		DELETE FROM list2 WHERE ID
+		= #{ID}
 	</delete>
 
 	<select id="getTotal" resultType="java.lang.Integer">
-    	select count(*) from list2
-    	<choose>
+		select count(*) from list2
+		<choose>
 			<when test="bbs_update_e != null and bbs_update_e != ''">
-				WHERE `update` &gt;= #{bbs_update_s} and `update` &lt;= #{bbs_update_e}
+				WHERE `update` &gt;= #{bbs_update_s} and `update`
+				&lt;= #{bbs_update_e}
 			</when>
 			<otherwise>
 				WHERE `update` &gt;= '0000-00-00'
@@ -62,7 +66,7 @@
 		<if test="bbs_keyword != null and bbs_keyword != ''">
 			AND `message` like concat('%', #{bbs_keyword} ,'%')
 		</if>
-  	</select>
+	</select>
 
 
 </mapper>

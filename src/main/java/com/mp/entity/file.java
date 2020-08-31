@@ -6,12 +6,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class file {
 	private int ID;
-	private String type;
+	private String type; 
 	private String parentId;
 	private String name;
-	private String originalFileName;
+	private String changeName;
 	private String path;
 	private int user_id;
+
 	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Tokyo")
 	private Date updatetime;
 
@@ -47,12 +48,12 @@ public class file {
 		this.name = name;
 	}
 
-	public String getOriginalFileName() {
-		return originalFileName;
+	public String getChangeName() {
+		return changeName;
 	}
 
-	public void setOriginalFileName(String originalFileName) {
-		this.originalFileName = originalFileName;
+	public void setChangeName(String changeName) {
+		this.changeName = changeName;
 	}
 
 	public String getPath() {

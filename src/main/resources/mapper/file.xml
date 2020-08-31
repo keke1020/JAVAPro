@@ -5,11 +5,12 @@
 <mapper namespace="com.mp.dao.fileDao">
 	<resultMap type="file" id="fileResult">
 		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<!-- 0:custom 1:企画 -->
 		<result column="type" property="type" jdbcType="VARCHAR" />
 		<result column="parentId" property="parentId"
 			jdbcType="VARCHAR" />
 		<result column="name" property="name" jdbcType="VARCHAR" />
-		<result column="originalFileName" property="originalFileName"
+		<result column="changeName" property="changeName"
 			jdbcType="VARCHAR" />
 		<result column="path" property="path" jdbcType="VARCHAR" />
 		<result column="user_id" property="user_id" jdbcType="INTEGER" />
@@ -17,25 +18,54 @@
 			jdbcType="TIMESTAMP" />
 	</resultMap>
 
+	<select id="getFilesByParentId" resultMap="fileResult">
+		SELECT
+		ID,
+		name,
+		changeName,
+		path
+		from
+		file
+		where
+		parentId = #{id}
+		and type = #{type}
+	</select>
+
+	<select id="getFileById" resultMap="fileResult">
+		SELECT
+		ID,
+		name,
+		changeName,
+		path
+		from
+		file
+		where
+		ID = #{id}
+	</select>
+
 	<insert id="insert" parameterType="com.mp.entity.file"
 		useGeneratedKeys="true" keyProperty="ID" keyColumn="ID">
 		insert into file(`type`,
-		`parentId`, `name`, `originalFileName`, `path`, `user_id`, `updatetime`)
+		`parentId`, `name`, `changeName`, `path`, `user_id`, `updatetime`)
 		values(
 		#{type},
 		#{parentId},
 		#{name},
-		#{originalFileName},
+		#{changeName},
 		#{path},
 		#{user_id},
 		#{updatetime}
 		)
 	</insert>
 
+	<update id="clearParentId" parameterType="com.mp.entity.file">
+		UPDATE `file` set `parentId` = null WHERE parentId = #{parentid} and type = #{type}
+	</update>
+
 	<update id="updateParentId" parameterType="com.mp.entity.file">
 		UPDATE `file`
 		<trim prefix="set" suffixOverrides=",">
-			`parentId` = #{id},
+			`parentId` = #{parentid},
 		</trim>
 		WHERE
 		`ID` in
@@ -46,7 +76,9 @@
 	</update>
 
 
-
+	<select id="getLastFinishFilesByParentId" resultMap="fileResult">
+		SELECT * from file where parentId = #{id} and type = '2' ORDER BY id desc
+	</select>
 
 
 </mapper>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mp.dao.customDao">
+	<resultMap type="custom" id="customResult">
+		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<result column="title" property="title" jdbcType="VARCHAR" />
+		<result column="goods_code" property="goods_code" jdbcType="VARCHAR" />
+		<result column="user_id" property="user_id" jdbcType="INTEGER" />
+		<result column="updatetime" property="updatetime"
+			jdbcType="TIMESTAMP" />
+		<result column="updater" property="updater" jdbcType="VARCHAR" />
+		<result column="view" property="view" jdbcType="INTEGER" />
+		<result column="info" property="info" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="getCustom" resultMap="customResult">
+		SELECT
+		ID,
+		title,
+		goods_code,
+		info,
+		updatetime,
+		(select realname from `user` where ID = user_id limit 1) as updater,
+		view
+		FROM
+		custom
+		where view = 1
+	</select>
+
+	<select id="getCustomById" resultMap="customResult">
+		SELECT
+		ID,
+		title,
+		goods_code,
+		updatetime,
+		info,
+		(select realname from `user` where ID = user_id limit 1) as updater
+		FROM
+		custom
+		where
+		ID = #{id}
+	</select>
+
+	<insert id="insert" parameterType="com.mp.entity.custom"
+		useGeneratedKeys="true" keyProperty="ID" keyColumn="ID">
+		insert into
+		custom(`title`,
+		`goods_code`,`user_id`, `updatetime`, `view`, `info`)
+		values(
+		#{title},
+		#{goods_code},
+		#{user_id},
+		#{updatetime},
+		#{view},
+		#{info}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.mp.entity.custom">
+		UPDATE `custom`
+		<set>
+            title=#{title},
+            goods_code=#{goods_code},
+            user_id=#{user_id},
+            updatetime=#{updatetime},
+            info=#{info},
+        </set>
+		WHERE `ID` = #{ID}
+	</update>
+
+	<update id="deleteCustomById" parameterType="com.mp.entity.custom">
+		UPDATE `custom`
+		set `view` = 0
+		WHERE `ID` = #{id}
+	</update>
+
+
+
+</mapper>

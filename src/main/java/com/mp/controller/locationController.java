@@ -1,8 +1,6 @@
 package com.mp.controller;
 
-import static org.hamcrest.CoreMatchers.nullValue;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,10 +8,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -27,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -35,7 +30,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.jasper.tagplugins.jstl.core.If;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,7 +43,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.alibaba.fastjson.JSONObject;
 import com.mp.common.DynamicDataSourceHolder;
 import com.mp.dto.result;
-import com.mp.dto.system;
+import com.mp.entity.config;
 import com.mp.entity.location;
 import com.mp.entity.location_up;
 import com.mp.entity.zaikorireki;
@@ -56,7 +51,6 @@ import com.mp.service.locationService;
 import com.mp.service.zaikorirekiService;
 import com.mp.util.CommonUtil;
 import com.mp.util.CsvExportUtil;
-import com.mp.util.FileCharDetecter;
 import com.mp.util.FileUtil;
 
 @Controller
@@ -73,16 +67,18 @@ public class locationController {
 	SimpleDateFormat sf4 = new SimpleDateFormat("yyyyMMddHH");
 	SimpleDateFormat sf5 = new SimpleDateFormat("yyyyMMddHHmmss");
 
-	String test_pl = "D:\\";
-	String server_pl = "E:\\";
-	String place = test_pl; // *
-	String place_zaiko = place + "xampp\\htdocs\\ordery\\logi\\zaiko\\update\\";
+	String place = "";
 
 	@ResponseBody
 	@RequestMapping(value = "/getLocation", method = RequestMethod.POST)
 	private JSONObject getLocation(HttpServletResponse response, HttpServletRequest request, String router_index) {
 		JSONObject object = new JSONObject();
 
+		if(config.ISLOCAL) {
+			place = config.LOCATION_PLACE_LOCAL;
+		} else {
+			place = config.LOCATION_PLACE_SERVER;
+		}
 		String masterPath = place + "xampp\\htdocs\\orderA\\dl_master\\master.csv";
 
 //		String masterDatePath = place + "xampp\\htdocs\\ordery\\data\\souko_master.txt";
@@ -96,6 +92,8 @@ public class locationController {
 
 		try {
 			request.setCharacterEncoding("utf-8");
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
 			int loginuser_id = Integer
 					.parseInt(new String(request.getParameter("loginuser_id").getBytes("ISO-8859-1"), "UTF-8"));
 			String loginuser = java.net.URLDecoder.decode(request.getParameter("loginuser"), "UTF-8");
@@ -307,7 +305,13 @@ public class locationController {
 				return object;
 			}
 
-			String move_Path = test_pl + "xampp\\htdocs\\ordery\\upload\\sf" + sf2.format(new Date()) + ".csv";
+			if(config.ISLOCAL) {
+				place = config.LOCATION_PLACE_LOCAL;
+			} else {
+				place = config.LOCATION_PLACE_SERVER;
+			}
+
+			String move_Path = place + "xampp\\htdocs\\ordery\\upload\\sf" + sf2.format(new Date()) + ".csv";
 			Path path_move = Paths.get(move_Path);
 			Files.copy(csvfile.getInputStream(), path_move, StandardCopyOption.REPLACE_EXISTING);
 
@@ -539,7 +543,7 @@ public class locationController {
 								.append(zaiko_lo.get(i).getZaiko()).append(",").append(loginuser).append(",")
 								.append(now);
 						zaiko_list.add(sb.toString());
-						CommonUtil.writeDataHubData(zaiko_list, place_zaiko + zaiko_lo.get(i).getCode() + "_" + now);
+						CommonUtil.writeDataHubData(zaiko_list, "xampp\\htdocs\\ordery\\logi\\zaiko\\update\\" + zaiko_lo.get(i).getCode() + "_" + now);
 					}
 				}
 			}
@@ -623,6 +627,12 @@ public class locationController {
 				datas.add(map);
 			}
 
+			if(config.ISLOCAL) {
+				place = config.LOCATION_PLACE_LOCAL;
+			} else {
+				place = config.LOCATION_PLACE_SERVER;
+			}
+
 			// 设置导出文件前缀
 			File file = new File(place + "xampp\\htdocs\\ordery\\\\logi\\backup\\" + sf4.format(new Date()) + ".csv");
 			if (!file.exists()) { // 文件不存在则创建文件，先创建目录
@@ -653,6 +663,11 @@ public class locationController {
 			newfile = new File(file_name);
 			Path path_file = Paths.get(file_name);
 
+			if(config.ISLOCAL) {
+				place = config.LOCATION_PLACE_LOCAL;
+			} else {
+				place = config.LOCATION_PLACE_SERVER;
+			}
 			String dest = place + "xampp\\htdocs\\ordery\\upload\\" + newfile.getName();
 			File destfile = new File(dest);
 			if (!destfile.exists()) {

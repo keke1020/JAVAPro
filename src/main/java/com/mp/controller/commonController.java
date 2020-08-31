@@ -38,6 +38,20 @@ public class commonController {
 		return object;
 	}
 
+	@ResponseBody
+	@RequestMapping(value = "/getCommonUser", method = RequestMethod.POST)
+	private JSONObject getCommonUser(HttpServletResponse response, HttpServletRequest request) {
+		JSONObject object = new JSONObject();
+
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
+		List<option> option = commonService.getUsers();
+		object.put("user_rows", option);
+
+		response.setHeader("Access-Control-Allow-Origin", "*");
+		response.setHeader("Cache-Control", "no-cache");
+		return object;
+	}
+
 
 
 

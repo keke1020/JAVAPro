@@ -3,47 +3,400 @@
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mp.dao.planDao">
-	<resultMap type="plan" id="planResult">
+	<resultMap type="com.mp.entity.plan" id="planResult">
 		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<result column="state" property="state" jdbcType="INTEGER" />
 		<result column="title" property="title" jdbcType="VARCHAR" />
 		<result column="link" property="link" jdbcType="VARCHAR" />
 		<result column="info" property="info" jdbcType="CLOB" />
+		<result column="createtime" property="createtime"
+			jdbcType="VARCHAR" />
+		<result column="user_id" property="user_id" jdbcType="INTEGER" />
+		<result column="tantou_id" property="tantou_id"
+			jdbcType="INTEGER" />
+		<result column="tantou" property="tantou" jdbcType="VARCHAR" />
+		<result column="updatetime" property="updatetime"
+			jdbcType="TIMESTAMP" />
+		<result column="updater" property="updater" jdbcType="VARCHAR" />
+		<result column="showFlag" property="showFlag" jdbcType="INTEGER" />
+	</resultMap>
+
+	<resultMap type="com.mp.entity.plan_info"
+		id="plan_infoResult">
+		<id column="ID" property="ID" jdbcType="INTEGER" />
 		<result column="state" property="state" jdbcType="INTEGER" />
 		<result column="user_id" property="user_id" jdbcType="INTEGER" />
 		<result column="updatetime" property="updatetime"
 			jdbcType="TIMESTAMP" />
+		<result column="updatetime2" property="updatetime2"
+			jdbcType="DATE" />
 		<result column="updater" property="updater" jdbcType="VARCHAR" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		<result column="info" property="info" jdbcType="CLOB" />
 	</resultMap>
 
 	<insert id="insert" parameterType="com.mp.entity.plan"
 		useGeneratedKeys="true" keyProperty="ID" keyColumn="ID">
 		insert into
 		plan(`title`,
-		`info`, `link`, `state`,`user_id`, `updatetime`)
+		`info`, `link`, `user_id`, `createtime`, `updatetime`, `showFlag`)
 		values(
 		#{title},
 		#{info},
 		#{link},
-		#{state},
 		#{user_id},
-		#{updatetime}
+		#{createtime},
+		#{updatetime},
+		#{showFlag}
 		)
 	</insert>
 
+	<insert id="insertInfo" parameterType="com.mp.entity.plan_info"
+		useGeneratedKeys="true" keyProperty="ID" keyColumn="ID">
+		insert into
+		plan_info(`state`,
+		`parentId`, `user_id`, `updatetime`, `code`, `info`)
+		values(
+		#{state},
+		#{parentId},
+		<choose>
+             <when test="backFlag == true and state == 1">
+                 (SELECT user_id from plan_info pi2 where parentId = #{parentId} order by id desc limit 1,1),
+             </when>
+             <otherwise>
+                 #{user_id},
+             </otherwise>
+         </choose>
+		#{updatetime},
+		#{code},
+		#{info}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.mp.entity.plan">
+		UPDATE `plan`
+		<set>
+			title=#{title},
+			info=#{info},
+			link=#{link},
+			user_id=#{user_id},
+			updatetime=#{updatetime},
+		</set>
+		WHERE `ID` = #{ID}
+	</update>
+
+	<update id="delete" parameterType="com.mp.entity.plan">
+		UPDATE `plan`
+		<set>
+			showFlag=0,
+			updatetime=#{updatetime},
+		</set>
+		WHERE `ID` = #{ID}
+	</update>
+
 	<select id="getPlan" resultMap="planResult">
+		SELECT
+		ID,
+		(select
+		state from
+		`plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1)
+		as state,
+		(select
+		user_id from `plan_info` pi where pi.parentId = pl.ID
+		ORDER BY pi.ID desc limit 1) as tantou_id,
+		(select
+		realname from `user`
+		ur where ur.ID = (select
+		user_id from `plan_info` pi where pi.parentId
+		= pl.ID ORDER BY pi.ID desc limit 1)) as tantou,
+		title,
+		info,
+		link,
+		user_id,
+		(select
+		realname from `user` ur where ur.ID = pl.user_id) as
+		updater,
+		createtime,
+		updatetime
+		FROM
+		plan pl
+		where
+		pl.showFlag = '1'
+	</select>
+
+	<select id="getPlanByState0" resultMap="planResult">
+		SELECT
+		ID,
+		(select
+		state from
+		`plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1)
+		as state,
+		(select
+		user_id from `plan_info` pi where pi.parentId = pl.ID
+		ORDER BY pi.ID desc limit 1) as tantou_id,
+		(select
+		realname from `user`
+		ur where ur.ID = (select
+		user_id from `plan_info` pi where pi.parentId
+		= pl.ID ORDER BY pi.ID desc limit 1)) as tantou,
+		title,
+		info,
+		link,
+		user_id,
+		(select
+		realname from `user` ur where ur.ID = pl.user_id) as
+		updater,
+		createtime,
+		updatetime
+		FROM
+		plan pl
+		where
+		pl.showFlag = '1'
+		and (select state from `plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1) = 0
+		LIMIT #{offset}, #{limit}
+	</select>
+
+	<select id="getPlanByState1" resultMap="planResult">
+		SELECT
+		ID,
+		(select
+		state from
+		`plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1)
+		as state,
+		(select
+		user_id from `plan_info` pi where pi.parentId = pl.ID
+		ORDER BY pi.ID desc limit 1) as tantou_id,
+		(select
+		realname from `user`
+		ur where ur.ID = (select
+		user_id from `plan_info` pi where pi.parentId
+		= pl.ID ORDER BY pi.ID desc limit 1)) as tantou,
+		title,
+		info,
+		link,
+		user_id,
+		(select
+		realname from `user` ur where ur.ID = pl.user_id) as
+		updater,
+		createtime,
+		updatetime
+		FROM
+		plan pl
+		where
+		pl.showFlag = '1'
+		and (select state from `plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1) = 1
+		LIMIT #{offset}, #{limit}
+	</select>
+
+	<select id="getPlanByState2" resultMap="planResult">
+		SELECT
+		ID,
+		(select
+		state from
+		`plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1)
+		as state,
+		(select
+		user_id from `plan_info` pi where pi.parentId = pl.ID
+		ORDER BY pi.ID desc limit 1) as tantou_id,
+		(select
+		realname from `user`
+		ur where ur.ID = (select
+		user_id from `plan_info` pi where pi.parentId
+		= pl.ID ORDER BY pi.ID desc limit 1)) as tantou,
+		title,
+		info,
+		link,
+		user_id,
+		(select
+		realname from `user` ur where ur.ID = pl.user_id) as
+		updater,
+		createtime,
+		updatetime
+		FROM
+		plan pl
+		where
+		pl.showFlag = '1'
+		and (select state from `plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1) = 2
+		LIMIT #{offset}, #{limit}
+	</select>
+
+	<select id="getPlanByState3" resultMap="planResult">
+		SELECT
+		ID,
+		(select
+		state from
+		`plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1)
+		as state,
+		(select
+		user_id from `plan_info` pi where pi.parentId = pl.ID
+		ORDER BY pi.ID desc limit 1) as tantou_id,
+		(select
+		realname from `user`
+		ur where ur.ID = (select
+		user_id from `plan_info` pi where pi.parentId
+		= pl.ID ORDER BY pi.ID desc limit 1)) as tantou,
+		title,
+		info,
+		link,
+		user_id,
+		(select
+		realname from `user` ur where ur.ID = pl.user_id) as
+		updater,
+		createtime,
+		updatetime
+		FROM
+		plan pl
+		where
+		pl.showFlag = '1'
+		and (select state from `plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1) = 3
+		LIMIT #{offset}, #{limit}
+	</select>
+
+	<select id="getPlanByState4" resultMap="planResult">
+		SELECT
+		ID,
+		(select
+		state from
+		`plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1)
+		as state,
+		(select
+		user_id from `plan_info` pi where pi.parentId = pl.ID
+		ORDER BY pi.ID desc limit 1) as tantou_id,
+		(select
+		realname from `user`
+		ur where ur.ID = (select
+		user_id from `plan_info` pi where pi.parentId
+		= pl.ID ORDER BY pi.ID desc limit 1)) as tantou,
+		title,
+		info,
+		link,
+		user_id,
+		(select
+		realname from `user` ur where ur.ID = pl.user_id) as
+		updater,
+		createtime,
+		updatetime
+		FROM
+		plan pl
+		where
+		pl.showFlag = '1'
+		and (select state from `plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1) = 4
+		or (select state from `plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1) = 5
+		LIMIT #{offset}, #{limit}
+	</select>
+
+	<select id="getPlanById" resultMap="planResult">
 		SELECT
 		ID,
 		title,
 		info,
 		link,
-		state,
-		updatetime,
-		(select realname from `user` where ID = user_id limit 1) as updater
+		createtime,
+		updatetime
 		FROM
 		plan
+		where
+		ID = #{id}
+	</select>
+
+	<select id="getPlanStateDetailById" resultMap="plan_infoResult">
+		SELECT
+		pi.ID,
+		pi.state,
+		pi.parentId,
+		pi.user_id,
+		(select
+		realname from `user` where ID = pi.user_id) as updater,
+		pi.updatetime,
+		date_format( pi.updatetime,'%Y-%m-%d') AS updatetime2,
+		pi.code,
+		pi.info
+		FROM
+		plan pl
+		LEFT JOIN plan_info pi ON pl.ID = pi.parentId
+		where
+		pl.ID = #{id}
 	</select>
 
 
+	<select id="getFinishPlanInfoByLastId"
+		resultMap="plan_infoResult">
+		SELECT
+		ID,
+		pi.state,
+		pi.parentId,
+		pi.user_id,
+		(
+		SELECT
+		realname
+		FROM
+		`user`
+		WHERE
+		ID = pi.user_id
+		) AS updater,
+		pi.updatetime,
+		date_format(pi.updatetime, '%Y-%m-%d') AS updatetime2,
+		pi.code,
+		pi.info
+		FROM
+		plan_info pi
+		WHERE
+		parentId = #{id}
+		AND state in ('4','5')
+		ORDER BY
+		ID DESC
+		LIMIT 1
+	</select>
 
+	<select id="getPlanCountByState0" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		plan pl
+		where
+		pl.showFlag = '1'
+		and (select state from `plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1) = 0
+	</select>
+
+	<select id="getPlanCountByState1" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		plan pl
+		where
+		pl.showFlag = '1'
+		and (select state from `plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1) = 1
+	</select>
+
+	<select id="getPlanCountByState2" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		plan pl
+		where
+		pl.showFlag = '1'
+		and (select state from `plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1) = 2
+	</select>
+
+	<select id="getPlanCountByState3" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		plan pl
+		where
+		pl.showFlag = '1'
+		and (select state from `plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1) = 3
+	</select>
+
+	<select id="getPlanCountByState4" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		plan pl
+		where
+		pl.showFlag = '1'
+		and (select state from `plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1) = 4
+		or (select state from `plan_info` pi where pi.parentId = pl.ID ORDER BY pi.ID desc limit 1) = 5
+	</select>
 
 </mapper>

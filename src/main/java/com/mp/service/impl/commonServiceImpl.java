@@ -22,4 +22,9 @@ public class commonServiceImpl implements commonService{
 		return commonDao.getBBS_user();
 	}
 
+	public List<option> getUsers() {
+		return commonDao.getUsers();
+	}
+
+
 }

@@ -35,5 +35,11 @@
 		select DISTINCT username as value,username as label from list2 ORDER BY `update` desc
 	</select>
 
+	<select id="getUsers" resultMap="option">
+		select id as value,realname as label from user ORDER BY realname
+	</select>
+
+
+
 
 </mapper>

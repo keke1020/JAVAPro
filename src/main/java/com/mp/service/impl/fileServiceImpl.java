@@ -1,5 +1,7 @@
 package com.mp.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,5 +22,27 @@ public class fileServiceImpl implements fileService{
 		// TODO 自動生成されたメソッド・スタブ
 		fileDao.updateParentId(ids, id);
 	}
+
+	public void clearParentId(String type, int id) {
+		// TODO 自動生成されたメソッド・スタブ
+		fileDao.clearParentId(type, id);
+	}
+
+	public List<file> getFilesByParentId(String type, String id) {
+		// TODO 自動生成されたメソッド・スタブ
+		return fileDao.getFilesByParentId(type,id);
+	}
+
+	public file getFileById(String id) {
+		// TODO 自動生成されたメソッド・スタブ
+		return fileDao.getFileById(id);
+	}
+
+	public List<file> getLastFinishFilesByParentId(int id) {
+		// TODO 自動生成されたメソッド・スタブ
+		return fileDao.getLastFinishFilesByParentId(id);
+	}
+
+
 
 }
