@@ -92,6 +92,7 @@ public class locationController {
 
 		try {
 			request.setCharacterEncoding("utf-8");
+			response.setCharacterEncoding("utf-8");
 			response.setHeader("Access-Control-Allow-Origin", "*");
 			response.setHeader("Cache-Control", "no-cache");
 			int loginuser_id = Integer

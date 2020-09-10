@@ -12,4 +12,5 @@ public interface customDao {
 	List<custom> getCustom();
 	custom getCustomById(@Param("id") String id);
 	void deleteCustomById(@Param("id") String id);
+	void setView_count(@Param("id") String id);
 }

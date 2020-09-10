@@ -52,8 +52,6 @@ public class planServiceImpl implements planService {
 		planDao.delete(p);
 	}
 
-
-
 	public List<plan> getPlanByState0(int state, int currentPage, int pageSize) {
 		// TODO 自動生成されたメソッド・スタブ
 		return planDao.getPlanByState0(state, currentPage, pageSize);
@@ -103,5 +101,6 @@ public class planServiceImpl implements planService {
 		// TODO 自動生成されたメソッド・スタブ
 		return planDao.getPlanCountByState4();
 	}
+
 
 }

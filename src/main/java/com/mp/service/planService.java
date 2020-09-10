@@ -24,4 +24,5 @@ public interface planService {
 	int getPlanCountByState2();
 	int getPlanCountByState3();
 	int getPlanCountByState4();
+
 }

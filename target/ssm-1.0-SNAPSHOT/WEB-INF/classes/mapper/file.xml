@@ -76,7 +76,9 @@
 	</update>
 
 
-
+	<select id="getLastFinishFilesByParentId" resultMap="fileResult">
+		SELECT * from file where parentId = #{id} and type = '2' ORDER BY id desc
+	</select>
 
 
 </mapper>

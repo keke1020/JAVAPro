@@ -35,6 +35,7 @@ import com.mp.entity.location;
 import com.mp.entity.plan;
 import com.mp.entity.plan_info;
 import com.mp.service.planService;
+import com.mp.service.userService;
 import com.mp.service.commonService;
 import com.mp.service.fileService;
 
@@ -45,6 +46,9 @@ public class planController {
 
 	@Autowired
 	private fileService fileService;
+
+	@Autowired
+	private userService userService;
 
 	SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss");
 	SimpleDateFormat sf2 = new SimpleDateFormat("yyyyMMdd");
@@ -59,9 +63,9 @@ public class planController {
 
 		String path = "";
 		if(config.ISLOCAL) {
-			path = config.PLAN_PIC_PLACE_LOCAL + "wanfang_file";
+			path = config.TODO_FILE_PLACE_LOCAL + "wanfang_file";
 		} else {
-			path = config.PLAN_PIC_PLACE_SERVER + "wanfang_file";
+			path = config.TODO_FILE_PLACE_SERVER + "wanfang_file";
 		}
 
 		try {
@@ -110,6 +114,27 @@ public class planController {
 			object.put("file", upfile_re);
 			object.put("success", true);
 			object.put("message", "アプロードしました!");
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return object;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/setUserPlan_contr", method = RequestMethod.POST)
+	private JSONObject setUserPlan_contr(HttpServletResponse response,
+			HttpServletRequest request, String id) {
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
+		JSONObject object = new JSONObject();
+
+		try {
+			String[] ids = id.split(",");
+			if (ids.length > 0) {
+				userService.setUserAuthority("plan_priv", ids);
+			}
+
 			response.setHeader("Access-Control-Allow-Origin", "*");
 			response.setHeader("Cache-Control", "no-cache");
 		} catch (Exception e) {
@@ -242,6 +267,7 @@ public class planController {
 		JSONObject object = new JSONObject();
 		try {
 			request.setCharacterEncoding("utf-8");
+			response.setCharacterEncoding("utf-8");
 
 			List<plan_info> plan_info = planService.getPlanStateDetailById(planId);
 

@@ -36,4 +36,9 @@ public class customServiceImpl implements customService {
 		customDao.update(custom);
 	}
 
+	public void setView_count(String id) {
+		// TODO 自動生成されたメソッド・スタブ
+		customDao.setView_count(id);
+	}
+
 }

@@ -12,6 +12,7 @@
 			jdbcType="TIMESTAMP" />
 		<result column="updater" property="updater" jdbcType="VARCHAR" />
 		<result column="view" property="view" jdbcType="INTEGER" />
+		<result column="view_count" property="view_count" jdbcType="INTEGER" />
 		<result column="info" property="info" jdbcType="VARCHAR" />
 	</resultMap>
 
@@ -23,7 +24,8 @@
 		info,
 		updatetime,
 		(select realname from `user` where ID = user_id limit 1) as updater,
-		view
+		view,
+		view_count
 		FROM
 		custom
 		where view = 1
@@ -36,7 +38,8 @@
 		goods_code,
 		updatetime,
 		info,
-		(select realname from `user` where ID = user_id limit 1) as updater
+		(select realname from `user` where ID = user_id limit 1) as updater,
+		view_count
 		FROM
 		custom
 		where
@@ -76,6 +79,11 @@
 		WHERE `ID` = #{id}
 	</update>
 
+	<update id="setView_count" parameterType="com.mp.entity.custom">
+		UPDATE `custom`
+		set view_count = view_count + 1
+		WHERE `ID` = #{id}
+	</update>
 
 
 </mapper>

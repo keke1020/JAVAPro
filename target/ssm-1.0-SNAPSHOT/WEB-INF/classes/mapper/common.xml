@@ -35,5 +35,26 @@
 		select DISTINCT username as value,username as label from list2 ORDER BY `update` desc
 	</select>
 
+	<select id="getUsers" resultMap="option">
+		select
+		id as value,
+		realname as label
+		from
+		user
+		<if test="place != null and place != ''">
+			<choose>
+             <when test="place == 'plan'">
+				where plan_priv = '1'
+             </when>
+             <otherwise>
+
+             </otherwise>
+         </choose>
+		</if>
+		ORDER BY realname
+	</select>
+
+
+
 
 </mapper>

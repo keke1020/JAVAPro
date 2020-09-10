@@ -6,12 +6,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class file {
 	private int ID;
-	private String type; 
+	private String type;
 	private String parentId;
 	private String name;
 	private String changeName;
 	private String path;
 	private int user_id;
+	private String value;
 
 	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Tokyo")
 	private Date updatetime;
@@ -78,6 +79,14 @@ public class file {
 
 	public void setUpdatetime(Date updatetime) {
 		this.updatetime = updatetime;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 }

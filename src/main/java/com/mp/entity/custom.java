@@ -16,6 +16,7 @@ public class custom {
 	private Date updatetime;
 
 	private int view;
+	private int view_count;
 
 	private String updater;
 
@@ -83,6 +84,12 @@ public class custom {
 		this.info = info;
 	}
 
+	public int getView_count() {
+		return view_count;
+	}
 
+	public void setView_count(int view_count) {
+		this.view_count = view_count;
+	}
 
 }

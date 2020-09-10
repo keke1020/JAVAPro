@@ -10,4 +10,5 @@ public interface customService {
 	List<custom> getCustom();
 	custom getCustomById(String id);
 	void deleteCustomById(String id);
+	void setView_count(String id);
 }

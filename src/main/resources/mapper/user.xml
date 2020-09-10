@@ -7,11 +7,98 @@
 		<id column="ID" property="ID" jdbcType="INTEGER" />
 		<result column="realname" property="realname" jdbcType="VARCHAR" />
 		<result column="password" property="password" jdbcType="VARCHAR" />
+		<result column="adminFlag" property="adminFlag" jdbcType="INTEGER" />
+		<result column="plan_contr" property="plan_contr" jdbcType="INTEGER" />
+		<result column="plan_priv" property="plan_priv" jdbcType="INTEGER" />
+		<result column="todo_priv1" property="todo_priv1" jdbcType="INTEGER" />
+		<result column="todo_priv2" property="todo_priv2" jdbcType="INTEGER" />
 	</resultMap>
 
 	<!-- dao接口方法提供sql语句配置 -->
 	<select id="login" resultMap="userResult">
 		select * from user where password = #{password}
 	</select>
+
+	<select id="getUsersConfig" resultMap="userResult">
+		select * from user order by realname
+		<if test="limitFlag == true">
+			LIMIT #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="getUsersConfigByRealnames" resultMap="userResult">
+		SELECT * from `user`
+		where realname in
+		<foreach collection="realnames" item="realname" index="index" open="("
+			close=")" separator=",">
+			#{realname}
+		</foreach>
+	</select>
+
+	<select id="getTotal" resultType="java.lang.Integer">
+		select count(*) from user
+	</select>
+
+	<select id="getUsersConfigById" resultMap="userResult">
+		select * from user
+		where ID = #{id}
+	</select>
+
+	<select id="getUsersConfigByIds" resultMap="userResult">
+		select * from user
+		WHERE
+		`ID` in
+		<foreach collection="ids" item="id" index="index" open="("
+			close=")" separator=",">
+			#{id}
+		</foreach>
+	</select>
+
+	<update id="setUserAuthority" parameterType="com.mp.entity.user">
+		<choose>
+			<when test="key == 'plan_priv'">
+				UPDATE `user` set plan_priv = 0;
+				UPDATE `user` set plan_priv = 1
+				WHERE
+				`ID` in
+				<foreach collection="ids" item="id" index="index" open="("
+					close=")" separator=",">
+					#{id}
+				</foreach>
+			</when>
+			<when test="key == 'todo_priv1'">
+				UPDATE `user` set todo_priv1 = 0;
+				UPDATE `user` set todo_priv1 = 1
+				WHERE
+				`ID` in
+				<foreach collection="ids" item="id" index="index" open="("
+					close=")" separator=",">
+					#{id}
+				</foreach>
+			</when>
+			<when test="key == 'todo_priv2'">
+				UPDATE `user` set todo_priv2 = 0;
+				UPDATE `user` set todo_priv2 = 1
+				WHERE
+				`ID` in
+				<foreach collection="ids" item="id" index="index" open="("
+					close=")" separator=",">
+					#{id}
+				</foreach>
+			</when>
+			<otherwise>
+
+			</otherwise>
+		</choose>
+	</update>
+
+	<update id="updateUserConfig" parameterType="com.mp.entity.user">
+		UPDATE `user`
+		<set>
+			plan_contr = #{plan_contr}
+		</set>
+		where ID = #{ID}
+	</update>
+
 
 </mapper>

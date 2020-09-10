@@ -166,8 +166,8 @@ public class customController {
 			request.setCharacterEncoding("utf-8");
 			DynamicDataSourceHolder.setDataSource("defultdataSource");
 			custom custom = customService.getCustomById(id);
-
 			List<file> files = fileService.getFilesByParentId("0",id);
+			customService.setView_count(id);
 			object.put("custom", custom);
 			object.put("files", files);
 		} catch (Exception e) {
