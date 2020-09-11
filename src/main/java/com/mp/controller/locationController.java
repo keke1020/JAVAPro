@@ -1260,7 +1260,7 @@ public class locationController {
 		return object;
 	}
 
-	public static String getValue(String[] item, int index) {
+	public String getValue(String[] item, int index) {
 		String value = "";
 		if (item == null) {
 

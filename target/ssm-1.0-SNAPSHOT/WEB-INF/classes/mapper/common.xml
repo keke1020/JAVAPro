@@ -10,51 +10,71 @@
 
 	<select id="getArrival_japan" resultMap="option">
 		SELECT DISTINCT
-			(
-				IF (
-					arrival = '0000-00-00 00:00:00',
-					'0000-00-00',
-					arrival
-				)
-			) AS
+		(
+		IF (
+		arrival = '0000-00-00 00:00:00',
+		'0000-00-00',
+		arrival
+		)
+		) AS
 		VALUE
-			,
-			arrival AS label
+		,
+		arrival AS label
 		FROM
-			list1
+		list1
 		WHERE
-			(
-				`lockuser` NOT IN ('del')
-				OR `lockuser` IS NULL
-			)
+		(
+		`lockuser` NOT IN ('del')
+		OR `lockuser` IS NULL
+		)
 		ORDER BY
-			arrival DESC
+		arrival DESC
 	</select>
 
 	<select id="getBBS_user" resultMap="option">
-		select DISTINCT username as value,username as label from list2 ORDER BY `update` desc
+		select DISTINCT username as
+		value,username as label from list2 ORDER BY `update` desc
 	</select>
 
 	<select id="getUsers" resultMap="option">
 		select
-		id as value,
+		realname as value,
 		realname as label
 		from
 		user
 		<if test="place != null and place != ''">
 			<choose>
-             <when test="place == 'plan'">
-				where plan_priv = '1'
-             </when>
-             <otherwise>
+				<when test="place == 'plan'">
+					where plan_priv = '1'
+				</when>
+				<when test="place == 'todo_priv1'">
+					where todo_priv1 = '1'
+				</when>
+				<when test="place == 'todo_priv2'">
+					where todo_priv2 = '1'
+				</when>
+				<otherwise>
 
-             </otherwise>
-         </choose>
+				</otherwise>
+			</choose>
 		</if>
 		ORDER BY realname
 	</select>
 
+	<select id="getInfoByType" resultType="java.lang.String">
+		select info from info
+		where type = #{type} order by id desc limit 1
+	</select>
 
+	<insert id="insertInfo">
+		insert into
+		info(`type`,
+		`info`)
+		values(
+		#{type},
+		#{info}
+		)
+	</insert>
 
 
 </mapper>
