@@ -8,46 +8,55 @@
 	<version>1.0-SNAPSHOT</version>
 	<name>ssm Maven Webapp</name>
 
-	 <build>
-        <plugins>
-            <plugin>
-	            <groupId>org.apache.tomcat.maven</groupId>
-	            <artifactId>tomcat7-maven-plugin</artifactId>
-	            <version>2.2</version>
-	            <configuration>
-	            	<uriEncoding>UTF-8</uriEncoding>
-	            	<systemProperties>
-	            		<profiles.active>dev</profiles.active>
-	            	</systemProperties>
-	            	<path>/</path>
-	            	<port>8123</port>
-	            </configuration>
-	        </plugin>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<uriEncoding>UTF-8</uriEncoding>
+					<systemProperties>
+						<profiles.active>dev</profiles.active>
+					</systemProperties>
+					<path>/</path>
+					<port>8123</port>
+				</configuration>
+			</plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <version>2.2</version>
-            </plugin>
-        </plugins>
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version> </plugin> -->
 
-        <resources>
-            <resource>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.properties</include>
-                    <include>**/*.xml</include>
-                </includes>
-                <filtering>false</filtering>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-            </resource>
-        </resources>
-    </build>
+			<!-- 让maven不编译xls文件，但仍将其打包 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<configuration>
+					<nonFilteredFileExtensions>
+						<nonFilteredFileExtension>xls</nonFilteredFileExtension>
+					</nonFilteredFileExtensions>
+				</configuration>
+			</plugin>
+
+		</plugins>
+
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.properties</include>
+					<include>**/*.xml</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
 
 	<properties>
 		<spring.version>4.2.2.RELEASE</spring.version>
@@ -62,11 +71,11 @@
 		</dependency>
 
 		<dependency>
-		     <groupId>org.apache.tomcat.maven</groupId>
-		     <artifactId>tomcat7-maven-plugin</artifactId>
-		     <version>2.2</version>
-		     <type>maven-plugin</type>
-		 </dependency>
+			<groupId>org.apache.tomcat.maven</groupId>
+			<artifactId>tomcat7-maven-plugin</artifactId>
+			<version>2.2</version>
+			<type>maven-plugin</type>
+		</dependency>
 
 		<!-- 1.日志 -->
 		<!-- 实现slf4j接口并整合 -->
@@ -77,9 +86,9 @@
 		</dependency>
 
 		<dependency>
-		    <groupId>commons-fileupload</groupId>
-		    <artifactId>commons-fileupload</artifactId>
-		    <version>1.3.3</version>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.3.3</version>
 		</dependency>
 
 		<!-- 2.数据库 -->
@@ -89,35 +98,29 @@
 			<version>5.1.47</version>
 			<scope>runtime</scope>
 		</dependency>
-		<!-- <dependency>
-			<groupId>c3p0</groupId>
-			<artifactId>c3p0</artifactId>
-			<version>0.9.1.2</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>c3p0</groupId> <artifactId>c3p0</artifactId>
+			<version>0.9.1.2</version> </dependency> -->
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2 -->
 		<dependency>
-		    <groupId>org.apache.commons</groupId>
-		    <artifactId>commons-dbcp2</artifactId>
-		    <version>2.1.1</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-dbcp2</artifactId>
+			<version>2.1.1</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-pool2 -->
 		<dependency>
-		    <groupId>org.apache.commons</groupId>
-		    <artifactId>commons-pool2</artifactId>
-		    <version>2.4.2</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-pool2</artifactId>
+			<version>2.4.2</version>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-redis</artifactId>
-			<version>2.1.5.RELEASE</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>org.springframework.data</groupId> <artifactId>spring-data-redis</artifactId>
+			<version>2.1.5.RELEASE</version> </dependency> -->
 
 		<dependency>
-		    <groupId>com.googlecode.juniversalchardet</groupId>
-		    <artifactId>juniversalchardet</artifactId>
-		    <version>1.0.3</version>
+			<groupId>com.googlecode.juniversalchardet</groupId>
+			<artifactId>juniversalchardet</artifactId>
+			<version>1.0.3</version>
 		</dependency>
 
 		<!-- DAO: MyBatis -->
@@ -150,16 +153,9 @@
 		</dependency>
 
 		<!-- POI -->
-		<dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>3.9</version>
-        </dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-			<version>3.9</version>
-		</dependency>
+		<!-- <dependency> <groupId>org.apache.poi</groupId> <artifactId>poi</artifactId>
+			<version>3.9</version> </dependency> <dependency> <groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId> <version>3.9</version> </dependency> -->
 
 		<!-- 4.Spring -->
 		<!-- 1)Spring核心 -->
@@ -255,9 +251,9 @@
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/log4j/log4j -->
 		<dependency>
-		    <groupId>log4j</groupId>
-		    <artifactId>log4j</artifactId>
-		    <version>1.2.17</version>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
 		</dependency>
 	</dependencies>
 </project>

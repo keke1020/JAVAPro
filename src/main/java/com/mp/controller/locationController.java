@@ -412,6 +412,7 @@ public class locationController {
 				}
 				num++;
 			}
+			reader.close();
 
 			String[] codes = new String[codes_.size()];
 			codes_.toArray(codes);

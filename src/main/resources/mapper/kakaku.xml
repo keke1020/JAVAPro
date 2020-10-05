@@ -22,6 +22,66 @@
 
 	<select id="getKakaku" resultMap="kakakuResult">
 		select * from kakaku
+		WHERE (`update` >= '0000-00-00')
+		<if test="s_code!=null and s_code.length>0">
+			and `code` in
+			<foreach collection="s_code" item="s_code_" index="index" open="("
+				close=")" separator=",">
+				#{s_code_}
+			</foreach>
+		</if>
+		<choose>
+			<when test="t_price1!='' and t_price2!='' and t_price_ch1 ==true and t_price_ch2 ==true">
+				AND ((`raku-price` &gt; #{t_price1}) AND (`raku-price` &lt; #{t_price2}))
+				AND ((`yahoo-price` &gt; #{t_price1}) AND (`yahoo-price` &lt; #{t_price2}))
+			</when>
+			<when test="t_price1!='' and t_price2=='' and t_price_ch1 ==true">
+				AND (`raku-price` &gt; #{t_price1})
+			</when>
+			<when test="t_price1=='' and t_price2!='' and t_price_ch2 ==true">
+				AND (`yahoo-price` &lt; #{t_price2})
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+
+		<choose>
+			<when test="s_price1!='' and s_price2!='' and s_price_ch1 ==true and s_price_ch2 ==true">
+				AND ((`raku-sale` &gt; #{s_price1}) AND (`raku-sale` &lt; #{s_price2}))
+				AND ((`yahoo-sale` &gt; #{s_price1}) AND (`yahoo-sale` &lt; #{s_price2}))
+			</when>
+			<when test="s_price1!='' and s_price2=='' and s_price_ch1 ==true">
+				AND ((`raku-sale` &gt; #{s_price1}) AND ((`yahoo-sale` &gt; #{s_price1}))
+			</when>
+			<when test="s_price1=='' and s_price2!='' and s_price_ch2 ==true">
+				AND ((`raku-sale` &lt; #{s_price2}) AND ((`yahoo-sale` &lt; #{s_price2}))
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+
+		<choose>
+
+			<when test="s_limit1!='' and s_limit2!='' and s_limit_ch1 ==true and s_limit_ch2 ==true">
+				AND ((`raku-sale-limit` &gt;= #{s_limit1}) AND (`raku-sale-limit` &lt;= #{s_limit2}))
+				AND ((`yahoo-sale-limit` &gt;= #{s_limit1}) AND (`yahoo-sale-limit` &lt;= #{s_limit2}))
+			</when>
+
+			<when test="s_limit1!='' and s_limit2!='' and s_limit_ch1 ==true">
+				AND ((`raku-sale-limit` &gt; #{s_limit1}) AND (`raku-sale-limit` &gt; #{s_limit2}))
+			</when>
+			<when test="s_limit1!='' and s_limit2!='' and s_limit_ch2 ==true">
+				AND ((`yahoo-sale-limit` &lt; #{s_limit1}) AND (`yahoo-sale-limit` &lt; #{s_limit2}))
+			</when>
+
+			<otherwise>
+			</otherwise>
+		</choose>
+
+		<if test="s_update1!='' and s_update2!=''">
+			AND ((`update` &gt;= #{s_update1}) AND (`update` &lt;= #{s_update2}))
+		</if>
+
 		<choose>
 			<when test="sort == '更新順'">
 				order by kakaku.update desc
@@ -43,5 +103,28 @@
 		select count(*) from `kakaku`
 	</select>
 
+	<update id="updateKakaku" parameterType="com.mp.entity.custom">
+		UPDATE `kakaku`
+		<set>
+            `haiso`=#{haiso},
+            `raku-price`=#{raku_price},
+            `raku-sale`=#{raku_sale},
+            `raku-sale-limit`=#{raku_sale_limit},
+            `yahoo-price`=#{yahoo_price},
+            `yahoo-sale`=#{yahoo_sale},
+            `yahoo-sale-limit`=#{yahoo_sale_limit},
+            `memo`=#{memo},
+            `tanto`=#{tanto},
+        </set>
+		WHERE `ID` = #{ID}
+	</update>
+
+	<select id="getKakakuRireki" resultMap="kakakuResult">
+		select `update` as 'update', `message` as name from kakaku_rireki where (`code` like #{code})
+	</select>
+
+	<select id="getAllCodes" resultMap="kakakuResult">
+		select * from kakaku
+	</select>
 
 </mapper>

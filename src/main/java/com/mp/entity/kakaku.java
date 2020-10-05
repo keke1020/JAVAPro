@@ -30,7 +30,10 @@ public class kakaku {
 	private int haiso_ryo;
 	private String h_tzaiko;// 在庫数
 	private String h_yzaiko;// 予約在庫
-	private int hasEda;// 枝番あり
+	private boolean hasEda;// 枝番あり
+	private String kagen1;// SALE下限
+	private String kagen2_goukei;// 処分下限
+	private int uploadFlag;
 
 	public int getID() {
 		return ID;
@@ -208,12 +211,36 @@ public class kakaku {
 		this.h_yzaiko = h_yzaiko;
 	}
 
-	public int getHasEda() {
+	public boolean isHasEda() {
 		return hasEda;
 	}
 
-	public void setHasEda(int hasEda) {
+	public void setHasEda(boolean hasEda) {
 		this.hasEda = hasEda;
+	}
+
+	public String getKagen1() {
+		return kagen1;
+	}
+
+	public void setKagen1(String kagen1) {
+		this.kagen1 = kagen1;
+	}
+
+	public String getKagen2_goukei() {
+		return kagen2_goukei;
+	}
+
+	public void setKagen2_goukei(String kagen2_goukei) {
+		this.kagen2_goukei = kagen2_goukei;
+	}
+
+	public int getUploadFlag() {
+		return uploadFlag;
+	}
+
+	public void setUploadFlag(int uploadFlag) {
+		this.uploadFlag = uploadFlag;
 	}
 
 }
