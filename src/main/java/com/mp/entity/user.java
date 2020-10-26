@@ -4,11 +4,9 @@ public class user {
 	private String ID;
 	private String realname;
 	private String password;
-	// 管理者権限
 	private int adminFlag;
-	// 企画権限
+	private int tenpoKanriId;
 	private int plan_contr;
-	// 企画受け
 	private int plan_priv;
 	private int todo_priv1;
 	private int todo_priv2;
@@ -45,6 +43,14 @@ public class user {
 		this.adminFlag = adminFlag;
 	}
 
+	public int getTenpoKanriId() {
+		return tenpoKanriId;
+	}
+
+	public void setTenpoKanriId(int tenpoKanriId) {
+		this.tenpoKanriId = tenpoKanriId;
+	}
+
 	public int getPlan_contr() {
 		return plan_contr;
 	}
@@ -76,4 +82,5 @@ public class user {
 	public void setTodo_priv2(int todo_priv2) {
 		this.todo_priv2 = todo_priv2;
 	}
+
 }

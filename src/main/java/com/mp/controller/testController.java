@@ -11,16 +11,16 @@ import com.mp.dto.system;
 
 @Controller
 public class testController {
-	@RequestMapping(value = "/test", method = RequestMethod.GET)
-	private String index(HttpServletRequest req, HttpSession session) {
-		String pg = null;
-		pg = "login";
-		System.out.println(session.getAttribute(system.usr));
-		if (!"".equals(session.getAttribute(system.usr)) && session.getAttribute(system.usr) != null) {
-			pg = "test";
-		}
-		return pg;
-	}
+//	@RequestMapping(value = "/test", method = RequestMethod.GET)
+//	private String index(HttpServletRequest req, HttpSession session) {
+//		String pg = null;
+//		pg = "login";
+//		System.out.println(session.getAttribute(system.usr));
+//		if (!"".equals(session.getAttribute(system.usr)) && session.getAttribute(system.usr) != null) {
+//			pg = "test";
+//		}
+//		return pg;
+//	}
 
 
 

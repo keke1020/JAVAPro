@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mp.dao.neDao">
+	<resultMap type="ne" id="neResult">
+		<id column="jyuchu_denpyo_no" property="jyuchu_denpyo_no" jdbcType="INTEGER" />
+		<result column="pic_siji_naiyou" property="pic_siji_naiyou" jdbcType="VARCHAR" />
+		<result column="jyuchu_bi" property="jyuchu_bi" jdbcType="TIMESTAMP" />
+		<result column="syuka_kakutei_bi" property="syuka_kakutei_bi" jdbcType="TIMESTAMP" />
+		<result column="nouhinsyo_insatusiji_bi" property="nouhinsyo_insatusiji_bi" jdbcType="TIMESTAMP" />
+		<result column="nouhinsyo_insatuhakou_bi" property="nouhinsyo_insatuhakou_bi" jdbcType="TIMESTAMP" />
+		<result column="jyuchu_jyotai_kbn" property="jyuchu_jyotai_kbn" jdbcType="VARCHAR" />
+		<result column="tenpo_denpyo_no" property="tenpo_denpyo_no" jdbcType="VARCHAR" />
+		<result column="tenpo_code" property="tenpo_code" jdbcType="VARCHAR" />
+		<result column="jyuchu_tantou_code" property="jyuchu_tantou_code" jdbcType="VARCHAR" />
+		<result column="jyuchu_name" property="jyuchu_name" jdbcType="VARCHAR" />
+		<result column="syohin_kin" property="syohin_kin" jdbcType="INTEGER" />
+		<result column="zei_kin" property="zei_kin" jdbcType="INTEGER" />
+		<result column="hasou_kin" property="hasou_kin" jdbcType="INTEGER" />
+		<result column="tesuryo_kin" property="tesuryo_kin" jdbcType="INTEGER" />
+		<result column="sonota_kin" property="sonota_kin" jdbcType="INTEGER" />
+		<result column="point" property="point" jdbcType="INTEGER" />
+		<result column="goukei_kin" property="goukei_kin" jdbcType="INTEGER" />
+		<result column="hasou_name" property="hasou_name" jdbcType="VARCHAR" />
+		<result column="hasou_yubin_bangou" property="hasou_yubin_bangou" jdbcType="VARCHAR" />
+		<result column="hasou_jyusyo" property="hasou_jyusyo" jdbcType="VARCHAR" />
+		<result column="hasou_kbn" property="hasou_kbn" jdbcType="VARCHAR" />
+		<result column="siharai_kbn" property="siharai_kbn" jdbcType="VARCHAR" />
+		<result column="hasou_denpyo_no" property="hasou_denpyo_no" jdbcType="INTEGER" />
+		<result column="bikou" property="bikou" jdbcType="VARCHAR" />
+		<result column="jyuyou" property="jyuyou" jdbcType="VARCHAR" />
+		<result column="jyuyou_check" property="jyuyou_check" jdbcType="VARCHAR" />
+		<result column="jyuchu_tag" property="jyuchu_tag" jdbcType="VARCHAR" />
+		<result column="import_date" property="import_date" jdbcType="TIMESTAMP" />
+		<result column="import_user" property="import_user" jdbcType="INTEGER" />
+	</resultMap>
+
+	<insert id="insert" parameterType="java.util.ArrayList">
+		insert into `ne`
+		(
+		`jyuchu_denpyo_no`,
+		`pic_siji_naiyou`,
+		`jyuchu_bi`,
+		`syuka_kakutei_bi`,
+		`nouhinsyo_insatusiji_bi`,
+		`nouhinsyo_insatuhakou_bi`,
+		`jyuchu_jyotai_kbn`,
+		`tenpo_denpyo_no`,
+		`tenpo_code`,
+		`jyuchu_tantou_code`,
+		`jyuchu_name`,
+		`syohin_kin`,
+		`zei_kin`,
+		`hasou_kin`,
+		`tesuryo_kin`,
+		`sonota_kin`,
+		`point`,
+		`goukei_kin`,
+		`hasou_name`,
+		`hasou_yubin_bangou`,
+		`hasou_jyusyo`,
+		`hasou_kbn`,
+		`siharai_kbn`,
+		`hasou_denpyo_no`,
+		`bikou`,
+		`jyuyou`,
+		`jyuyou_check`,
+		`jyuchu_tag`,
+		`import_date`,
+		`import_user`
+		)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.jyuchu_denpyo_no},
+			#{item.pic_siji_naiyou},
+			#{item.jyuchu_bi},
+			#{item.syuka_kakutei_bi},
+			#{item.nouhinsyo_insatusiji_bi},
+			#{item.nouhinsyo_insatuhakou_bi},
+			#{item.jyuchu_jyotai_kbn},
+			#{item.tenpo_denpyo_no},
+			#{item.tenpo_code},
+			#{item.jyuchu_tantou_code},
+			#{item.jyuchu_name},
+			#{item.syohin_kin},
+			#{item.zei_kin},
+			#{item.hasou_kin},
+			#{item.tesuryo_kin},
+			#{item.sonota_kin},
+			#{item.point},
+			#{item.goukei_kin},
+			#{item.hasou_name},
+			#{item.hasou_yubin_bangou},
+			#{item.hasou_jyusyo},
+			#{item.hasou_kbn},
+			#{item.siharai_kbn},
+			#{item.hasou_denpyo_no},
+			#{item.bikou},
+			#{item.jyuyou},
+			#{item.jyuyou_check},
+			#{item.jyuchu_tag},
+			#{item.import_date},
+			#{item.import_user}
+			)
+		</foreach>
+		ON DUPLICATE KEY UPDATE
+		`jyuchu_denpyo_no` =VALUES(`jyuchu_denpyo_no`),
+		`pic_siji_naiyou` =VALUES(`pic_siji_naiyou`),
+		`jyuchu_bi`=VALUES(`jyuchu_bi`),
+		`syuka_kakutei_bi`=VALUES(`syuka_kakutei_bi`),
+		`nouhinsyo_insatusiji_bi`=VALUES(`nouhinsyo_insatusiji_bi`),
+		`nouhinsyo_insatuhakou_bi`=VALUES(`nouhinsyo_insatuhakou_bi`),
+		`jyuchu_jyotai_kbn`=VALUES(`jyuchu_jyotai_kbn`),
+		`tenpo_denpyo_no`=VALUES(`tenpo_denpyo_no`),
+		`tenpo_code`=VALUES(`tenpo_code`),
+		`jyuchu_tantou_code`=VALUES(`jyuchu_tantou_code`),
+		`jyuchu_name`=VALUES(`jyuchu_name`),
+		`syohin_kin`=VALUES(`syohin_kin`),
+		`zei_kin`=VALUES(`zei_kin`),
+		`hasou_kin`=VALUES(`hasou_kin`),
+		`tesuryo_kin`=VALUES(`tesuryo_kin`),
+		`sonota_kin`=VALUES(`sonota_kin`),
+		`point`=VALUES(`point`),
+		`goukei_kin`=VALUES(`goukei_kin`),
+		`hasou_name`=VALUES(`hasou_name`),
+		`hasou_yubin_bangou`=VALUES(`hasou_yubin_bangou`),
+		`hasou_jyusyo`=VALUES(`hasou_jyusyo`),
+		`hasou_kbn`=VALUES(`hasou_kbn`),
+		`siharai_kbn`=VALUES(`siharai_kbn`),
+		`hasou_denpyo_no`=VALUES(`hasou_denpyo_no`),
+		`bikou`=VALUES(`bikou`),
+		`jyuyou`=VALUES(`jyuyou`),
+		`jyuyou_check`=VALUES(`jyuyou_check`),
+		`jyuchu_tag`=VALUES(`jyuchu_tag`)
+	</insert>
+
+	<select id="getHomeDataByNe_everday" resultMap="neResult">
+		SELECT
+			sum(goukei_kin) AS goukei_kin,
+			jyuchu_name
+		FROM
+			ne
+		WHERE
+			jyuchu_bi &gt;=  #{time_s} AND jyuchu_bi &lt;=  #{time_e}
+			<if test="tenpo != '' and tenpo != null">
+				AND tenpo_code = #{tenpo}
+			</if>
+			group by jyuchu_name
+	</select>
+
+	<select id="getMeisaiDataByNe" resultMap="neResult">
+		SELECT
+			*
+		FROM
+			ne
+		WHERE 1=1
+		<if test="tenpo != '' and tenpo != null">
+			and tenpo_code = #{tenpo}
+		</if>
+		<if test="jyuchu_name != '' and jyuchu_name != null">
+			and jyuchu_name = #{jyuchu_name}
+		</if>
+		<choose>
+			<when test="time_s == '' and time_e == ''">
+			</when>
+			<when test="time_s != '' and time_e != ''">
+				AND jyuchu_bi &gt;=  #{time_s} AND jyuchu_bi &lt;=  #{time_e}
+			</when>
+			<when test="time_s != '' and time_e == ''">
+				AND jyuchu_bi &gt;=  #{time_s}
+			</when>
+			<when test="time_s == '' and time_e != ''">
+				AND jyuchu_bi &lt;=  #{time_e}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+		order by jyuchu_name
+		LIMIT #{current}, #{pageCount}
+	</select>
+
+	<select id="getMeisaiDataByNe_count" resultType="java.lang.Integer">
+		SELECT
+			count(*)
+		FROM
+			ne
+		WHERE 1=1
+		<if test="tenpo != '' and tenpo != null">
+			and tenpo_code = #{tenpo}
+		</if>
+		<if test="jyuchu_name != '' and jyuchu_name != null">
+			and jyuchu_name = #{jyuchu_name}
+		</if>
+		<choose>
+			<when test="time_s == '' and time_e == ''">
+			</when>
+			<when test="time_s != '' and time_e != ''">
+				AND jyuchu_bi &gt;=  #{time_s} AND jyuchu_bi &lt;=  #{time_e}
+			</when>
+			<when test="time_s != '' and time_e == ''">
+				AND jyuchu_bi &gt;=  #{time_s}
+			</when>
+			<when test="time_s == '' and time_e != ''">
+				AND jyuchu_bi &lt;=  #{time_e}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="getMeisaiDataByNe_goukei" resultType="java.lang.Integer">
+		SELECT
+			sum(goukei_kin)
+		FROM
+			ne
+		WHERE 1=1
+		<if test="tenpo != '' and tenpo != null">
+			and tenpo_code = #{tenpo}
+		</if>
+		<if test="jyuchu_name != '' and jyuchu_name != null">
+			and jyuchu_name = #{jyuchu_name}
+		</if>
+		<choose>
+			<when test="time_s == '' and time_e == ''">
+			</when>
+			<when test="time_s != '' and time_e != ''">
+				AND jyuchu_bi &gt;=  #{time_s} AND jyuchu_bi &lt;=  #{time_e}
+			</when>
+			<when test="time_s != '' and time_e == ''">
+				AND jyuchu_bi &gt;=  #{time_s}
+			</when>
+			<when test="time_s == '' and time_e != ''">
+				AND jyuchu_bi &lt;=  #{time_e}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+
+</mapper>

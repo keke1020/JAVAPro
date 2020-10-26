@@ -2,12 +2,18 @@ package com.mp.entity;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class ne {
 	private int jyuchu_denpyo_no;
 	private String pic_siji_naiyou;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Tokyo")
 	private Date jyuchu_bi;
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Tokyo")
 	private Date syuka_kakutei_bi;
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Tokyo")
 	private Date nouhinsyo_insatusiji_bi;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Tokyo")
 	private Date nouhinsyo_insatuhakou_bi;
 	private String jyuchu_jyotai_kbn;
 	private String tenpo_denpyo_no;
@@ -26,11 +32,13 @@ public class ne {
 	private String hasou_jyusyo;
 	private String hasou_kbn;
 	private String siharai_kbn;
-	private int hasou_denpyo_no;
+	private String hasou_denpyo_no;
 	private String bikou;
 	private String jyuyou;
 	private String jyuyou_check;
 	private String jyuchu_tag;
+	private Date import_date;
+	private int import_user;
 
 	public int getJyuchu_denpyo_no() {
 		return jyuchu_denpyo_no;
@@ -216,11 +224,11 @@ public class ne {
 		this.siharai_kbn = siharai_kbn;
 	}
 
-	public int getHasou_denpyo_no() {
+	public String getHasou_denpyo_no() {
 		return hasou_denpyo_no;
 	}
 
-	public void setHasou_denpyo_no(int hasou_denpyo_no) {
+	public void setHasou_denpyo_no(String hasou_denpyo_no) {
 		this.hasou_denpyo_no = hasou_denpyo_no;
 	}
 
@@ -254,6 +262,22 @@ public class ne {
 
 	public void setJyuchu_tag(String jyuchu_tag) {
 		this.jyuchu_tag = jyuchu_tag;
+	}
+
+	public Date getImport_date() {
+		return import_date;
+	}
+
+	public void setImport_date(Date import_date) {
+		this.import_date = import_date;
+	}
+
+	public int getImport_user() {
+		return import_user;
+	}
+
+	public void setImport_user(int import_user) {
+		this.import_user = import_user;
 	}
 
 }

@@ -37,6 +37,16 @@ public class commonServiceImpl implements commonService{
 		commonDao.insertInfo(type,info);
 	}
 
+	public List<option> getTenpoByNe() {
+		// TODO 自動生成されたメソッド・スタブ
+		return commonDao.getTenpoByNe();
+	}
+
+	public List<option> getHomeDataByNe(String tenpo,String beginDay,String endDay) {
+		// TODO 自動生成されたメソッド・スタブ
+		return commonDao.getHomeDataByNe(tenpo,beginDay,endDay);
+	}
+
 
 
 }

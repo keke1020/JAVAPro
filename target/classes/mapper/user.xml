@@ -8,6 +8,7 @@
 		<result column="realname" property="realname" jdbcType="VARCHAR" />
 		<result column="password" property="password" jdbcType="VARCHAR" />
 		<result column="adminFlag" property="adminFlag" jdbcType="INTEGER" />
+		<result column="tenpoKanriId" property="tenpoKanriId" jdbcType="INTEGER" />
 		<result column="plan_contr" property="plan_contr" jdbcType="INTEGER" />
 		<result column="plan_priv" property="plan_priv" jdbcType="INTEGER" />
 		<result column="todo_priv1" property="todo_priv1" jdbcType="INTEGER" />

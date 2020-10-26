@@ -11,4 +11,6 @@ public interface commonService {
 	List<option> getUsers(String place);
 	String getInfoByType(String type);
 	void insertInfo(String type, String info);
+	List<option> getTenpoByNe();
+	List<option> getHomeDataByNe(String tenpo,String beginDay,String endDay);
 }

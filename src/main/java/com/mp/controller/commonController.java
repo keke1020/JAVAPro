@@ -309,6 +309,19 @@ public class commonController {
 		return object;
 	}
 
+	@ResponseBody
+	@RequestMapping(value = "/getTenpoByNe", method = RequestMethod.POST)
+	private JSONObject getTenpoByNe(HttpServletResponse response, HttpServletRequest request) {
+		JSONObject object = new JSONObject();
+		response.setHeader("Access-Control-Allow-Origin", "*");
+		response.setHeader("Cache-Control", "no-cache");
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
+		List<option> option1 = commonService.getTenpoByNe();
+		object.put("tenpo_rows", option1);
+		return object;
+	}
+
+
 //	@ResponseBody
 //	@RequestMapping(value = "/download_tool", method = RequestMethod.POST)
 //	private JSONObject download_tool(HttpServletResponse response, HttpServletRequest request, String spare_result) {

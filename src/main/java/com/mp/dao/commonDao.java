@@ -12,4 +12,6 @@ public interface commonDao {
 	List<option> getUsers(@Param("place") String place);
 	String getInfoByType(@Param("type") String type);
 	void insertInfo(@Param("type") String type, @Param("info") String info);
+	List<option> getTenpoByNe();
+	List<option> getHomeDataByNe(@Param("tenpo") String tenpo,@Param("beginDay") String beginDay,@Param("endDay") String endDay);
 }
