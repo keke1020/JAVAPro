@@ -22,6 +22,7 @@ public class CommonUtil {
 		return false;// 没找到返回false
 	}
 
+	//判断一个字符串是否为数字型
 	public static boolean isInteger(String str) {
         Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
         return pattern.matcher(str).matches();
@@ -71,6 +72,32 @@ public class CommonUtil {
             }
             return flag;
         }
+    }
+	/**
+     * 截取字符串str中指定字符 strStart、strEnd之间的字符串
+     *
+     * @param string
+     * @param str1
+     * @param str2
+     * @return
+     */
+    public static String subString(String str, String strStart, String strEnd) {
+
+        int strStartIndex = str.indexOf(strStart);
+        int strEndIndex = str.indexOf(strEnd);
+
+        String result = "";
+
+        /* index 为负数 即表示该字符串中 没有该字符 */
+        if (strStartIndex < 0) {
+//            return "字符串 :---->" + str + "<---- 中不存在 " + strStart + ", 无法截取目标字符串";
+        	return result;
+        }
+        if (strEndIndex < 0) {
+        	return result;
+        }
+        result = str.substring(strStartIndex, strEndIndex).substring(strStart.length());
+        return result;
     }
 
 }

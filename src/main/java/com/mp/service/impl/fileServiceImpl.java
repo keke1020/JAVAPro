@@ -43,6 +43,11 @@ public class fileServiceImpl implements fileService{
 		return fileDao.getLastFinishFilesByParentId(id);
 	}
 
+	public List<file> getUploadRirekiByNe() {
+		// TODO 自動生成されたメソッド・スタブ
+		return fileDao.getUploadRirekiByNe();
+	}
+
 
 
 }

@@ -76,7 +76,17 @@
 		)
 	</insert>
 
+	<select id="getTenpoByNe" resultMap="option">
+		select distinct tenpo_code as value, tenpo_code as label from ne order by tenpo_code
+	</select>
 
+	<select id="getHomeDataByNe" resultMap="option">
+
+	</select>
+
+	<select id="getJyuchuName_optionsByNe" resultMap="option">
+		select distinct jyuchu_name as label, jyuchu_name as value from ne where tenpo_code = #{tenpo} order by jyuchu_name
+	</select>
 
 
 </mapper>

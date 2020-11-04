@@ -14,8 +14,12 @@
 			jdbcType="VARCHAR" />
 		<result column="path" property="path" jdbcType="VARCHAR" />
 		<result column="user_id" property="user_id" jdbcType="INTEGER" />
+		<result column="user" property="user" jdbcType="VARCHAR" />
 		<result column="updatetime" property="updatetime"
 			jdbcType="TIMESTAMP" />
+		<result column="memo" property="memo"
+			jdbcType="VARCHAR" />
+
 	</resultMap>
 
 	<select id="getFilesByParentId" resultMap="fileResult">
@@ -23,6 +27,7 @@
 		ID,
 		name,
 		changeName,
+		memo,
 		path
 		from
 		file
@@ -36,6 +41,7 @@
 		ID,
 		name,
 		changeName,
+		memo,
 		path
 		from
 		file
@@ -46,7 +52,7 @@
 	<insert id="insert" parameterType="com.mp.entity.file"
 		useGeneratedKeys="true" keyProperty="ID" keyColumn="ID">
 		insert into file(`type`,
-		`parentId`, `name`, `changeName`, `path`, `user_id`, `updatetime`)
+		`parentId`, `name`, `changeName`, `path`, `user_id`, `updatetime` , `memo`)
 		values(
 		#{type},
 		#{parentId},
@@ -54,7 +60,8 @@
 		#{changeName},
 		#{path},
 		#{user_id},
-		#{updatetime}
+		#{updatetime},
+		#{memo}
 		)
 	</insert>
 
@@ -80,5 +87,31 @@
 		SELECT * from file where parentId = #{id} and type = '2' ORDER BY id desc
 	</select>
 
+	<select id="getUploadRirekiByNe" resultMap="fileResult">
+		SELECT
+			ID,
+			type,
+			parentId,
+			NAME,
+			changeName,
+			path,
+			user_id,
+			memo,
+			updatetime,
+			(
+				SELECT
+					realname
+				FROM
+					USER
+				WHERE
+					ID = user_id
+			) AS USER
+		FROM
+			file
+		WHERE
+			type = 'ne'
+		ORDER BY
+			id DESC
+	</select>
 
 </mapper>

@@ -84,5 +84,9 @@
 
 	</select>
 
+	<select id="getJyuchuName_optionsByNe" resultMap="option">
+		select distinct jyuchu_name as label, jyuchu_name as value from ne where tenpo_code = #{tenpo} order by jyuchu_name
+	</select>
+
 
 </mapper>

@@ -5,6 +5,7 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class ne {
+	private boolean chk;
 	private int jyuchu_denpyo_no;
 	private String pic_siji_naiyou;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Tokyo")
@@ -33,12 +34,33 @@ public class ne {
 	private String hasou_kbn;
 	private String siharai_kbn;
 	private String hasou_denpyo_no;
+	private String haisoukaisya;
 	private String bikou;
 	private String jyuyou;
 	private String jyuyou_check;
 	private String jyuchu_tag;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Tokyo")
 	private Date import_date;
 	private int import_user;
+	private String import_username;
+
+	private String tsuisekiData;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Tokyo")
+	private Date tsuisekiImportDate;
+	private String sumi;
+	private String todokesaki;
+	private String kekka;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Tokyo")
+	private Date haitatsukanryo;
+	private String kosuu;
+	private String syosai;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Tokyo")
+	private Date syokaihannnou;
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Tokyo")
+	private Date syukabi;
+	private int tsuisekiImportUserId;
+	private String tsuisekiImportUser;
+	private String tsuisekiNo;
 
 	public int getJyuchu_denpyo_no() {
 		return jyuchu_denpyo_no;
@@ -278,6 +300,134 @@ public class ne {
 
 	public void setImport_user(int import_user) {
 		this.import_user = import_user;
+	}
+
+	public String getImport_username() {
+		return import_username;
+	}
+
+	public void setImport_username(String import_username) {
+		this.import_username = import_username;
+	}
+
+	public boolean isChk() {
+		return chk;
+	}
+
+	public void setChk(boolean chk) {
+		this.chk = chk;
+	}
+
+	public String getSumi() {
+		return sumi;
+	}
+
+	public void setSumi(String sumi) {
+		this.sumi = sumi;
+	}
+
+	public String getTodokesaki() {
+		return todokesaki;
+	}
+
+	public void setTodokesaki(String todokesaki) {
+		this.todokesaki = todokesaki;
+	}
+
+	public String getKekka() {
+		return kekka;
+	}
+
+	public void setKekka(String kekka) {
+		this.kekka = kekka;
+	}
+
+	public Date getHaitatsukanryo() {
+		return haitatsukanryo;
+	}
+
+	public void setHaitatsukanryo(Date haitatsukanryo) {
+		this.haitatsukanryo = haitatsukanryo;
+	}
+
+	public Date getSyukabi() {
+		return syukabi;
+	}
+
+	public void setSyukabi(Date syukabi) {
+		this.syukabi = syukabi;
+	}
+
+	public String getKosuu() {
+		return kosuu;
+	}
+
+	public void setKosuu(String kosuu) {
+		this.kosuu = kosuu;
+	}
+
+	public String getSyosai() {
+		return syosai;
+	}
+
+	public void setSyosai(String syosai) {
+		this.syosai = syosai;
+	}
+
+	public Date getSyokaihannnou() {
+		return syokaihannnou;
+	}
+
+	public void setSyokaihannnou(Date syokaihannnou) {
+		this.syokaihannnou = syokaihannnou;
+	}
+
+	public Date getTsuisekiImportDate() {
+		return tsuisekiImportDate;
+	}
+
+	public void setTsuisekiImportDate(Date tsuisekiImportDate) {
+		this.tsuisekiImportDate = tsuisekiImportDate;
+	}
+
+	public String getHaisoukaisya() {
+		return haisoukaisya;
+	}
+
+	public void setHaisoukaisya(String haisoukaisya) {
+		this.haisoukaisya = haisoukaisya;
+	}
+
+	public int getTsuisekiImportUserId() {
+		return tsuisekiImportUserId;
+	}
+
+	public void setTsuisekiImportUserId(int tsuisekiImportUserId) {
+		this.tsuisekiImportUserId = tsuisekiImportUserId;
+	}
+
+	public String getTsuisekiImportUser() {
+		return tsuisekiImportUser;
+	}
+
+	public void setTsuisekiImportUser(String tsuisekiImportUser) {
+		this.tsuisekiImportUser = tsuisekiImportUser;
+	}
+
+	public String getTsuisekiData() {
+		return tsuisekiData;
+	}
+
+	public void setTsuisekiData(String tsuisekiData) {
+		this.tsuisekiData = tsuisekiData;
+	}
+
+	public String getTsuisekiNo() {
+		return tsuisekiNo;
+	}
+
+	public void setTsuisekiNo(String tsuisekiNo) {
+		this.tsuisekiNo = tsuisekiNo;
 	}
 
 }

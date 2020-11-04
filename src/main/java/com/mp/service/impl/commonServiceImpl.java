@@ -47,6 +47,11 @@ public class commonServiceImpl implements commonService{
 		return commonDao.getHomeDataByNe(tenpo,beginDay,endDay);
 	}
 
+	public List<option> getJyuchuName_optionsByNe(String tenpo) {
+		// TODO 自動生成されたメソッド・スタブ
+		return commonDao.getJyuchuName_optionsByNe(tenpo);
+	}
+
 
 
 }

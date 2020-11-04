@@ -12,9 +12,11 @@ public class file {
 	private String changeName;
 	private String path;
 	private int user_id;
+	private String user;
 	private String value;
+	private String memo;
 
-	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Tokyo")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Tokyo")
 	private Date updatetime;
 
 	public int getID() {
@@ -87,6 +89,22 @@ public class file {
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public String getMemo() {
+		return memo;
+	}
+
+	public void setMemo(String memo) {
+		this.memo = memo;
 	}
 
 }

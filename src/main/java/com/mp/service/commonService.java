@@ -13,4 +13,5 @@ public interface commonService {
 	void insertInfo(String type, String info);
 	List<option> getTenpoByNe();
 	List<option> getHomeDataByNe(String tenpo,String beginDay,String endDay);
+	List<option> getJyuchuName_optionsByNe(String tenpo);
 }

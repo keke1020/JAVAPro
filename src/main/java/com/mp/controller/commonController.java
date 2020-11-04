@@ -109,9 +109,11 @@ public class commonController {
 	@ResponseBody
 	@RequestMapping(value = "/updateUserConfig", method = RequestMethod.POST)
 	private JSONObject updateUserConfig(HttpServletResponse response, HttpServletRequest request, String id,
-			boolean plan_contr_sw) {
+			boolean plan_contr_sw, boolean ne_upload_sw, boolean ne_delete_sw) {
 		JSONObject object = new JSONObject();
 
+		response.setHeader("Access-Control-Allow-Origin", "*");
+		response.setHeader("Cache-Control", "no-cache");
 		DynamicDataSourceHolder.setDataSource("defultdataSource");
 		user user = new user();
 		user.setID(id);
@@ -121,10 +123,19 @@ public class commonController {
 			user.setPlan_contr(0);
 		}
 
+		if (ne_upload_sw) {
+			user.setNe_upload(1);
+		} else {
+			user.setNe_upload(0);
+		}
+
+		if (ne_delete_sw) {
+			user.setNe_delete(1);
+		} else {
+			user.setNe_delete(0);
+		}
 		userService.updateUserConfig(user);
 
-		response.setHeader("Access-Control-Allow-Origin", "*");
-		response.setHeader("Cache-Control", "no-cache");
 		return object;
 	}
 
@@ -309,6 +320,7 @@ public class commonController {
 		return object;
 	}
 
+//	ne画面で使う
 	@ResponseBody
 	@RequestMapping(value = "/getTenpoByNe", method = RequestMethod.POST)
 	private JSONObject getTenpoByNe(HttpServletResponse response, HttpServletRequest request) {

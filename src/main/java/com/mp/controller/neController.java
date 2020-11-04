@@ -1,6 +1,7 @@
 package com.mp.controller;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,7 +11,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -25,17 +25,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mp.common.DynamicDataSourceHolder;
 import com.mp.dto.option;
 import com.mp.dto.result;
+import com.mp.entity.config;
 import com.mp.entity.file;
 import com.mp.entity.ne;
-import com.mp.entity.todo;
-import com.mp.entity.user;
 import com.mp.service.commonService;
-import com.mp.service.listService;
-import com.mp.service.locationService;
+import com.mp.service.fileService;
 import com.mp.service.neService;
 import com.mp.util.CommonUtil;
 import com.mp.util.FileUtil;
@@ -47,12 +46,17 @@ public class neController {
 	SimpleDateFormat sf3 = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 	SimpleDateFormat sf4 = new SimpleDateFormat("yyyy-MM");
 	SimpleDateFormat sf5 = new SimpleDateFormat("yyyy-MM-dd");
+	SimpleDateFormat sf6 = new SimpleDateFormat("yyyyMMdd");
+	SimpleDateFormat sf7 = new SimpleDateFormat("yyyyMMddHHmmss");
 
 	private static Pattern datePattern = Pattern.compile("^\\d{4}/\\d{1,2}/\\d{1,2}$");
 	private static Pattern numPattern = Pattern.compile("^-?\\d+(\\.\\d*)?$");
 
 	@Autowired
 	private neService neService;
+
+	@Autowired
+	private fileService fileService;
 
 	@Autowired
 	private commonService commonService;
@@ -70,6 +74,15 @@ public class neController {
 			response.setCharacterEncoding("utf-8");
 			response.setHeader("Access-Control-Allow-Origin", "*");
 			response.setHeader("Cache-Control", "no-cache");
+
+			String path = "";
+			if (config.ISLOCAL) {
+				path = config.NE_UPLOADFILE_PLACE_LOCAL;
+			} else {
+				path = config.NE_UPLOADFILE_PLACE_SERVER;
+			}
+
+			Date now = new Date();
 
 			if (!"csv".equals(FileUtil.getFileType(file.getOriginalFilename()))) {
 				result.setState(0);
@@ -112,8 +125,6 @@ public class neController {
 			Integer jyuyou_index = null;
 			Integer jyuyou_check_index = null;
 			Integer jyuchu_tag_index = null;
-
-			Date now = new Date();
 
 			// データ本体を読み込みます
 			while (true) {
@@ -333,11 +344,34 @@ public class neController {
 
 			if (ne_add.size() > 0) {
 				neService.insert(ne_add);
-			}
 
-			result.setState(1);
-			result.setMsg(ne_add.size() + "件を登録しました。");
-			object.put("rows", result);
+				String date = sf6.format(now);
+				String place_str = path + "\\wanfang_file_NE\\" + date;
+
+				String originalFileName = file.getOriginalFilename();
+				File place = new File(place_str);
+				if (!place.exists()) {// 如果文件夹不存在
+					place.mkdir();// 创建文件夹
+				}
+
+				String newfilename = sf7.format(now) + "_" + originalFileName;
+				File file1 = new File(place, newfilename);
+				file.transferTo(file1);
+
+				file upfile = new file();
+				upfile.setChangeName(originalFileName);
+				upfile.setMemo("NEデータ");
+				upfile.setName(newfilename);
+				upfile.setPath(place + "\\" + newfilename);
+				upfile.setType("ne");
+				upfile.setUpdatetime(now);
+				upfile.setUser_id(loginuser_id);
+				fileService.insert(upfile);
+
+				result.setState(1);
+				result.setMsg(ne_add.size() + "件を登録しました。");
+				object.put("rows", result);
+			}
 			return object;
 
 //			String line = null;
@@ -546,6 +580,332 @@ public class neController {
 	}
 
 	@ResponseBody
+	@RequestMapping(value = "/uploadCsvACtion_tuiseki", method = RequestMethod.POST)
+	private JSONObject uploadCsvACtion_tuiseki(@RequestParam(value = "file") MultipartFile file,
+			HttpServletResponse response, HttpServletRequest request, int loginuser_id) {
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
+		JSONObject object = new JSONObject();
+		result result = new result();
+
+		try {
+			request.setCharacterEncoding("utf-8");
+			response.setCharacterEncoding("utf-8");
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+
+			String path = "";
+			if (config.ISLOCAL) {
+				path = config.NE_UPLOADFILE_PLACE_LOCAL;
+			} else {
+				path = config.NE_UPLOADFILE_PLACE_SERVER;
+			}
+
+			Date now = new Date();
+
+			if (!"csv".equals(FileUtil.getFileType(file.getOriginalFilename()))) {
+				result.setState(0);
+				result.setMsg("csvファイルをアップロードしてください。");
+				object.put("rows", result);
+				return object;
+			}
+
+			InputStream is = file.getInputStream();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is, "Shift-JIS"));
+//			Reader rd = new BufferedReader(new InputStreamReader(is, "Shift-JIS"));
+
+			int num = 0;
+			List<ne> ne_up = new ArrayList<ne>();
+			Integer haisoukaisya_index = null;
+			Integer denpyono_index = null;
+			Integer kekka_index = null;
+			Integer sumi_index = null;
+			Integer todokesaki_index = null;
+			Integer tsuisekibango_index = null;
+			Integer syukabi_index = null;
+			Integer haitatsukanryo_index = null;
+			Integer kosuu_index = null;
+			Integer syosai_index = null;
+			Integer syokaihannnou_index = null;
+
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				String item[] = line.split(",\\s*(?![^\"]*\"\\,)");// CSV格式文件为逗号分隔符文件，这里根据逗号切分
+				if (num == 0) {
+					if (!CommonUtil.isHave(item, "配送会社") || !CommonUtil.isHave(item, "伝票番号")
+							|| !CommonUtil.isHave(item, "結果") || !CommonUtil.isHave(item, "済")
+							|| !CommonUtil.isHave(item, "届け先") || !CommonUtil.isHave(item, "追跡番号")
+							|| !CommonUtil.isHave(item, "出荷日") || !CommonUtil.isHave(item, "配達完了日")
+							|| !CommonUtil.isHave(item, "個数") || !CommonUtil.isHave(item, "詳細")
+							|| !CommonUtil.isHave(item, "初回反応")) {
+						result.setState(0);
+						result.setMsg("正しいcsvファイルをアップロードしてください。");
+						object.put("rows", result);
+						return object;
+					}
+					for (int i = 0; i < item.length; i++) {
+						if ("配送会社".equals(getValue(item, i))) {
+							haisoukaisya_index = i;
+						} else if ("伝票番号".equals(getValue(item, i))) {
+							denpyono_index = i;
+						} else if ("結果".equals(getValue(item, i))) {
+							kekka_index = i;
+						} else if ("済".equals(getValue(item, i))) {
+							sumi_index = i;
+						} else if ("届け先".equals(getValue(item, i))) {
+							todokesaki_index = i;
+						} else if ("追跡番号".equals(getValue(item, i))) {
+							tsuisekibango_index = i;
+						} else if ("出荷日".equals(getValue(item, i))) {
+							syukabi_index = i;
+						} else if ("配達完了日".equals(getValue(item, i))) {
+							haitatsukanryo_index = i;
+						} else if ("個数".equals(getValue(item, i))) {
+							kosuu_index = i;
+						} else if ("詳細".equals(getValue(item, i))) {
+							syosai_index = i;
+						} else if ("初回反応".equals(getValue(item, i))) {
+							syokaihannnou_index = i;
+						}
+					}
+				} else {
+					String sumi_csv = getValue(item, sumi_index);
+					String haisoukaisya_csv = getValue(item, haisoukaisya_index);
+					String denpyono_csv = getValue(item, denpyono_index);
+					String kekka_csv = getValue(item, kekka_index);
+					String todokesaki_csv = getValue(item, todokesaki_index);
+					String tsuisekibango_csv = getValue(item, tsuisekibango_index);
+					String syukabi_csv = getValue(item, syukabi_index);
+					String haitatsukanryo_csv = getValue(item, haitatsukanryo_index);
+					String kosuu_csv = getValue(item, kosuu_index);
+					String syosai_csv = getValue(item, syosai_index);
+					String syokaihannnou_csv = getValue(item, syokaihannnou_index);
+
+					if (!"".equals(haisoukaisya_csv) && haisoukaisya_csv != null && !"".equals(denpyono_csv)
+							&& denpyono_csv != null && !"".equals(kekka_csv) && kekka_csv != null) {
+
+						if (CommonUtil.isInteger(denpyono_csv) && CommonUtil.isInteger(tsuisekibango_csv)) {
+							ne ne = new ne();
+							ne.setTsuisekiImportUserId(loginuser_id);
+							ne.setJyuchu_denpyo_no(Integer.parseInt(denpyono_csv));
+							ne.setTsuisekiNo(tsuisekibango_csv);
+							ne.setHaisoukaisya(haisoukaisya_csv);
+							ne.setSumi(sumi_csv);
+							ne.setTodokesaki(todokesaki_csv);
+							ne.setKekka(kekka_csv);
+
+							if (!"".equals(syukabi_csv) && syukabi_csv != null) {
+//								if (syukabi_csv.length() == 9) {
+//									Date date = new Date();
+//									String year = syukabi_csv.substring(0, 4);
+//									String month = syukabi_csv.substring(5, 7);
+//									String day = syukabi_csv.substring(8, 9);
+//
+//									date.setYear(Integer.parseInt(year) - 1900);
+//									date.setMonth(Integer.parseInt(month));
+//									date.setDate(Integer.parseInt(day));
+//									date.setHours(0);
+//									date.setMinutes(0);
+//									date.setSeconds(0);
+//									ne.setSyukabi(date);
+//								} else if (syukabi_csv.length() > 9 && syukabi_csv.length() < 12) {
+//									Date date = new Date();
+//									String year = syukabi_csv.substring(0, 4);
+//									String month = syukabi_csv.substring(5, 7);
+//									String day = syukabi_csv.substring(8, 10);
+//									day = day.replace("日", "");
+//
+//									date.setYear(Integer.parseInt(year) - 1900);
+//									date.setMonth(Integer.parseInt(month));
+//									date.setDate(Integer.parseInt(day));
+//									date.setHours(0);
+//									date.setMinutes(0);
+//									date.setSeconds(0);
+//									ne.setSyukabi(date);
+//								}
+								if ("佐川急便(宅配便)".equals(haisoukaisya_csv)) {
+									String year = CommonUtil.subString(syukabi_csv, "", "年");
+									String month = CommonUtil.subString(syukabi_csv, "年", "月");
+									String day = CommonUtil.subString(syukabi_csv, "月", "日");
+									if (!"".equals(year) && !"".equals(month) && !"".equals(day)) {
+										Date date = new Date();
+										date.setYear(Integer.parseInt(year) - 1900);
+										date.setMonth(Integer.parseInt(month));
+										date.setDate(Integer.parseInt(day));
+										date.setHours(0);
+										date.setMinutes(0);
+										date.setSeconds(0);
+										ne.setSyukabi(date);
+									}
+								} else if ("ゆうパケット".equals(haisoukaisya_csv)) {
+									String[] date_str = syukabi_csv.split("/");
+									if (date_str.length == 3) {
+										String year = date_str[0];
+										String month = date_str[1];
+										String day = date_str[2];
+
+										if (!"".equals(year) && !"".equals(month) && !"".equals(day)) {
+											Date date = new Date();
+											date.setYear(Integer.parseInt(year) - 1900);
+											date.setMonth(Integer.parseInt(month));
+											date.setDate(Integer.parseInt(day));
+											date.setHours(0);
+											date.setMinutes(0);
+											date.setSeconds(0);
+											ne.setSyukabi(date);
+										}
+									}
+								}
+
+							}
+
+							if (ne.getSyukabi() != null) {
+								if (!"".equals(haitatsukanryo_csv) && haitatsukanryo_csv != null) {
+									if ("佐川急便(宅配便)".equals(haisoukaisya_csv)) {
+										String month = CommonUtil.subString(haitatsukanryo_csv, "", "月");
+										String day = CommonUtil.subString(haitatsukanryo_csv, "月", "日");
+										String hour = CommonUtil.subString(haitatsukanryo_csv, "日", "時");
+										String minute = CommonUtil.subString(haitatsukanryo_csv, "時", "分");
+										if (!"".equals(month) && !"".equals(day)) {
+											Date date = new Date();
+											date.setYear(ne.getSyukabi().getYear());
+											date.setMonth(Integer.parseInt(month));
+											date.setDate(Integer.parseInt(day));
+											date.setHours(0);
+											date.setMinutes(0);
+											date.setSeconds(0);
+
+											if (date.getTime() < ne.getSyukabi().getTime()) {
+												date.setYear(ne.getSyukabi().getYear() + 1);
+											}
+											if (!"".equals(hour) && !"".equals(minute)) {
+												date.setHours(Integer.parseInt(hour));
+												date.setMinutes(Integer.parseInt(minute));
+											}
+											ne.setHaitatsukanryo(date);
+										}
+									} else if ("ゆうパケット".equals(haisoukaisya_csv)) {
+										String[] date_str = haitatsukanryo_csv.split("/");
+										if (date_str.length == 3) {
+											String year = date_str[0];
+											String month = date_str[1];
+
+											String[] datetime = date_str[2].split(" ");
+
+											if (datetime.length == 2) {
+												String day = datetime[0];
+												String[] datetime2 = datetime[1].split(":");
+
+												if (datetime2.length == 2) {
+													String hour = datetime2[0];
+													String minute = datetime2[1];
+													if (!"".equals(year) && !"".equals(month) && !"".equals(day)) {
+														Date date = new Date();
+														date.setYear(Integer.parseInt(year) - 1900);
+														date.setMonth(Integer.parseInt(month));
+														date.setDate(Integer.parseInt(day));
+														date.setHours(0);
+														date.setMinutes(0);
+														date.setSeconds(0);
+
+														if (date.getTime() < ne.getSyukabi().getTime()) {
+															date.setYear(ne.getSyukabi().getYear() + 1);
+														}
+														date.setHours(Integer.parseInt(hour));
+														date.setMinutes(Integer.parseInt(minute));
+														ne.setHaitatsukanryo(date);
+													}
+												}
+											}
+
+										}
+									}
+								}
+							}
+
+							ne.setKosuu(kosuu_csv);
+							ne.setSyosai(syosai_csv);
+							ne.setTsuisekiImportDate(now);
+							if (!"".equals(syokaihannnou_csv) && syokaihannnou_csv != null) {
+								String[] date_str = syokaihannnou_csv.split("/");
+								if (date_str.length == 3) {
+									String year = date_str[0];
+									String month = date_str[1];
+
+									String[] datetime = date_str[2].split(" ");
+
+									if (datetime.length == 2) {
+										String day = datetime[0];
+										String[] datetime2 = datetime[1].split(":");
+
+										if (datetime2.length == 2) {
+											String hour = datetime2[0];
+											String minute = datetime2[1];
+											if (!"".equals(year) && !"".equals(month) && !"".equals(day)
+													&& !"".equals(hour) && !"".equals(minute)) {
+												Date date = new Date();
+												date.setYear(Integer.parseInt(year) - 1900);
+												date.setMonth(Integer.parseInt(month));
+												date.setDate(Integer.parseInt(day));
+												date.setHours(Integer.parseInt(hour));
+												date.setMinutes(Integer.parseInt(minute));
+												ne.setSyokaihannnou(date);
+											}
+										}
+									}
+
+								}
+
+							}
+							ne_up.add(ne);
+						}
+					}
+				}
+				num++;
+			}
+
+			if (ne_up.size() > 0) {
+				neService.UpdateTsuisekiData(ne_up);
+
+				String date = sf6.format(now);
+				String place_str = path + "\\wanfang_file_NE\\" + date;
+
+				String originalFileName = file.getOriginalFilename();
+				File place = new File(place_str);
+				if (!place.exists()) {// 如果文件夹不存在
+					place.mkdir();// 创建文件夹
+				}
+
+				String newfilename = sf7.format(now) + "_" + originalFileName;
+				File file1 = new File(place, newfilename);
+				file.transferTo(file1);
+
+				file upfile = new file();
+				upfile.setChangeName(originalFileName);
+				upfile.setMemo("荷物追跡データ");
+				upfile.setName(newfilename);
+				upfile.setPath(place + "\\" + newfilename);
+				upfile.setType("ne");
+				upfile.setUpdatetime(now);
+				upfile.setUser_id(loginuser_id);
+				fileService.insert(upfile);
+
+				result.setState(1);
+				result.setMsg("登録しました。");
+			}
+
+			object.put("rows", result);
+			return object;
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e);
+			result.setState(0);
+			result.setMsg("インポート中にエラーがあります。");
+			object.put("rows", result);
+			return object;
+		}
+	}
+
+	@ResponseBody
 	@RequestMapping(value = "/getHomeDataByNe", method = RequestMethod.POST)
 	private JSONObject getHomeDataByNe(HttpServletResponse response, HttpServletRequest request, String tenpo,
 			String time) {
@@ -602,9 +962,8 @@ public class neController {
 				option op = new option();
 				if (ne.size() == 0) {
 					op.setLabel("0");
-					List<String> vals = new ArrayList<String>();
 //					vals.add("無し");
-					op.setVaList(vals);
+					op.setVaList(null);
 				} else {
 					op.setLabel(String.valueOf(ne.size()));
 					List<String> vals = new ArrayList<String>();
@@ -637,7 +996,8 @@ public class neController {
 	@ResponseBody
 	@RequestMapping(value = "/getMeisaiDataByNe", method = RequestMethod.POST)
 	private JSONObject getMeisaiDataByNe(HttpServletResponse response, HttpServletRequest request, String tenpo,
-			String time_s, String time_e, int currentPage, int pageCount, String jyuchu_name) {
+			String time_s, String time_e, int currentPage, int pageCount, String jyuchu_name, String denpyono,
+			String haitatsukanryo_s, String haitatsukanryo_e, String haitatsukanryo_chk) {
 		DynamicDataSourceHolder.setDataSource("defultdataSource");
 		JSONObject object = new JSONObject();
 		try {
@@ -649,23 +1009,132 @@ public class neController {
 			int current = (currentPage - 1) * pageCount;
 
 			String time1 = "";
-			if(!"".equals(time_s) && time_s != null && !"null".equals(time_s)) {
+			if (!"".equals(time_s) && time_s != null && !"null".equals(time_s)) {
 				time1 = time_s + " 00:00:00";
 			}
 			String time2 = "";
-			if(!"".equals(time_e) && time_e != null && !"null".equals(time_e)) {
+			if (!"".equals(time_e) && time_e != null && !"null".equals(time_e)) {
 				time2 = time_e + " 23:59:59";
 			}
 
-			List<ne> dataList = neService.getMeisaiDataByNe(tenpo, time1, time2, jyuchu_name, current, pageCount);
-			int dataCount = neService.getMeisaiDataByNe_count(tenpo, time1, jyuchu_name, time2);
-			int datagoukei = neService.getMeisaiDataByNe_goukei(tenpo, time1, time2, jyuchu_name, current, pageCount);
+			List<ne> dataList = neService.getMeisaiDataByNe(tenpo, time1, time2, jyuchu_name, denpyono,
+					haitatsukanryo_chk, haitatsukanryo_s, haitatsukanryo_e, current, pageCount);
+
+//			for (int i = 0; i < dataList.size(); i++) {
+//				ne ne = dataList.get(i);
+//				StringBuilder tsuisekiData_sb = new StringBuilder();
+//				String syokaihannnou = "";
+//				if(ne.getSyokaihannnou() != null) {
+//					syokaihannnou = sf.format(ne.getSyokaihannnou());
+//				}
+//				String syukabi = "";
+//				if(ne.getSyukabi() != null) {
+//					syukabi =sf2.format(ne.getSyukabi());
+//				}
+//				if(!"".equals(ne.getKekka()) && ne.getKekka() != null) {
+//					tsuisekiData_sb.append("荷物追跡: 初回反応日 -> ").append(syokaihannnou)
+//					.append(" 状態-> ").append(ne.getSumi())
+//					.append(" 結果 -> ").append(ne.getKekka())
+//					.append(" 配送会社 -> ").append(ne.getHaisoukaisya())
+//					.append(" 届け先 -> ").append(ne.getTodokesaki())
+//					.append(" 出荷日 -> ").append(syukabi)
+//					.append(" 配達完了日 -> ").append(ne.getHaitatsukanryo())
+//					.append(" 個数 -> ").append(ne.getKosuu())
+//					.append(" 導入日-> ").append(ne.getTsuisekiImportDate())
+//					.append(" 導入者-> ").append(ne.getTsuisekiImportUser());
+//				}
+//				dataList.get(i).setTsuisekiData(tsuisekiData_sb.toString());
+//			}
+
+			int dataCount = neService.getMeisaiDataByNe_count(tenpo, time1, time2, jyuchu_name, denpyono,
+					haitatsukanryo_chk, haitatsukanryo_s, haitatsukanryo_e);
+			int datagoukei = 0;
+			if (dataCount > 0) {
+				datagoukei = neService.getMeisaiDataByNe_goukei(tenpo, time1, time2, jyuchu_name, denpyono,
+						haitatsukanryo_chk, haitatsukanryo_s, haitatsukanryo_e);
+			}
+//			int datagoukei2 = neService.getMeisaiDataByNe_goukei2(tenpo, time1, time2, jyuchu_name, current, pageCount);
+			int datagoukei2 = 0;
+
+			if (dataList.size() > 0) {
+				for (int i = 0; i < dataList.size(); i++) {
+					datagoukei2 += dataList.get(i).getGoukei_kin();
+				}
+			}
+
+			List<option> jyuchu_name_op = commonService.getJyuchuName_optionsByNe(tenpo);
 
 			object.put("dataList", dataList);
 			object.put("dataCount", dataCount);
 			object.put("datagoukei", datagoukei);
+			object.put("datagoukei2", datagoukei2);
+			object.put("jyuchu_name_op", jyuchu_name_op);
 		} catch (Exception e) {
 			// TODO: handle exception
+			System.out.println(e);
+		}
+		return object;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/deleteMeisai", method = RequestMethod.POST)
+	private JSONObject deleteMeisai(HttpServletResponse response, HttpServletRequest request, String data) {
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
+		JSONObject object = new JSONObject();
+		result result = new result();
+		try {
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+			request.setCharacterEncoding("utf-8");
+			response.setCharacterEncoding("utf-8");
+
+			String ids = "";
+			if (data != "" && !"".equals(data)) {
+				JSONArray json = (JSONArray) JSONArray.parse(data);
+				if (json.size() > 0) {
+					for (Object obj : json) {
+						JSONObject jo = (JSONObject) obj;
+						boolean chk = jo.getBoolean("chk");
+						if (chk) {
+							int id = jo.getInteger("jyuchu_denpyo_no");
+							ids = ids + id + ",";
+						}
+					}
+				}
+				if (!"".equals(ids)) {
+					String[] ids_arr = ids.split(",");
+					neService.deleteMeisaiByIds(ids_arr);
+					result.setState(0);
+					result.setMsg(ids_arr.length + "件を削除しました。");
+				}
+			} else {
+				result.setState(1);
+			}
+
+			object.put("rows", result);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return object;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/getUploadRirekiByNe", method = RequestMethod.POST)
+	private JSONObject getUploadRirekiByNe(HttpServletResponse response, HttpServletRequest request) {
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
+		JSONObject object = new JSONObject();
+		try {
+			request.setCharacterEncoding("utf-8");
+			response.setCharacterEncoding("utf-8");
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+
+			List<file> datalist = fileService.getUploadRirekiByNe();
+
+			object.put("datalist", datalist);
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e);
 		}
 		return object;
 	}

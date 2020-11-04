@@ -117,8 +117,8 @@ public class todoController {
 
 					if (!"".equals(todoList.get(i).getRireki()) && todoList.get(i).getRireki() != null) {
 						if (todoList.get(i).getRireki().contains("<br>")) {
-							String[] ï½’ireki_ = todoList.get(i).getRireki().split("<br>");
-							todoList.get(i).setRireki_(ï½’ireki_);
+							String[] r’ireki_ = todoList.get(i).getRireki().split("<br>");
+							todoList.get(i).setRireki_(r’ireki_);
 						}
 					}
 

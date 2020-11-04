@@ -13,6 +13,8 @@
 		<result column="plan_priv" property="plan_priv" jdbcType="INTEGER" />
 		<result column="todo_priv1" property="todo_priv1" jdbcType="INTEGER" />
 		<result column="todo_priv2" property="todo_priv2" jdbcType="INTEGER" />
+		<result column="ne_upload" property="ne_upload" jdbcType="INTEGER" />
+		<result column="ne_delete" property="ne_delete" jdbcType="INTEGER" />
 	</resultMap>
 
 	<!-- dao接口方法提供sql语句配置 -->
@@ -96,7 +98,9 @@
 	<update id="updateUserConfig" parameterType="com.mp.entity.user">
 		UPDATE `user`
 		<set>
-			plan_contr = #{plan_contr}
+			plan_contr = #{plan_contr},
+			ne_upload = #{ne_upload},
+			ne_delete = #{ne_delete}
 		</set>
 		where ID = #{ID}
 	</update>
