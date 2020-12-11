@@ -3,7 +3,6 @@ package com.mp.service;
 import java.util.List;
 
 import com.mp.dto.option;
-import com.mp.entity.user;
 
 public interface commonService {
 	List<option> getArrival_japan();
@@ -14,4 +13,6 @@ public interface commonService {
 	List<option> getTenpoByNe();
 	List<option> getHomeDataByNe(String tenpo,String beginDay,String endDay);
 	List<option> getJyuchuName_optionsByNe(String tenpo);
+	List<option> getJyuchuKekka_optionsByNe(String tenpo);
+	List<option> getAllShopCodeDataByNe(String start, String end);
 }

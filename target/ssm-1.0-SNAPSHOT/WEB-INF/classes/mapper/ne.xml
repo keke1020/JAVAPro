@@ -6,6 +6,7 @@
 	<resultMap type="ne" id="neResult">
 		<id column="jyuchu_denpyo_no" property="jyuchu_denpyo_no"
 			jdbcType="INTEGER" />
+		<result column="count" property="count" jdbcType="INTEGER" />
 		<result column="pic_siji_naiyou" property="pic_siji_naiyou"
 			jdbcType="VARCHAR" />
 		<result column="jyuchu_bi" property="jyuchu_bi"
@@ -84,7 +85,57 @@
 			jdbcType="TIMESTAMP" />
 		<result column="syukabi" property="syukabi"
 			jdbcType="TIMESTAMP" />
-		<result column="tsuisekiNo" property="tsuisekiNo" jdbcType="VARCHAR" />
+		<result column="tsuisekiNo" property="tsuisekiNo"
+			jdbcType="VARCHAR" />
+
+		<result column="code" property="code" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap type="ne_meisai" id="neMeisaiResult">
+		<id column="jyuchu_denpyo_no" property="jyuchu_denpyo_no"
+			jdbcType="INTEGER" />
+		<result column="tenpo_code" property="tenpo_code" jdbcType="VARCHAR" />
+		<result column="count" property="count" jdbcType="INTEGER" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="meisaigyo" property="meisaigyo"
+			jdbcType="INTEGER" />
+		<result column="jyucyu_count" property="jyucyu_count"
+			jdbcType="INTEGER" />
+		<result column="hikiate_count" property="hikiate_count"
+			jdbcType="INTEGER" />
+
+		<result column="kingaku" property="kingaku" jdbcType="INTEGER" />
+		<result column="gennka" property="gennka" jdbcType="INTEGER" />
+	</resultMap>
+
+	<resultMap type="ne_goods" id="neGoodsResult">
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		<result column="dhcode" property="dhcode" jdbcType="VARCHAR" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="baika" property="baika" jdbcType="VARCHAR" />
+		<result column="genka" property="genka" jdbcType="VARCHAR" />
+		<result column="teika" property="teika" jdbcType="VARCHAR" />
+		<result column="tag" property="tag" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap type="ne_hikaku" id="neHikakuResult">
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		<result column="value1" property="value1" jdbcType="VARCHAR" />
+		<result column="value2" property="value2" jdbcType="VARCHAR" />
+		<result column="value3" property="value3" jdbcType="VARCHAR" />
+		<result column="value4" property="value4" jdbcType="VARCHAR" />
+		<result column="value5" property="value5" jdbcType="VARCHAR" />
+		<result column="value6" property="value6" jdbcType="VARCHAR" />
+		<result column="value7" property="value7" jdbcType="VARCHAR" />
+		<result column="value8" property="value8" jdbcType="VARCHAR" />
+		<result column="value9" property="value9" jdbcType="VARCHAR" />
+		<result column="value10" property="value10" jdbcType="VARCHAR" />
+		<result column="value11" property="value11" jdbcType="VARCHAR" />
+		<result column="value12" property="value12" jdbcType="VARCHAR" />
+		<result column="value13" property="value13" jdbcType="VARCHAR" />
+		<result column="value14" property="value14" jdbcType="VARCHAR" />
+		<result column="value15" property="value15" jdbcType="VARCHAR" />
 	</resultMap>
 
 	<insert id="insert" parameterType="java.util.ArrayList">
@@ -188,18 +239,382 @@
 		`jyuchu_tag`=VALUES(`jyuchu_tag`)
 	</insert>
 
+	<select id="getHomedata_keisan" resultMap="neResult">
+		SELECT
+			sum(goukei_kin) as goukei_kin,
+			sum(hasou_kin) as hasou_kin,
+			sum(zei_kin) as zei_kin,
+			sum(syohin_kin) as syohin_kin,
+			sum(tesuryo_kin) as tesuryo_kin,
+			sum(sonota_kin) as sonota_kin,
+			sum(point) as point
+		FROM
+			ne
+		WHERE
+			tenpo_code = #{tenpo}
+			AND jyuchu_bi &gt;= #{start}
+			AND jyuchu_bi &lt;= #{end}
+	</select>
+
+
 	<select id="getHomeDataByNe_everday" resultMap="neResult">
 		SELECT
 		sum(goukei_kin) AS goukei_kin,
+		jyuchu_bi,
 		jyuchu_name
 		FROM
 		ne
 		WHERE
-		jyuchu_bi &gt;= #{time_s} AND jyuchu_bi &lt;= #{time_e}
+		jyuchu_bi
+		&gt;= #{time_s} AND jyuchu_bi &lt;= #{time_e}
 		<if test="tenpo != '' and tenpo != null">
 			AND tenpo_code = #{tenpo}
 		</if>
 		group by jyuchu_name
+	</select>
+
+	<select id="getHomeTenpoinfoDataByNe_month" resultMap="neResult">
+		SELECT
+		jyuchu_name,
+		(
+		SELECT
+		sum(goukei_kin)
+		FROM
+		ne n2
+		WHERE
+		n2.tenpo_code =
+		#{tenpo}
+		AND n2.jyuchu_name = n1.jyuchu_name
+		<if
+			test="start != '' and start != null and end != '' and end != null">
+			AND n2.jyuchu_bi &gt;= #{start}
+			AND n2.jyuchu_bi &lt;= #{end}
+		</if>
+		) AS goukei_kin,
+		(
+		SELECT
+		count(*)
+		FROM
+		ne n3
+		WHERE
+		n3.tenpo_code = #{tenpo}
+		AND n3.jyuchu_name = n1.jyuchu_name
+		<if
+			test="start != '' and start != null and end != '' and end != null">
+			AND n3.jyuchu_bi &gt;= #{start}
+			AND n3.jyuchu_bi &lt;= #{end}
+		</if>
+		) AS count
+		FROM
+		ne n1
+		WHERE
+		tenpo_code = #{tenpo}
+		<if
+			test="start != '' and start != null and end != '' and end != null">
+			AND jyuchu_bi &gt;= #{start}
+			AND jyuchu_bi &lt;= #{end}
+		</if>
+		GROUP BY
+		jyuchu_name
+		ORDER BY
+		goukei_kin DESC
+		LIMIT #{current},
+		#{pageCount}
+	</select>
+
+	<select id="getHomeTenpoinfoCountDataByNe_month"
+		resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		(
+		select
+		jyuchu_name
+		from
+		ne
+		WHERE
+		tenpo_code = #{tenpo}
+		<if
+			test="start != '' and start != null and end != '' and end != null">
+			AND jyuchu_bi &gt;= #{start}
+			AND jyuchu_bi &lt;= #{end}
+		</if>
+		GROUP BY
+		jyuchu_name
+		) n
+	</select>
+
+	<select id="getHomeTenpoinfo2DataByNe_month"
+		resultMap="neMeisaiResult">
+		SELECT
+		nm.code,
+		(SELECT
+		SUM(nm2.kingaku)
+		FROM
+		ne_meisai nm2
+		LEFT JOIN ne n2 ON nm2.jyuchu_denpyo_no = n2.jyuchu_denpyo_no
+		WHERE
+		nm2. CODE = nm.code
+		AND n2.tenpo_code = #{tenpo}
+		AND n2.jyuchu_bi &gt;= #{start}
+		AND n2.jyuchu_bi &lt;= #{end}
+		) as kingaku,
+		(SELECT
+				SUM(nm3.hikiate_count)
+			FROM
+				ne_meisai nm3
+			LEFT JOIN ne n3 ON nm3.jyuchu_denpyo_no = n3.jyuchu_denpyo_no
+			WHERE
+				nm3. CODE = nm.code
+				AND n3.tenpo_code = #{tenpo}
+				AND n3.jyuchu_bi &gt;= #{start}
+				AND n3.jyuchu_bi &lt;= #{end}
+		) as count
+		FROM
+		ne_meisai nm
+		LEFT JOIN ne n ON nm.jyuchu_denpyo_no = n.jyuchu_denpyo_no
+		where
+		n.tenpo_code = #{tenpo}
+		AND n.jyuchu_bi &gt;= #{start}
+		AND n.jyuchu_bi &lt;= #{end}
+		GROUP BY nm.code
+		ORDER BY kingaku desc
+		LIMIT #{current},
+		#{pageCount}
+	</select>
+
+	<select id="getHomeTenpoinfo2CountDataByNe_month"
+		resultType="java.lang.Integer">
+		SELECT
+			count(*)
+		FROM
+		(
+			SELECT code from ne_meisai nm
+			LEFT JOIN ne n ON nm.jyuchu_denpyo_no = n.jyuchu_denpyo_no
+			where
+				n.tenpo_code = #{tenpo}
+				AND n.jyuchu_bi &gt;= #{start}
+				AND n.jyuchu_bi &lt;= #{end}
+			GROUP BY nm.code
+		) n
+	</select>
+
+	<select id="getHomeKakuTenpoinfoDataByNe"
+		resultMap="neHikakuResult">
+		SELECT
+			nm_master.`code` AS `code`,
+			(
+				SELECT
+					SUM(nm1.jyucyu_count)
+				FROM
+					ne_meisai nm1
+				JOIN ne n1 ON nm1.jyuchu_denpyo_no = n1.jyuchu_denpyo_no
+				WHERE
+					n1.jyuchu_bi &gt;= #{start}
+				AND n1.jyuchu_bi &lt;= #{end}
+				AND n1.tenpo_code = 'あかね楽天'
+				AND nm1.`code` = nm_master.`code`
+			) AS value1,
+			(
+				SELECT
+					SUM(nm2.jyucyu_count)
+				FROM
+					ne_meisai nm2
+				JOIN ne n2 ON nm2.jyuchu_denpyo_no = n2.jyuchu_denpyo_no
+				WHERE
+					n2.jyuchu_bi &gt;= #{start}
+				AND n2.jyuchu_bi &lt;= #{end}
+				AND n2.tenpo_code = 'アリス'
+				AND nm2.`code` = nm_master.`code`
+			) AS value2,
+			(
+				SELECT
+					SUM(nm3.jyucyu_count)
+				FROM
+					ne_meisai nm3
+				JOIN ne n3 ON nm3.jyuchu_denpyo_no = n3.jyuchu_denpyo_no
+				WHERE
+					n3.jyuchu_bi &gt;= #{start}
+				AND n3.jyuchu_bi &lt;= #{end}
+				AND n3.tenpo_code = '暁'
+				AND nm3.`code` = nm_master.`code`
+			) AS value3,
+			(
+				SELECT
+					SUM(nm4.jyucyu_count)
+				FROM
+					ne_meisai nm4
+				JOIN ne n4 ON nm4.jyuchu_denpyo_no = n4.jyuchu_denpyo_no
+				WHERE
+					n4.jyuchu_bi &gt;= #{start}
+				AND n4.jyuchu_bi &lt;= #{end}
+				AND n4.tenpo_code = 'あかねY'
+				AND nm4.`code` = nm_master.`code`
+			) AS value4,
+			(
+				SELECT
+					SUM(nm5.jyucyu_count)
+				FROM
+					ne_meisai nm5
+				JOIN ne n5 ON nm5.jyuchu_denpyo_no = n5.jyuchu_denpyo_no
+				WHERE
+					n5.jyuchu_bi &gt;= #{start}
+				AND n5.jyuchu_bi &lt;= #{end}
+				AND n5.tenpo_code = 'FK'
+				AND nm5.`code` = nm_master.`code`
+			) AS value5,
+			(
+				SELECT
+					SUM(nm6.jyucyu_count)
+				FROM
+					ne_meisai nm6
+				JOIN ne n6 ON nm6.jyuchu_denpyo_no = n6.jyuchu_denpyo_no
+				WHERE
+					n6.jyuchu_bi &gt;= #{start}
+				AND n6.jyuchu_bi &lt;= #{end}
+				AND n6.tenpo_code = 'ヤフーKT'
+				AND nm6.`code` = nm_master.`code`
+			) AS value6,
+			(
+				SELECT
+					SUM(nm7.jyucyu_count)
+				FROM
+					ne_meisai nm7
+				JOIN ne n7 ON nm7.jyuchu_denpyo_no = n7.jyuchu_denpyo_no
+				WHERE
+					n7.jyuchu_bi &gt;= #{start}
+				AND n7.jyuchu_bi &lt;= #{end}
+				AND n7.tenpo_code = 'YオクKT'
+				AND nm7.`code` = nm_master.`code`
+			) AS value7,
+			(
+				SELECT
+					SUM(nm8.jyucyu_count)
+				FROM
+					ne_meisai nm8
+				JOIN ne n8 ON nm8.jyuchu_denpyo_no = n8.jyuchu_denpyo_no
+				WHERE
+					n8.jyuchu_bi &gt;= #{start}
+				AND n8.jyuchu_bi &lt;= #{end}
+				AND n8.tenpo_code = 'ラキナイ'
+				AND nm8.`code` = nm_master.`code`
+			) AS value8,
+			(
+				SELECT
+					SUM(nm9.jyucyu_count)
+				FROM
+					ne_meisai nm9
+				JOIN ne n9 ON nm9.jyuchu_denpyo_no = n9.jyuchu_denpyo_no
+				WHERE
+					n9.jyuchu_bi &gt;= #{start}
+				AND n9.jyuchu_bi &lt;= #{end}
+				AND n9.tenpo_code = '問屋よか'
+				AND nm9.`code` = nm_master.`code`
+			) AS value9,
+			(
+				SELECT
+					SUM(nm10.jyucyu_count)
+				FROM
+					ne_meisai nm10
+				JOIN ne n10 ON nm10.jyuchu_denpyo_no = n10.jyuchu_denpyo_no
+				WHERE
+					n10.jyuchu_bi &gt;= #{start}
+				AND n10.jyuchu_bi &lt;= #{end}
+				AND n10.tenpo_code = 'とんよか卸'
+				AND nm10.`code` = nm_master.`code`
+			) AS value10,
+			(
+				SELECT
+					SUM(nm11.jyucyu_count)
+				FROM
+					ne_meisai nm11
+				JOIN ne n11 ON nm11.jyuchu_denpyo_no = n11.jyuchu_denpyo_no
+				WHERE
+					n11.jyuchu_bi &gt;= #{start}
+				AND n11.jyuchu_bi &lt;= #{end}
+				AND n11.tenpo_code = 'クラナビ'
+				AND nm11.`code` = nm_master.`code`
+			) AS value11,
+			(
+				SELECT
+					SUM(nm12.jyucyu_count)
+				FROM
+					ne_meisai nm12
+				JOIN ne n12 ON nm12.jyuchu_denpyo_no = n12.jyuchu_denpyo_no
+				WHERE
+					n12.jyuchu_bi &gt;= #{start}
+				AND n12.jyuchu_bi &lt;= #{end}
+				AND n12.tenpo_code = 'AZアリス'
+				AND nm12.`code` = nm_master.`code`
+			) AS value12,
+			(
+				SELECT
+					SUM(nm13.jyucyu_count)
+				FROM
+					ne_meisai nm13
+				JOIN ne n13 ON nm13.jyuchu_denpyo_no = n13.jyuchu_denpyo_no
+				WHERE
+					n13.jyuchu_bi &gt;= #{start}
+				AND n13.jyuchu_bi &lt;= #{end}
+				AND n13.tenpo_code = 'フリット'
+				AND nm13.`code` = nm_master.`code`
+			) AS value13,
+			(
+				SELECT
+					SUM(nm14.jyucyu_count)
+				FROM
+					ne_meisai nm14
+				JOIN ne n14 ON nm14.jyuchu_denpyo_no = n14.jyuchu_denpyo_no
+				WHERE
+					n14.jyuchu_bi &gt;= #{start}
+				AND n14.jyuchu_bi &lt;= #{end}
+				AND n14.tenpo_code = 'トココ'
+				AND nm14.`code` = nm_master.`code`
+			) AS value14,
+			(
+				SELECT
+					SUM(nm15.jyucyu_count)
+				FROM
+					ne_meisai nm15
+				JOIN ne n15 ON nm15.jyuchu_denpyo_no = n15.jyuchu_denpyo_no
+				WHERE
+					n15.jyuchu_bi &gt;= #{start}
+				AND n15.jyuchu_bi &lt;= #{end}
+				AND n15.tenpo_code = 'サラダ'
+				AND nm15.`code` = nm_master.`code`
+			) AS value15
+		FROM
+			ne n
+		JOIN ne_meisai nm_master ON nm_master.jyuchu_denpyo_no = n.jyuchu_denpyo_no
+		WHERE
+			n.jyuchu_bi &gt;= #{start}
+		AND n.jyuchu_bi &lt;= #{end}
+		<choose>
+            <when test="codes.size() > 0">
+            	AND nm_master.`code` in
+                <foreach collection="codes" item="code" index="index" open="("
+					close=")" separator=",">
+					#{code}
+				</foreach>
+            </when>
+            <otherwise>
+
+            </otherwise>
+        </choose>
+        GROUP BY nm_master.`code`
+	</select>
+
+	<select id="getHomeKakuTenpoinfoCodeDataByNe"
+		resultType="java.lang.String">
+		SELECT
+			DISTINCT nm.`code`
+		FROM
+			ne n
+		JOIN ne_meisai nm ON nm.jyuchu_denpyo_no = n.jyuchu_denpyo_no
+		WHERE
+			n.jyuchu_bi &gt;= #{start}
+		AND n.jyuchu_bi &lt;= #{end}
+		AND nm.`code` is not null AND nm.`code` != ''
 	</select>
 
 	<select id="getMeisaiDataByNe" resultMap="neResult">
@@ -234,7 +649,8 @@
 		`jyuchu_tag`,
 		`import_date`,
 		`import_user`,
-		(select realname from `user` where ID = import_user LIMIT 1) as
+		(select
+		realname from `user` where ID = import_user LIMIT 1) as
 		import_username,
 		`sumi`,
 		`kekka`,
@@ -246,7 +662,9 @@
 		`syokaihannnou`,
 		`syukabi`,
 		`tsuisekiImportDate`,
-		(select realname from `user` where ID = tsuisekiImportUserId LIMIT 1) as
+		`tsuisekiNo`,
+		(select realname from `user` where
+		ID = tsuisekiImportUserId LIMIT 1) as
 		tsuisekiImportUser
 		FROM
 		ne
@@ -260,10 +678,33 @@
 		<if test="denpyono != '' and denpyono != null">
 			and jyuchu_denpyo_no = #{denpyono}
 		</if>
+		<if test="haitatsukanryo_chk == 'true'">
+			and (haitatsukanryo is null or haitatsukanryo = '')
+		</if>
+		<if test="haitatsukanryo_chk2 == 'true'">
+			and (haitatsukanryo is not null or haitatsukanryo != '')
+		</if>
+		<if test="kekka != '' and kekka != null">
+			<choose>
+				<when test="kekka == '配達未完了'">
+					and (kekka != '配達完了' or kekka is null)
+				</when>
+				<otherwise>
+					and kekka = #{kekka}
+				</otherwise>
+			</choose>
+		</if>
+		<if test="jyuchu_haisokaisya != '' and jyuchu_haisokaisya != null">
+			and haisoukaisya = #{jyuchu_haisokaisya}
+		</if>
 		<if
-			test="haitatsukanryo_s != '' and haitatsukanryo_s != null and haitatsukanryo_e != '' and haitatsukanryo_e != null">
-			and haitatsukanryo &gt;= #{haitatsukanryo_s} and haitatsukanryo &lt;=
-			#{haitatsukanryo_e}
+			test="haitatsukanryo_chk == 'false' and haitatsukanryo_chk2 == 'false'">
+			<if
+				test="haitatsukanryo_s != '' and haitatsukanryo_s != null and haitatsukanryo_e != '' and haitatsukanryo_e != null">
+				and haitatsukanryo &gt;= #{haitatsukanryo_s} and haitatsukanryo
+				&lt;=
+				#{haitatsukanryo_e}
+			</if>
 		</if>
 		<choose>
 			<when test="time_s == '' and time_e == ''">
@@ -301,10 +742,33 @@
 		<if test="denpyono != '' and denpyono != null">
 			and jyuchu_denpyo_no = #{denpyono}
 		</if>
+		<if test="haitatsukanryo_chk == 'true'">
+			and (haitatsukanryo is null or haitatsukanryo = '')
+		</if>
+		<if test="haitatsukanryo_chk2 == 'true'">
+			and (haitatsukanryo is not null or haitatsukanryo != '')
+		</if>
+		<if test="kekka != '' and kekka != null">
+			<choose>
+				<when test="kekka == '配達未完了'">
+					and (kekka != '配達完了' or kekka is null)
+				</when>
+				<otherwise>
+					and kekka = #{kekka}
+				</otherwise>
+			</choose>
+		</if>
+		<if test="jyuchu_haisokaisya != '' and jyuchu_haisokaisya != null">
+			and haisoukaisya = #{jyuchu_haisokaisya}
+		</if>
 		<if
-			test="haitatsukanryo_s != '' and haitatsukanryo_s != null and haitatsukanryo_e != '' and haitatsukanryo_e != null">
-			and haitatsukanryo &gt;= #{haitatsukanryo_s} and haitatsukanryo &lt;=
-			#{haitatsukanryo_e}
+			test="haitatsukanryo_chk == 'false' and haitatsukanryo_chk2 == 'false'">
+			<if
+				test="haitatsukanryo_s != '' and haitatsukanryo_s != null and haitatsukanryo_e != '' and haitatsukanryo_e != null">
+				and haitatsukanryo &gt;= #{haitatsukanryo_s} and haitatsukanryo
+				&lt;=
+				#{haitatsukanryo_e}
+			</if>
 		</if>
 		<choose>
 			<when test="time_s == '' and time_e == ''">
@@ -324,6 +788,18 @@
 		</choose>
 	</select>
 
+	<select id="getHomedata_goukei"
+		resultType="java.lang.Integer">
+		SELECT
+			sum(goukei_kin)
+		FROM
+			ne
+		WHERE
+			tenpo_code = #{tenpo}
+			AND jyuchu_bi &gt;= #{start}
+			AND jyuchu_bi &lt;= #{end}
+	</select>
+
 	<select id="getMeisaiDataByNe_goukei"
 		resultType="java.lang.Integer">
 		SELECT
@@ -340,10 +816,33 @@
 		<if test="denpyono != '' and denpyono != null">
 			and jyuchu_denpyo_no = #{denpyono}
 		</if>
+		<if test="haitatsukanryo_chk == 'true'">
+			and (haitatsukanryo is null or haitatsukanryo = '')
+		</if>
+		<if test="haitatsukanryo_chk2 == 'true'">
+			and (haitatsukanryo is not null or haitatsukanryo != '')
+		</if>
+		<if test="kekka != '' and kekka != null">
+			<choose>
+				<when test="kekka == '配達未完了'">
+					and (kekka != '配達完了' or kekka is null)
+				</when>
+				<otherwise>
+					and kekka = #{kekka}
+				</otherwise>
+			</choose>
+		</if>
+		<if test="jyuchu_haisokaisya != '' and jyuchu_haisokaisya != null">
+			and haisoukaisya = #{jyuchu_haisokaisya}
+		</if>
 		<if
-			test="haitatsukanryo_s != '' and haitatsukanryo_s != null and haitatsukanryo_e != '' and haitatsukanryo_e != null">
-			and haitatsukanryo &gt;= #{haitatsukanryo_s} and haitatsukanryo &lt;=
-			#{haitatsukanryo_e}
+			test="haitatsukanryo_chk == 'false' and haitatsukanryo_chk2 == 'false'">
+			<if
+				test="haitatsukanryo_s != '' and haitatsukanryo_s != null and haitatsukanryo_e != '' and haitatsukanryo_e != null">
+				and haitatsukanryo &gt;= #{haitatsukanryo_s} and haitatsukanryo
+				&lt;=
+				#{haitatsukanryo_e}
+			</if>
 		</if>
 		<choose>
 			<when test="time_s == '' and time_e == ''">
@@ -398,4 +897,75 @@
 		</foreach>
 	</update>
 
+	<delete id="deleteByDenpyono">
+		delete from `ne_meisai`
+		WHERE
+		`jyuchu_denpyo_no` in
+		<foreach collection="ids" item="id" index="index" open="("
+			close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+
+	<insert id="insertNeMeisai" parameterType="java.util.ArrayList">
+		insert into `ne_meisai`
+		(
+		`jyuchu_denpyo_no`,
+		`code`,
+		`name`,
+		`meisaigyo`,
+		`jyucyu_count`,
+		`hikiate_count`,
+		`kingaku`,
+		`gennka`
+		)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.jyuchu_denpyo_no},
+			#{item.code},
+			#{item.name},
+			#{item.meisaigyo},
+			#{item.jyucyu_count},
+			#{item.hikiate_count},
+			#{item.kingaku},
+			#{item.gennka}
+			)
+		</foreach>
+	</insert>
+
+	<insert id="insertGoods" parameterType="java.util.ArrayList">
+		insert into `ne_goods`
+		(
+		`code`,
+		`dhcode`,
+		`name`,
+		`baika`,
+		`genka`,
+		`teika`,
+		`tag`
+		)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.code},
+			#{item.dhcode},
+			#{item.name},
+			#{item.baika},
+			#{item.genka},
+			#{item.teika},
+			#{item.tag}
+			)
+		</foreach>
+		ON DUPLICATE KEY UPDATE
+		`dhcode` =VALUES(`dhcode`),
+		`name`
+		=VALUES(`name`),
+		`baika`=VALUES(`baika`),
+		`genka`=VALUES(`genka`),
+		`teika`=VALUES(`teika`),
+		`tag`=VALUES(`tag`)
+	</insert>
 </mapper>

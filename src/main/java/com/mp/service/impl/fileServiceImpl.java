@@ -48,6 +48,11 @@ public class fileServiceImpl implements fileService{
 		return fileDao.getUploadRirekiByNe();
 	}
 
+	public List<file> getUploadRirekiByType(String type) {
+		// TODO 自動生成されたメソッド・スタブ
+		return fileDao.getUploadRirekiByType(type);
+	}
+
 
 
 }

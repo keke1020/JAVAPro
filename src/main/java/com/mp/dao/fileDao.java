@@ -14,4 +14,5 @@ public interface fileDao {
 	file getFileById(@Param("id") String id);
 	List<file> getLastFinishFilesByParentId(@Param("id") int id);
 	List<file> getUploadRirekiByNe();
+	List<file> getUploadRirekiByType(@Param("type") String type);
 }

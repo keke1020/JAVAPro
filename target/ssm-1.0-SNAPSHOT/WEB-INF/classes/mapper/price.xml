@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mp.dao.priceDao">
+	<resultMap type="price" id="priceResult">
+		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<result column="dataTime" property="dataTime"
+			jdbcType="TIMESTAMP" />
+		<result column="tenpo_code" property="tenpo_code"
+			jdbcType="VARCHAR" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="postage_set" property="postage_set"
+			jdbcType="VARCHAR" />
+		<result column="price" property="price" jdbcType="VARCHAR" />
+		<result column="import_date" property="import_date"
+			jdbcType="TIMESTAMP" />
+		<result column="import_userId" property="import_userId"
+			jdbcType="INTEGER" />
+		<result column="import_user" property="import_user"
+			jdbcType="VARCHAR" />
+		<result column="uuid" property="uuid"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap type="ne_hikaku" id="ne_hikakuResult">
+		<result column="dataTime" property="dataTime"
+			jdbcType="TIMESTAMP" />
+		<result column="code" property="code"
+			jdbcType="VARCHAR" />
+		<result column="value1" property="value1" jdbcType="VARCHAR" />
+		<result column="value2" property="value2" jdbcType="VARCHAR" />
+		<result column="value3" property="value3" jdbcType="VARCHAR" />
+		<result column="value4" property="value4" jdbcType="VARCHAR" />
+		<result column="value5" property="value5" jdbcType="VARCHAR" />
+		<result column="value6" property="value6" jdbcType="VARCHAR" />
+		<result column="value7" property="value7" jdbcType="VARCHAR" />
+		<result column="value8" property="value8" jdbcType="VARCHAR" />
+		<result column="value9" property="value9" jdbcType="VARCHAR" />
+		<result column="value10" property="value10" jdbcType="VARCHAR" />
+		<result column="value11" property="value11" jdbcType="VARCHAR" />
+		<result column="value12" property="value12" jdbcType="VARCHAR" />
+		<result column="value13" property="value13" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="getDcodeByLocation" resultType="java.lang.String">
+		select dcode from location where code = #{code}
+	</select>
+
+	<insert id="insert" parameterType="java.util.ArrayList">
+		insert into `price`
+		(
+		`dataTime`,
+		`tenpo_code`,
+		`code`,
+		`name`,
+		`postage_set`,
+		`price`,
+		`import_date`,
+		`import_userId`,
+		`uuid`
+		)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.dataTime},
+			#{item.tenpo_code},
+			#{item.code},
+			#{item.name},
+			#{item.postage_set},
+			#{item.price},
+			#{item.import_date},
+			#{item.import_userId},
+			#{item.uuid}
+			)
+		</foreach>
+	</insert>
+
+	<delete id="deleteByToday">
+		delete from `price`
+		where to_days(import_date) =
+		to_days(now()) and tenpo_code = #{tenpo}
+	</delete>
+
+	<delete id="deleteByDataTime">
+		delete from `price`
+		where dataTime = #{time} and tenpo_code = #{tenpo}
+	</delete>
+
+	<select id="getDistinctCodeByDate" resultMap="priceResult">
+		SELECT
+			DISTINCT `code`
+		FROM
+			price
+		WHERE
+			dataTime &gt;= #{start}
+		AND dataTime &lt;= #{end}
+		ANd `code` != ""
+	</select>
+
+	<select id="getDistinctCodeByDate_ne" resultMap="priceResult">
+		SELECT
+			DISTINCT nm.`code`
+		FROM
+			ne_meisai nm
+		LEFT JOIN ne n ON nm.jyuchu_denpyo_no = n.jyuchu_denpyo_no
+		WHERE
+			n.jyuchu_bi &gt;= #{start}
+		AND n.jyuchu_bi &lt;= #{end}
+		order by nm.`code`
+	</select>
+
+	<select id="getHikakuDataByCodeAndDate" resultMap="priceResult">
+		SELECT
+			*
+		FROM
+			price
+		WHERE
+			tenpo_code = #{tenpo}
+		AND `code` = #{code}
+		AND dataTime &gt;= #{start}
+		AND dataTime &lt;= #{end}
+		ORDER BY
+			dataTime DESC
+		LIMIT 1
+	</select>
+
+	<select id="getHikakuDataByDate" resultMap="ne_hikakuResult">
+		SELECT
+			p.`code`,
+			(
+				SELECT
+					price
+				FROM
+					price
+				WHERE
+					1 = 1
+				AND dataTime &gt;= #{start}
+				AND dataTime &lt;= #{end}
+				AND `code` = p.`code`
+				AND tenpo_code = 'あかね楽天'
+				ORDER BY
+					dataTime DESC
+				LIMIT 1
+			) AS value1,
+			(
+				SELECT
+					price
+				FROM
+					price
+				WHERE
+					1 = 1
+				AND dataTime &gt;= #{start}
+				AND dataTime &lt;= #{end}
+				AND `code` = p.`code`
+				AND tenpo_code = 'アリス楽天'
+				ORDER BY
+					dataTime DESC
+				LIMIT 1
+			) AS value2,
+			(
+				SELECT
+					price
+				FROM
+					price
+				WHERE
+					1 = 1
+				AND dataTime &gt;= #{start}
+				AND dataTime &lt;= #{end}
+				AND `code` = p.`code`
+				AND tenpo_code = '暁'
+				ORDER BY
+					dataTime DESC
+				LIMIT 1
+			) AS value3,
+			(
+				SELECT
+					price
+				FROM
+					price
+				WHERE
+					1 = 1
+				AND dataTime &gt;= #{start}
+				AND dataTime &lt;= #{end}
+				AND `code` = p.`code`
+				AND tenpo_code = 'あかねYahoo'
+				ORDER BY
+					dataTime DESC
+				LIMIT 1
+			) AS value4,
+			(
+				SELECT
+					price
+				FROM
+					price
+				WHERE
+					1 = 1
+				AND dataTime &gt;= #{start}
+				AND dataTime &lt;= #{end}
+				AND `code` = p.`code`
+				AND tenpo_code = 'FKstyle'
+				ORDER BY
+					dataTime DESC
+				LIMIT 1
+			) AS value5,
+			(
+				SELECT
+					price
+				FROM
+					price
+				WHERE
+					1 = 1
+				AND dataTime &gt;= #{start}
+				AND dataTime &lt;= #{end}
+				AND `code` = p.`code`
+				AND tenpo_code = 'KT雑貨Yahoo'
+				ORDER BY
+					dataTime DESC
+				LIMIT 1
+			) AS value6,
+			(
+				SELECT
+					price
+				FROM
+					price
+				WHERE
+					1 = 1
+				AND dataTime &gt;= #{start}
+				AND dataTime &lt;= #{end}
+				AND `code` = p.`code`
+				AND tenpo_code = 'Lucky9'
+				ORDER BY
+					dataTime DESC
+				LIMIT 1
+			) AS value7,
+			(
+				SELECT
+					price
+				FROM
+					price
+				WHERE
+					1 = 1
+				AND dataTime &gt;= #{start}
+				AND dataTime &lt;= #{end}
+				AND `code` = p.`code`
+				AND tenpo_code = '問屋よかろうもん'
+				ORDER BY
+					dataTime DESC
+				LIMIT 1
+			) AS value8,
+			(
+				SELECT
+					price
+				FROM
+					price
+				WHERE
+					1 = 1
+				AND dataTime &gt;= #{start}
+				AND dataTime &lt;= #{end}
+				AND `code` = p.`code`
+				AND tenpo_code = 'KuraNavi'
+				ORDER BY
+					dataTime DESC
+				LIMIT 1
+			) AS value9,
+			(
+				SELECT
+					price
+				FROM
+					price
+				WHERE
+					1 = 1
+				AND dataTime &gt;= #{start}
+				AND dataTime &lt;= #{end}
+				AND `code` = p.`code`
+				AND tenpo_code = 'Amazon 雑貨の国のアリス'
+				ORDER BY
+					dataTime DESC
+				LIMIT 1
+			) AS value10,
+			(
+				SELECT
+					price
+				FROM
+					price
+				WHERE
+					1 = 1
+				AND dataTime &gt;= #{start}
+				AND dataTime &lt;= #{end}
+				AND `code` = p.`code`
+				AND tenpo_code = 'Amazon ヒューフリット'
+				ORDER BY
+					dataTime DESC
+				LIMIT 1
+			) AS value11,
+			(
+				SELECT
+					price
+				FROM
+					price
+				WHERE
+					1 = 1
+				AND dataTime &gt;= #{start}
+				AND dataTime &lt;= #{end}
+				AND `code` = p.`code`
+				AND tenpo_code = 'Amazon 通販のトココ'
+				ORDER BY
+					dataTime DESC
+				LIMIT 1
+			) AS value12,
+			(
+				SELECT
+					price
+				FROM
+					price
+				WHERE
+					1 = 1
+				AND dataTime &gt;= #{start}
+				AND dataTime &lt;= #{end}
+				AND `code` = p.`code`
+				AND tenpo_code = 'Amazon サラダ'
+				ORDER BY
+					dataTime DESC
+				LIMIT 1
+			) AS value13
+		FROM
+			price p
+		WHERE 1=1
+		AND p.`code` IN
+		<foreach collection="codes" item="code" index="index" open="("
+			close=")" separator=",">
+			#{code}
+		</foreach>
+		GROUP BY p.`code`
+	</select>
+
+	<select id="getHikakuDataByDate_ne" resultMap="ne_hikakuResult">
+
+
+	</select>
+
+	<select id="getPriceData" resultMap="priceResult">
+		SELECT
+		`ID`,
+		`dataTime`,
+		`tenpo_code`,
+		`CODE`,
+		`NAME`,
+		`postage_set`,
+		`price`,
+		`import_date`,
+		`import_userId`,
+		`uuid`,
+		(
+		SELECT
+		realname
+		FROM
+		USER
+		WHERE
+		ID = import_userId
+		LIMIT 1
+		) AS import_user
+		FROM
+		price
+		WHERE 1=1
+			AND `tenpo_code` = #{tenpo}
+			AND `dataTime` = #{date}
+		ORDER BY
+		CODE
+		LIMIT #{current}, #{pageCount}
+	</select>
+
+	<select id="getPriceData_total" resultType="java.lang.Integer">
+		SELECT
+			count(*)
+		FROM
+		price
+		WHERE 1=1
+			AND `tenpo_code` = #{tenpo}
+			AND `dataTime` = #{date}
+	</select>
+
+</mapper>

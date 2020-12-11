@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class ne {
 	private boolean chk;
+	private int count; //件数
 	private int jyuchu_denpyo_no;
 	private String pic_siji_naiyou;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Tokyo")
@@ -61,6 +62,16 @@ public class ne {
 	private int tsuisekiImportUserId;
 	private String tsuisekiImportUser;
 	private String tsuisekiNo;
+
+	private String code;
+
+	public int getCount() {
+		return count;
+	}
+
+	public void setCount(int count) {
+		this.count = count;
+	}
 
 	public int getJyuchu_denpyo_no() {
 		return jyuchu_denpyo_no;
@@ -429,5 +440,15 @@ public class ne {
 	public void setTsuisekiNo(String tsuisekiNo) {
 		this.tsuisekiNo = tsuisekiNo;
 	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+
 
 }

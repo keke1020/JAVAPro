@@ -12,4 +12,5 @@ public interface fileService {
 	file getFileById(String id);
 	List<file> getLastFinishFilesByParentId(int id);
 	List<file> getUploadRirekiByNe();
+	List<file> getUploadRirekiByType(String type);
 }

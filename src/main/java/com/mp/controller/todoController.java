@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -32,8 +31,6 @@ import com.mp.dto.option;
 import com.mp.dto.result;
 import com.mp.entity.config;
 import com.mp.entity.file;
-import com.mp.entity.plan;
-import com.mp.entity.plan_info;
 import com.mp.entity.todo;
 import com.mp.entity.user;
 import com.mp.service.commonService;
@@ -117,8 +114,8 @@ public class todoController {
 
 					if (!"".equals(todoList.get(i).getRireki()) && todoList.get(i).getRireki() != null) {
 						if (todoList.get(i).getRireki().contains("<br>")) {
-							String[] r’ireki_ = todoList.get(i).getRireki().split("<br>");
-							todoList.get(i).setRireki_(r’ireki_);
+							String[] rireki = todoList.get(i).getRireki().split("<br>");
+							todoList.get(i).setRireki_(rireki);
 						}
 					}
 

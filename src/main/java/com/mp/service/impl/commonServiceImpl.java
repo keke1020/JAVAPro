@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.mp.dao.commonDao;
 import com.mp.dto.option;
-import com.mp.entity.user;
 import com.mp.service.commonService;
 
 @Service
@@ -50,6 +49,18 @@ public class commonServiceImpl implements commonService{
 	public List<option> getJyuchuName_optionsByNe(String tenpo) {
 		// TODO 自動生成されたメソッド・スタブ
 		return commonDao.getJyuchuName_optionsByNe(tenpo);
+	}
+
+	@Override
+	public List<option> getJyuchuKekka_optionsByNe(String tenpo) {
+		// TODO 自動生成されたメソッド・スタブ
+		return commonDao.getJyuchuKekka_optionsByNe(tenpo);
+	}
+
+	@Override
+	public List<option> getAllShopCodeDataByNe(String start, String end) {
+		// TODO 自動生成されたメソッド・スタブ
+		return commonDao.getAllShopCodeDataByNe(start,end);
 	}
 
 

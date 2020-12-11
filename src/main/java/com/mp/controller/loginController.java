@@ -12,12 +12,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSONObject;
-import com.mp.entity.user;
 import com.mp.common.DynamicDataSourceHolder;
 import com.mp.dto.result;
+import com.mp.entity.user;
 import com.mp.service.userService;
 
 @Controller
@@ -51,7 +50,7 @@ public class loginController {
 
 		if ("".equals(password) || password == null) {
 			result.setState(0);
-			result.setMsg("もう一度入力してください。");
+			result.setMsg("パスワードを入力してください。");
 		} else {
 			user_ = userService.login(password);
 			if (user_ != null) {
@@ -59,7 +58,7 @@ public class loginController {
 				object.put("user", user_);
 			} else {
 				result.setState(0);
-				result.setMsg("パスワードを確認してください。");
+				result.setMsg("正しいパスワードを入力してください。");
 			}
 		}
 		object.put("rows", result);

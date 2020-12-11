@@ -15,4 +15,6 @@ public interface commonDao {
 	List<option> getTenpoByNe();
 	List<option> getHomeDataByNe(@Param("tenpo") String tenpo,@Param("beginDay") String beginDay,@Param("endDay") String endDay);
 	List<option> getJyuchuName_optionsByNe(@Param("tenpo") String tenpo);
+	List<option> getJyuchuKekka_optionsByNe(@Param("tenpo") String tenpo);
+	List<option> getAllShopCodeDataByNe(@Param("start") String start, @Param("end") String end);
 }

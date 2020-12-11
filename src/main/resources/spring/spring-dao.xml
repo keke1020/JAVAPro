@@ -74,12 +74,25 @@
         <!-- <property name="maxWait" value="${maxWait}"></property> -->
     </bean>
 
+    <bean id="jrt_dataSource_server" class="org.apache.commons.dbcp2.BasicDataSource"
+          destroy-method="close">
+        <property name="driverClassName" value="${jrt_driverClass_server}"/>
+        <property name="url" value="${jrt_jdbcUrl_server}"/>
+        <property name="username" value="${jrt_username_server}"/>
+        <property name="password" value="${jrt_password_server}"/>
+        <property name="initialSize" value="${initialSize}"></property>
+        <property name="maxIdle" value="${maxIdle}"></property>
+        <property name="minIdle" value="${minIdle}"></property>
+        <!-- <property name="maxWait" value="${maxWait}"></property> -->
+    </bean>
+
 	<bean id="dataSource" class="com.mp.common.DynamicDataSource">
 	        <property name="targetDataSources">
 	            <map key-type="java.lang.String">
 	                <!-- 指定lookupKey和与之对应的数据源，这里的key可以自行定义，要切换数据库的时候以key为标识，不要写错 -->
 	                <entry key="defultdataSource" value-ref="defultdataSource"></entry>
 	                <entry key="jrt_dataSource" value-ref="jrt_dataSource"></entry>
+	                <entry key="jrt_dataSource_server" value-ref="jrt_dataSource_server"></entry>
 	            </map>
 	        </property>
         <property name="defaultTargetDataSource" ref="defultdataSource" />

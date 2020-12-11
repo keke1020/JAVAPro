@@ -114,4 +114,34 @@
 			id DESC
 	</select>
 
+	<select id="getUploadRirekiByType" resultMap="fileResult">
+		SELECT
+			ID,
+			type,
+			parentId,
+			NAME,
+			changeName,
+			path,
+			user_id,
+			memo,
+			updatetime,
+			(
+				SELECT
+					realname
+				FROM
+					USER
+				WHERE
+					ID = user_id
+			) AS USER
+		FROM
+			file
+		WHERE
+			type = #{type}
+		ORDER BY
+			id DESC
+	</select>
+
+
+
+
 </mapper>

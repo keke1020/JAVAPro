@@ -88,5 +88,23 @@
 		select distinct jyuchu_name as label, jyuchu_name as value from ne where tenpo_code = #{tenpo} order by jyuchu_name
 	</select>
 
+	<select id="getJyuchuKekka_optionsByNe" resultMap="option">
+		select distinct distinct kekka as label, kekka as value from ne where tenpo_code = #{tenpo} and kekka IS NOT NULL
+	</select>
+
+	<select id="getAllShopCodeDataByNe" resultMap="option">
+		SELECT
+			DISTINCT nm_master.`code` AS label,
+			nm_master.`code` AS value
+		FROM
+			ne n
+		JOIN ne_meisai nm_master ON nm_master.jyuchu_denpyo_no = n.jyuchu_denpyo_no
+		WHERE
+			n.jyuchu_bi &gt;= #{start}
+		AND n.jyuchu_bi &lt;= #{end}
+		ORDER BY nm_master.`code`
+	</select>
+
+
 
 </mapper>
