@@ -36,7 +36,6 @@ import com.mp.entity.ne_meisai;
 import com.mp.service.commonService;
 import com.mp.service.fileService;
 import com.mp.service.neService;
-import com.mp.service.priceService;
 import com.mp.util.CommonUtil;
 import com.mp.util.CsvUtil;
 import com.mp.util.FileUtil;
@@ -50,6 +49,7 @@ public class neController {
 	SimpleDateFormat sf5 = new SimpleDateFormat("yyyy-MM-dd");
 	SimpleDateFormat sf6 = new SimpleDateFormat("yyyyMMdd");
 	SimpleDateFormat sf7 = new SimpleDateFormat("yyyyMMddHHmmss");
+	SimpleDateFormat sf8 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	@Autowired
 	private neService neService;
@@ -59,9 +59,6 @@ public class neController {
 
 	@Autowired
 	private commonService commonService;
-
-	@Autowired
-	private priceService priceService;
 
 	@ResponseBody
 	@RequestMapping(value = "/uploadCsv_ne", method = RequestMethod.POST)
@@ -142,20 +139,20 @@ public class neController {
 						String[] item = new String[item_.length];
 						System.arraycopy(item_, 0, item, 0, item_.length);
 
-						if (!CommonUtil.isHave(item, "伝票番号") || !CommonUtil.isHave(item, "ﾋﾟｯｷﾝｸﾞ指示内容")
+						if (!CommonUtil.isHave(item, "伝票番号") || !CommonUtil.isHave(item, "ピッキング指示")
 								|| !CommonUtil.isHave(item, "受注日") || !CommonUtil.isHave(item, "出荷確定日")
 								|| !CommonUtil.isHave(item, "納品書印刷指示日") || !CommonUtil.isHave(item, "納品書発行日")
-								|| !CommonUtil.isHave(item, "状態") || !CommonUtil.isHave(item, "受注番号")
-								|| !CommonUtil.isHave(item, "店舗") || !CommonUtil.isHave(item, "受注担当者")
+								|| !CommonUtil.isHave(item, "受注状態") || !CommonUtil.isHave(item, "受注番号")
+								|| !CommonUtil.isHave(item, "店舗コード") || !CommonUtil.isHave(item, "受注担当者名")
 								|| !CommonUtil.isHave(item, "購入者名") || !CommonUtil.isHave(item, "商品計")
-								|| !CommonUtil.isHave(item, "税金") || !CommonUtil.isHave(item, "発送料")
+								|| !CommonUtil.isHave(item, "税金") || !CommonUtil.isHave(item, "発送代")
 								|| !CommonUtil.isHave(item, "手数料") || !CommonUtil.isHave(item, "他費用")
 								|| !CommonUtil.isHave(item, "ポイント数") || !CommonUtil.isHave(item, "総合計")
-								|| !CommonUtil.isHave(item, "送り先名") || !CommonUtil.isHave(item, "送り先〒")
-								|| !CommonUtil.isHave(item, "送り先住所") || !CommonUtil.isHave(item, "発送方法")
+								|| !CommonUtil.isHave(item, "送り先名") || !CommonUtil.isHave(item, "送り先郵便番号")
+								|| !CommonUtil.isHave(item, "送り先住所1") || !CommonUtil.isHave(item, "発送方法")
 								|| !CommonUtil.isHave(item, "支払方法") || !CommonUtil.isHave(item, "発送伝票番号")
-								|| !CommonUtil.isHave(item, "備考") || !CommonUtil.isHave(item, "重要")
-								|| !CommonUtil.isHave(item, "重要ﾁｪｯｸ者") || !CommonUtil.isHave(item, "受注分類タグ")) {
+								|| !CommonUtil.isHave(item, "備考") || !CommonUtil.isHave(item, "重要チェック区分名")
+								|| !CommonUtil.isHave(item, "重要チェック担当者名") || !CommonUtil.isHave(item, "受注分類タグ")) {
 							result.setState(0);
 							result.setMsg("正しいcsvファイルをアップロードしてください。");
 							object.put("rows", result);
@@ -164,7 +161,7 @@ public class neController {
 						for (int i = 0; i < item.length; i++) {
 							if ("伝票番号".equals(CsvUtil.getValue(item, i))) {
 								jyuchu_denpyo_no_index = i;
-							} else if ("ﾋﾟｯｷﾝｸﾞ指示内容".equals(CsvUtil.getValue(item, i))) {
+							} else if ("ピッキング指示".equals(CsvUtil.getValue(item, i))) {
 								pic_siji_naiyou_index = i;
 							} else if ("受注日".equals(CsvUtil.getValue(item, i))) {
 								jyuchu_bi_index = i;
@@ -174,13 +171,13 @@ public class neController {
 								nouhinsyo_insatusiji_bi_index = i;
 							} else if ("納品書発行日".equals(CsvUtil.getValue(item, i))) {
 								nouhinsyo_insatuhakou_bi_index = i;
-							} else if ("状態".equals(CsvUtil.getValue(item, i))) {
+							} else if ("受注状態".equals(CsvUtil.getValue(item, i))) {
 								jyuchu_jyotai_kbn_index = i;
 							} else if ("受注番号".equals(CsvUtil.getValue(item, i))) {
 								tenpo_denpyo_no_index = i;
-							} else if ("店舗".equals(CsvUtil.getValue(item, i))) {
+							} else if ("店舗コード".equals(CsvUtil.getValue(item, i))) {
 								tenpo_code_index = i;
-							} else if ("受注担当者".equals(CsvUtil.getValue(item, i))) {
+							} else if ("受注担当者名".equals(CsvUtil.getValue(item, i))) {
 								jyuchu_tantou_code_index = i;
 							} else if ("購入者名".equals(CsvUtil.getValue(item, i))) {
 								jyuchu_name_index = i;
@@ -188,7 +185,7 @@ public class neController {
 								syohin_kin_index = i;
 							} else if ("税金".equals(CsvUtil.getValue(item, i))) {
 								zei_kin_index = i;
-							} else if ("発送料".equals(CsvUtil.getValue(item, i))) {
+							} else if ("発送代".equals(CsvUtil.getValue(item, i))) {
 								hasou_kin_index = i;
 							} else if ("手数料".equals(CsvUtil.getValue(item, i))) {
 								tesuryo_kin_index = i;
@@ -200,9 +197,9 @@ public class neController {
 								goukei_kin_index = i;
 							} else if ("送り先名".equals(CsvUtil.getValue(item, i))) {
 								hasou_name_index = i;
-							} else if ("送り先〒".equals(CsvUtil.getValue(item, i))) {
+							} else if ("送り先郵便番号".equals(CsvUtil.getValue(item, i))) {
 								hasou_yubin_bangou_index = i;
-							} else if ("送り先住所".equals(CsvUtil.getValue(item, i))) {
+							} else if ("送り先住所1".equals(CsvUtil.getValue(item, i))) {
 								hasou_jyusyo_index = i;
 							} else if ("発送方法".equals(CsvUtil.getValue(item, i))) {
 								hasou_kbn_index = i;
@@ -212,9 +209,9 @@ public class neController {
 								hasou_denpyo_no_index = i;
 							} else if ("備考".equals(CsvUtil.getValue(item, i))) {
 								bikou_index = i;
-							} else if ("重要".equals(CsvUtil.getValue(item, i))) {
+							} else if ("重要チェック区分名".equals(CsvUtil.getValue(item, i))) {
 								jyuyou_index = i;
-							} else if ("重要ﾁｪｯｸ者".equals(CsvUtil.getValue(item, i))) {
+							} else if ("重要チェック担当者名".equals(CsvUtil.getValue(item, i))) {
 								jyuyou_check_index = i;
 							} else if ("受注分類タグ".equals(CsvUtil.getValue(item, i))) {
 								jyuchu_tag_index = i;
@@ -248,14 +245,14 @@ public class neController {
 								|| CsvUtil.getValue(item, jyuchu_bi_index) == null) {
 							ne.setJyuchu_bi(null);
 						} else {
-							ne.setJyuchu_bi(sf3.parse(CsvUtil.getValue(item, jyuchu_bi_index)));
+							ne.setJyuchu_bi(sf8.parse(CsvUtil.getValue(item, jyuchu_bi_index)));
 						}
 
 						if ("".equals(CsvUtil.getValue(item, syuka_kakutei_bi_index))
 								|| CsvUtil.getValue(item, syuka_kakutei_bi_index) == null) {
 							ne.setSyuka_kakutei_bi(null);
 						} else {
-							ne.setSyuka_kakutei_bi(sf2.parse(CsvUtil.getValue(item, syuka_kakutei_bi_index)));
+							ne.setSyuka_kakutei_bi(sf8.parse(CsvUtil.getValue(item, syuka_kakutei_bi_index)));
 						}
 
 						if ("".equals(CsvUtil.getValue(item, nouhinsyo_insatusiji_bi_index))
@@ -264,7 +261,7 @@ public class neController {
 							ne.setNouhinsyo_insatusiji_bi(null);
 						} else {
 							ne.setNouhinsyo_insatusiji_bi(
-									sf2.parse(CsvUtil.getValue(item, nouhinsyo_insatusiji_bi_index)));
+									sf8.parse(CsvUtil.getValue(item, nouhinsyo_insatusiji_bi_index)));
 						}
 
 						if ("".equals(CsvUtil.getValue(item, nouhinsyo_insatuhakou_bi_index))
@@ -272,12 +269,68 @@ public class neController {
 							ne.setNouhinsyo_insatuhakou_bi(null);
 						} else {
 							ne.setNouhinsyo_insatuhakou_bi(
-									sf3.parse(CsvUtil.getValue(item, nouhinsyo_insatuhakou_bi_index)));
+									sf8.parse(CsvUtil.getValue(item, nouhinsyo_insatuhakou_bi_index)));
 						}
 
 						ne.setJyuchu_jyotai_kbn(CsvUtil.getValue(item, jyuchu_jyotai_kbn_index));
 						ne.setTenpo_denpyo_no(CsvUtil.getValue(item, tenpo_denpyo_no_index));
-						ne.setTenpo_code(CsvUtil.getValue(item, tenpo_code_index));
+
+						String tenpo_code = CsvUtil.getValue(item, tenpo_code_index);
+						String tenpo = "";
+						if (!"".equals(tenpo_code)) {
+							if ("20".equals(tenpo_code)) {
+								tenpo = "あかね楽天";
+							} else if ("6".equals(tenpo_code)) {
+								tenpo = "アリス";
+							} else if ("3".equals(tenpo_code)) {
+								tenpo = "暁";
+							} else if ("19".equals(tenpo_code)) {
+								tenpo = "あかねY";
+							} else if ("2".equals(tenpo_code)) {
+								tenpo = "FK";
+							} else if ("8".equals(tenpo_code)) {
+								tenpo = "Qoo10";
+							} else if ("23".equals(tenpo_code)) {
+								tenpo = "ヤフーKT";
+							} else if ("22".equals(tenpo_code)) {
+								tenpo = "YオクKT";
+							} else if ("12".equals(tenpo_code)) {
+								tenpo = "ラキナイ";
+							} else if ("11".equals(tenpo_code)) {
+								tenpo = "問屋よか";
+							} else if ("17".equals(tenpo_code)) {
+								tenpo = "とんよか卸";
+							} else if ("1".equals(tenpo_code)) {
+								tenpo = "クラナビ";
+							} else if ("24".equals(tenpo_code)) {
+								tenpo = "AZアリス";
+							} else if ("21".equals(tenpo_code)) {
+								tenpo = "フリット";
+							} else if ("4".equals(tenpo_code)) {
+								tenpo = "トココ";
+							} else if ("15".equals(tenpo_code)) {
+								tenpo = "サラダ";
+							} else if ("13".equals(tenpo_code)) {
+								tenpo = "メルカリ";
+							} else if ("14".equals(tenpo_code)) {
+								tenpo = "ヤフオク（付）";
+							} else if ("16".equals(tenpo_code)) {
+								tenpo = "Amazon（趙）";
+							} else if ("18".equals(tenpo_code)) {
+								tenpo = "テスト用店舗";
+							} else if ("25".equals(tenpo_code)) {
+								tenpo = "Selecting";
+							} else if ("26".equals(tenpo_code)) {
+								tenpo = "卸深セン";
+							} else if ("27".equals(tenpo_code)) {
+								tenpo = "卸東京";
+							}
+
+							if (!"".equals(tenpo)) {
+								ne.setTenpo_code(tenpo);
+							}
+						}
+
 						ne.setJyuchu_tantou_code(CsvUtil.getValue(item, jyuchu_tantou_code_index));
 						ne.setJyuchu_name(CsvUtil.getValue(item, jyuchu_name_index));
 
@@ -286,21 +339,22 @@ public class neController {
 							ne.setSyohin_kin(0);
 						} else {
 							ne.setSyohin_kin(
-									Integer.valueOf(CsvUtil.getValue(item, syohin_kin_index).replace(",", "")));
+									Integer.valueOf(CsvUtil.getValue(item, syohin_kin_index).replace(".00", "")));
 						}
 
 						if ("".equals(CsvUtil.getValue(item, zei_kin_index))
 								|| CsvUtil.getValue(item, zei_kin_index) == null) {
 							ne.setZei_kin(0);
 						} else {
-							ne.setZei_kin(Integer.valueOf(CsvUtil.getValue(item, zei_kin_index).replace(",", "")));
+							ne.setZei_kin(Integer.valueOf(CsvUtil.getValue(item, zei_kin_index).replace(".00", "")));
 						}
 
 						if ("".equals(CsvUtil.getValue(item, hasou_kin_index))
 								|| CsvUtil.getValue(item, hasou_kin_index) == null) {
 							ne.setHasou_kin(0);
 						} else {
-							ne.setHasou_kin(Integer.valueOf(CsvUtil.getValue(item, hasou_kin_index).replace(",", "")));
+							ne.setHasou_kin(
+									Integer.valueOf(CsvUtil.getValue(item, hasou_kin_index).replace(".00", "")));
 						}
 
 						if ("".equals(CsvUtil.getValue(item, tesuryo_kin_index))
@@ -308,7 +362,7 @@ public class neController {
 							ne.setTesuryo_kin(0);
 						} else {
 							ne.setTesuryo_kin(
-									Integer.valueOf(CsvUtil.getValue(item, tesuryo_kin_index).replace(",", "")));
+									Integer.valueOf(CsvUtil.getValue(item, tesuryo_kin_index).replace(".00", "")));
 						}
 
 						if ("".equals(CsvUtil.getValue(item, sonota_kin_index))
@@ -316,14 +370,14 @@ public class neController {
 							ne.setSonota_kin(0);
 						} else {
 							ne.setSonota_kin(
-									Integer.valueOf(CsvUtil.getValue(item, sonota_kin_index).replace(",", "")));
+									Integer.valueOf(CsvUtil.getValue(item, sonota_kin_index).replace(".00", "")));
 						}
 
 						if ("".equals(CsvUtil.getValue(item, point_index))
 								|| CsvUtil.getValue(item, point_index) == null) {
 							ne.setPoint(0);
 						} else {
-							ne.setPoint(Integer.valueOf(CsvUtil.getValue(item, point_index).replace(",", "")));
+							ne.setPoint(Integer.valueOf(CsvUtil.getValue(item, point_index).replace(".00", "")));
 						}
 
 						if ("".equals(CsvUtil.getValue(item, goukei_kin_index))
@@ -331,7 +385,7 @@ public class neController {
 							ne.setGoukei_kin(0);
 						} else {
 							ne.setGoukei_kin(
-									Integer.valueOf(CsvUtil.getValue(item, goukei_kin_index).replace(",", "")));
+									Integer.valueOf(CsvUtil.getValue(item, goukei_kin_index).replace(".00", "")));
 						}
 
 						ne.setHasou_name(CsvUtil.getValue(item, hasou_name_index));
@@ -1695,11 +1749,7 @@ public class neController {
 			starttimestr = starttimestr + " 00:00:00";
 			endtimestr = endtimestr + " 23:59:59";
 
-			//			List<price> pr = priceService.getDistinctCodeByDate_ne(starttimestr, endtimestr);
-
-			//			List<ne> ne = new ArrayList<ne>();
-			//			ne = neService.getHomeKakuTenpoinfoDataByNe(starttimestr, endtimestr);
-			List<ne_hikaku> ne_hikaku = new ArrayList<ne_hikaku>();
+			//			List<ne_hikaku> ne_hikaku = new ArrayList<ne_hikaku>();
 
 			JSONArray json = (JSONArray) JSONArray.parse(codes_s);
 			List<String> codes = new ArrayList<String>();
@@ -1709,93 +1759,203 @@ public class neController {
 				}
 			}
 
-			ne_hikaku = neService.getHomeKakuTenpoinfoDataByNe(codes, starttimestr, endtimestr);
+			//			ne_hikaku = neService.getHomeKakuTenpoinfoDataByNe(codes, starttimestr, endtimestr);
 
-			if (ne_hikaku.size() > 0) {
-				for (int i = 0; i < ne_hikaku.size(); i++) {
-					int sum = 0;
-					if (ne_hikaku.get(i).getValue1() != null) {
-						if (!"".equals(ne_hikaku.get(i).getValue1().trim())) {
-							sum += Integer.parseInt(ne_hikaku.get(i).getValue1());
-						}
-					}
-					if (ne_hikaku.get(i).getValue2() != null) {
-						if (!"".equals(ne_hikaku.get(i).getValue2().trim())) {
-							sum += Integer.parseInt(ne_hikaku.get(i).getValue2());
-						}
-					}
-					if (ne_hikaku.get(i).getValue3() != null) {
-						if (!"".equals(ne_hikaku.get(i).getValue3().trim())) {
-							sum += Integer.parseInt(ne_hikaku.get(i).getValue3());
-						}
-					}
-					if (ne_hikaku.get(i).getValue4() != null) {
-						if (!"".equals(ne_hikaku.get(i).getValue4().trim())) {
-							sum += Integer.parseInt(ne_hikaku.get(i).getValue4());
-						}
-					}
-					if (ne_hikaku.get(i).getValue5() != null) {
-						if (!"".equals(ne_hikaku.get(i).getValue5().trim())) {
-							sum += Integer.parseInt(ne_hikaku.get(i).getValue5());
-						}
-					}
-					if (ne_hikaku.get(i).getValue6() != null) {
-						if (!"".equals(ne_hikaku.get(i).getValue6().trim())) {
-							sum += Integer.parseInt(ne_hikaku.get(i).getValue6());
-						}
-					}
-					if (ne_hikaku.get(i).getValue7() != null) {
-						if (!"".equals(ne_hikaku.get(i).getValue7().trim())) {
-							sum += Integer.parseInt(ne_hikaku.get(i).getValue7());
-						}
-					}
-					if (ne_hikaku.get(i).getValue8() != null) {
-						if (!"".equals(ne_hikaku.get(i).getValue8().trim())) {
-							sum += Integer.parseInt(ne_hikaku.get(i).getValue8());
-						}
-					}
-					if (ne_hikaku.get(i).getValue9() != null) {
-						if (!"".equals(ne_hikaku.get(i).getValue9().trim())) {
-							sum += Integer.parseInt(ne_hikaku.get(i).getValue9());
-						}
-					}
-					if (ne_hikaku.get(i).getValue10() != null) {
-						if (!"".equals(ne_hikaku.get(i).getValue10().trim())) {
-							sum += Integer.parseInt(ne_hikaku.get(i).getValue10());
-						}
-					}
-					if (ne_hikaku.get(i).getValue11() != null) {
-						if (!"".equals(ne_hikaku.get(i).getValue11().trim())) {
-							sum += Integer.parseInt(ne_hikaku.get(i).getValue11());
-						}
-					}
-					if (ne_hikaku.get(i).getValue12() != null) {
-						if (!"".equals(ne_hikaku.get(i).getValue12().trim())) {
-							sum += Integer.parseInt(ne_hikaku.get(i).getValue12());
-						}
-					}
-					if (ne_hikaku.get(i).getValue13() != null) {
-						if (!"".equals(ne_hikaku.get(i).getValue13().trim())) {
-							sum += Integer.parseInt(ne_hikaku.get(i).getValue13());
-						}
-					}
-					if (ne_hikaku.get(i).getValue14() != null) {
-						if (!"".equals(ne_hikaku.get(i).getValue14().trim())) {
-							sum += Integer.parseInt(ne_hikaku.get(i).getValue14());
-						}
-					}
-					if (ne_hikaku.get(i).getValue15() != null) {
-						if (!"".equals(ne_hikaku.get(i).getValue15().trim())) {
-							sum += Integer.parseInt(ne_hikaku.get(i).getValue15());
-						}
-					}
+			//			if (ne_hikaku.size() > 0) {
+			//				for (int i = 0; i < ne_hikaku.size(); i++) {
+			//					int sum = 0;
+			//					if (ne_hikaku.get(i).getValue1() != null) {
+			//						if (!"".equals(ne_hikaku.get(i).getValue1().trim())) {
+			//							sum += Integer.parseInt(ne_hikaku.get(i).getValue1());
+			//						}
+			//					}
+			//					if (ne_hikaku.get(i).getValue2() != null) {
+			//						if (!"".equals(ne_hikaku.get(i).getValue2().trim())) {
+			//							sum += Integer.parseInt(ne_hikaku.get(i).getValue2());
+			//						}
+			//					}
+			//					if (ne_hikaku.get(i).getValue3() != null) {
+			//						if (!"".equals(ne_hikaku.get(i).getValue3().trim())) {
+			//							sum += Integer.parseInt(ne_hikaku.get(i).getValue3());
+			//						}
+			//					}
+			//					if (ne_hikaku.get(i).getValue4() != null) {
+			//						if (!"".equals(ne_hikaku.get(i).getValue4().trim())) {
+			//							sum += Integer.parseInt(ne_hikaku.get(i).getValue4());
+			//						}
+			//					}
+			//					if (ne_hikaku.get(i).getValue5() != null) {
+			//						if (!"".equals(ne_hikaku.get(i).getValue5().trim())) {
+			//							sum += Integer.parseInt(ne_hikaku.get(i).getValue5());
+			//						}
+			//					}
+			//					if (ne_hikaku.get(i).getValue6() != null) {
+			//						if (!"".equals(ne_hikaku.get(i).getValue6().trim())) {
+			//							sum += Integer.parseInt(ne_hikaku.get(i).getValue6());
+			//						}
+			//					}
+			//					if (ne_hikaku.get(i).getValue7() != null) {
+			//						if (!"".equals(ne_hikaku.get(i).getValue7().trim())) {
+			//							sum += Integer.parseInt(ne_hikaku.get(i).getValue7());
+			//						}
+			//					}
+			//					if (ne_hikaku.get(i).getValue8() != null) {
+			//						if (!"".equals(ne_hikaku.get(i).getValue8().trim())) {
+			//							sum += Integer.parseInt(ne_hikaku.get(i).getValue8());
+			//						}
+			//					}
+			//					if (ne_hikaku.get(i).getValue9() != null) {
+			//						if (!"".equals(ne_hikaku.get(i).getValue9().trim())) {
+			//							sum += Integer.parseInt(ne_hikaku.get(i).getValue9());
+			//						}
+			//					}
+			//					if (ne_hikaku.get(i).getValue10() != null) {
+			//						if (!"".equals(ne_hikaku.get(i).getValue10().trim())) {
+			//							sum += Integer.parseInt(ne_hikaku.get(i).getValue10());
+			//						}
+			//					}
+			//					if (ne_hikaku.get(i).getValue11() != null) {
+			//						if (!"".equals(ne_hikaku.get(i).getValue11().trim())) {
+			//							sum += Integer.parseInt(ne_hikaku.get(i).getValue11());
+			//						}
+			//					}
+			//					if (ne_hikaku.get(i).getValue12() != null) {
+			//						if (!"".equals(ne_hikaku.get(i).getValue12().trim())) {
+			//							sum += Integer.parseInt(ne_hikaku.get(i).getValue12());
+			//						}
+			//					}
+			//					if (ne_hikaku.get(i).getValue13() != null) {
+			//						if (!"".equals(ne_hikaku.get(i).getValue13().trim())) {
+			//							sum += Integer.parseInt(ne_hikaku.get(i).getValue13());
+			//						}
+			//					}
+			//					if (ne_hikaku.get(i).getValue14() != null) {
+			//						if (!"".equals(ne_hikaku.get(i).getValue14().trim())) {
+			//							sum += Integer.parseInt(ne_hikaku.get(i).getValue14());
+			//						}
+			//					}
+			//					if (ne_hikaku.get(i).getValue15() != null) {
+			//						if (!"".equals(ne_hikaku.get(i).getValue15().trim())) {
+			//							sum += Integer.parseInt(ne_hikaku.get(i).getValue15());
+			//						}
+			//					}
+			//
+			//					if (sum > 0) {
+			//						ne_hikaku.get(i).setValue999(String.valueOf(sum));
+			//					}
+			//				}
+			//			}
+			List<ne> nm = new ArrayList<ne>();
+			List<ne_hikaku> ne_hikaku = new ArrayList<ne_hikaku>();
+			List<String> codes_result = neService.getHomeKakuTenpoinfoCodeDataByNe(codes, starttimestr, endtimestr);
+			if (codes_result.size() > 0) {
+				nm = neService.getHomeKakuTenpoinfoDataByNe2(codes, starttimestr, endtimestr);
 
-					if (sum > 0) {
-						ne_hikaku.get(i).setValue999(String.valueOf(sum));
+				if (nm.size() > 0) {
+					int value1 = 0;
+					int value2 = 0;
+					int value3 = 0;
+					int value4 = 0;
+					int value5 = 0;
+					int value6 = 0;
+					int value7 = 0;
+					int value8 = 0;
+					int value9 = 0;
+					int value10 = 0;
+					int value11 = 0;
+					int value12 = 0;
+					int value13 = 0;
+					int value14 = 0;
+					int value15 = 0;
+					int value16 = 0;
+					int value999 = 0;
+
+					for (int i = 0; i < codes_result.size(); i++) {
+						String code = codes_result.get(i);
+						if (code != null && !"".equals(code)) {
+							ne_hikaku nh = new ne_hikaku();
+							value1 = 0;
+							value2 = 0;
+							value3 = 0;
+							value4 = 0;
+							value5 = 0;
+							value6 = 0;
+							value7 = 0;
+							value8 = 0;
+							value9 = 0;
+							value10 = 0;
+							value11 = 0;
+							value12 = 0;
+							value13 = 0;
+							value14 = 0;
+							value15 = 0;
+							value16 = 0;
+							value999 = 0;
+
+							nh.setCode(code);
+							for (int j = 0; j < nm.size(); j++) {
+								String tenpcode = nm.get(j).getTenpo_code();
+								if (nm.get(j).getCode().equals(code)) {
+									if ("あかね楽天".equals(tenpcode)) {
+										value1++;
+									} else if ("アリス".equals(tenpcode)) {
+										value2++;
+									} else if ("暁".equals(tenpcode)) {
+										value3++;
+									} else if ("あかねY".equals(tenpcode)) {
+										value4++;
+									} else if ("FK".equals(tenpcode)) {
+										value5++;
+									} else if ("ヤフーKT".equals(tenpcode)) {
+										value6++;
+									} else if ("YオクKT".equals(tenpcode)) {
+										value7++;
+									} else if ("ラキナイ".equals(tenpcode)) {
+										value8++;
+									} else if ("問屋よか".equals(tenpcode)) {
+										value9++;
+									} else if ("とんよか卸".equals(tenpcode)) {
+										value10++;
+									} else if ("クラナビ".equals(tenpcode)) {
+										value11++;
+									} else if ("AZアリス".equals(tenpcode)) {
+										value12++;
+									} else if ("フリット".equals(tenpcode)) {
+										value13++;
+									} else if ("トココ".equals(tenpcode)) {
+										value14++;
+									} else if ("サラダ".equals(tenpcode)) {
+										value15++;
+									} else if ("Qoo10".equals(tenpcode)) {
+										value16++;
+									}
+								}
+							}
+							nh.setValue1(String.valueOf(value1));
+							nh.setValue2(String.valueOf(value2));
+							nh.setValue3(String.valueOf(value3));
+							nh.setValue4(String.valueOf(value4));
+							nh.setValue5(String.valueOf(value5));
+							nh.setValue6(String.valueOf(value6));
+							nh.setValue7(String.valueOf(value7));
+							nh.setValue8(String.valueOf(value8));
+							nh.setValue9(String.valueOf(value9));
+							nh.setValue10(String.valueOf(value10));
+							nh.setValue11(String.valueOf(value11));
+							nh.setValue12(String.valueOf(value12));
+							nh.setValue13(String.valueOf(value13));
+							nh.setValue14(String.valueOf(value14));
+							nh.setValue15(String.valueOf(value15));
+							nh.setValue16(String.valueOf(value16));
+
+							value999 = value1 + value2 + value3+ value4+ value5+ value6+ value7+ value8+ value9+ value10+ value11+ value12+ value13+ value14+ value15;
+							nh.setValue999(String.valueOf(value999));
+							ne_hikaku.add(nh);
+						}
 					}
 				}
-
 			}
+
 			object.put("ne_hikaku", ne_hikaku);
 		} catch (Exception e) {
 			// TODO: handle exception

@@ -14,4 +14,7 @@ public class config {
 
 	public static String NE_UPLOADFILE_PLACE_LOCAL = "E:\\";
 	public static String NE_UPLOADFILE_PLACE_SERVER = "F:\\";
+
+	public static String DATASOURCE_LOCAL_YUBIN = "jrt_dataSource";
+	public static String DATASOURCE_SERVER_YUBIN = "jrt_dataSource_server";
 }

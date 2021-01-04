@@ -50,7 +50,7 @@ public class loginController {
 
 		if ("".equals(password) || password == null) {
 			result.setState(0);
-			result.setMsg("パスワードを入力してください。");
+			result.setMsg("ユーザのパスワードを入力してください。");
 		} else {
 			user_ = userService.login(password);
 			if (user_ != null) {
@@ -58,7 +58,7 @@ public class loginController {
 				object.put("user", user_);
 			} else {
 				result.setState(0);
-				result.setMsg("正しいパスワードを入力してください。");
+				result.setMsg("正しいユーザのパスワードを入力してください。");
 			}
 		}
 		object.put("rows", result);

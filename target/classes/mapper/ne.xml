@@ -136,6 +136,7 @@
 		<result column="value13" property="value13" jdbcType="VARCHAR" />
 		<result column="value14" property="value14" jdbcType="VARCHAR" />
 		<result column="value15" property="value15" jdbcType="VARCHAR" />
+		<result column="value15" property="value16" jdbcType="VARCHAR" />
 	</resultMap>
 
 	<insert id="insert" parameterType="java.util.ArrayList">
@@ -275,51 +276,24 @@
 
 	<select id="getHomeTenpoinfoDataByNe_month" resultMap="neResult">
 		SELECT
-		jyuchu_name,
-		(
-		SELECT
-		sum(goukei_kin)
+			jyuchu_name,
+			sum(goukei_kin) AS goukei_kin,
+			sum(hasou_kin) AS hasou_kin,
+			count(*) AS count
 		FROM
-		ne n2
+			ne n1
 		WHERE
-		n2.tenpo_code =
-		#{tenpo}
-		AND n2.jyuchu_name = n1.jyuchu_name
-		<if
-			test="start != '' and start != null and end != '' and end != null">
-			AND n2.jyuchu_bi &gt;= #{start}
-			AND n2.jyuchu_bi &lt;= #{end}
-		</if>
-		) AS goukei_kin,
-		(
-		SELECT
-		count(*)
-		FROM
-		ne n3
-		WHERE
-		n3.tenpo_code = #{tenpo}
-		AND n3.jyuchu_name = n1.jyuchu_name
-		<if
-			test="start != '' and start != null and end != '' and end != null">
-			AND n3.jyuchu_bi &gt;= #{start}
-			AND n3.jyuchu_bi &lt;= #{end}
-		</if>
-		) AS count
-		FROM
-		ne n1
-		WHERE
-		tenpo_code = #{tenpo}
-		<if
-			test="start != '' and start != null and end != '' and end != null">
-			AND jyuchu_bi &gt;= #{start}
-			AND jyuchu_bi &lt;= #{end}
-		</if>
+			tenpo_code = #{tenpo}
+			<if
+				test="start != '' and start != null and end != '' and end != null">
+				AND jyuchu_bi &gt;= #{start}
+				AND jyuchu_bi &lt;= #{end}
+			</if>
 		GROUP BY
-		jyuchu_name
+			jyuchu_name
 		ORDER BY
-		goukei_kin DESC
-		LIMIT #{current},
-		#{pageCount}
+			goukei_kin DESC
+		LIMIT #{current},#{pageCount}
 	</select>
 
 	<select id="getHomeTenpoinfoCountDataByNe_month"
@@ -347,40 +321,19 @@
 	<select id="getHomeTenpoinfo2DataByNe_month"
 		resultMap="neMeisaiResult">
 		SELECT
-		nm.code,
-		(SELECT
-		SUM(nm2.kingaku)
+			nm.`code`,
+			SUM(nm.kingaku) AS kingaku,
+			SUM(hikiate_count) AS count
 		FROM
-		ne_meisai nm2
-		LEFT JOIN ne n2 ON nm2.jyuchu_denpyo_no = n2.jyuchu_denpyo_no
-		WHERE
-		nm2. CODE = nm.code
-		AND n2.tenpo_code = #{tenpo}
-		AND n2.jyuchu_bi &gt;= #{start}
-		AND n2.jyuchu_bi &lt;= #{end}
-		) as kingaku,
-		(SELECT
-				SUM(nm3.hikiate_count)
-			FROM
-				ne_meisai nm3
-			LEFT JOIN ne n3 ON nm3.jyuchu_denpyo_no = n3.jyuchu_denpyo_no
-			WHERE
-				nm3. CODE = nm.code
-				AND n3.tenpo_code = #{tenpo}
-				AND n3.jyuchu_bi &gt;= #{start}
-				AND n3.jyuchu_bi &lt;= #{end}
-		) as count
-		FROM
-		ne_meisai nm
+			ne_meisai nm
 		LEFT JOIN ne n ON nm.jyuchu_denpyo_no = n.jyuchu_denpyo_no
 		where
-		n.tenpo_code = #{tenpo}
-		AND n.jyuchu_bi &gt;= #{start}
-		AND n.jyuchu_bi &lt;= #{end}
+			n.tenpo_code = #{tenpo}
+			AND n.jyuchu_bi &gt;= #{start}
+			AND n.jyuchu_bi &lt;= #{end}
 		GROUP BY nm.code
 		ORDER BY kingaku desc
-		LIMIT #{current},
-		#{pageCount}
+		LIMIT #{current},#{pageCount}
 	</select>
 
 	<select id="getHomeTenpoinfo2CountDataByNe_month"
@@ -582,7 +535,19 @@
 				AND n15.jyuchu_bi &lt;= #{end}
 				AND n15.tenpo_code = 'サラダ'
 				AND nm15.`code` = nm_master.`code`
-			) AS value15
+			) AS value15,
+			(
+				SELECT
+					SUM(nm16.jyucyu_count)
+				FROM
+					ne_meisai nm16
+				JOIN ne n16 ON nm16.jyuchu_denpyo_no = n16.jyuchu_denpyo_no
+				WHERE
+					n16.jyuchu_bi &gt;= #{start}
+				AND n16.jyuchu_bi &lt;= #{end}
+				AND n16.tenpo_code = 'Qoo10'
+				AND nm16.`code` = nm_master.`code`
+			) AS value16
 		FROM
 			ne n
 		JOIN ne_meisai nm_master ON nm_master.jyuchu_denpyo_no = n.jyuchu_denpyo_no
@@ -604,6 +569,30 @@
         GROUP BY nm_master.`code`
 	</select>
 
+	<select id="getHomeKakuTenpoinfoDataByNe2"
+		resultMap="neResult">
+		SELECT
+			 nm_master.`code`,n.tenpo_code
+		FROM
+			ne n
+		JOIN ne_meisai nm_master ON nm_master.jyuchu_denpyo_no = n.jyuchu_denpyo_no
+		WHERE
+			n.jyuchu_bi &gt;= #{start}
+		AND n.jyuchu_bi &lt;= #{end}
+		<choose>
+            <when test="codes.size() > 0">
+            	AND nm_master.`code` in
+                <foreach collection="codes" item="code" index="index" open="("
+					close=")" separator=",">
+					#{code}
+				</foreach>
+            </when>
+            <otherwise>
+
+            </otherwise>
+        </choose>
+	</select>
+
 	<select id="getHomeKakuTenpoinfoCodeDataByNe"
 		resultType="java.lang.String">
 		SELECT
@@ -615,6 +604,19 @@
 			n.jyuchu_bi &gt;= #{start}
 		AND n.jyuchu_bi &lt;= #{end}
 		AND nm.`code` is not null AND nm.`code` != ''
+		<choose>
+            <when test="codes.size() > 0">
+            	AND nm.`code` in
+                <foreach collection="codes" item="code" index="index" open="("
+					close=")" separator=",">
+					#{code}
+				</foreach>
+            </when>
+            <otherwise>
+
+            </otherwise>
+        </choose>
+        ORDER BY nm.`code`
 	</select>
 
 	<select id="getMeisaiDataByNe" resultMap="neResult">

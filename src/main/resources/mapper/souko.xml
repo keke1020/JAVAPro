@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mp.dao.soukoDao">
+	<resultMap type="souko" id="soukoResult">
+		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<result column="update" property="update" jdbcType="TIMESTAMP" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="tag" property="tag" jdbcType="VARCHAR" />
+		<result column="dcode" property="dcode" jdbcType="VARCHAR" />
+		<result column="sw" property="sw" jdbcType="VARCHAR" />
+		<result column="sw2" property="sw2" jdbcType="VARCHAR" />
+		<result column="kaisou" property="kaisou" jdbcType="VARCHAR" />
+		<result column="tana" property="tana" jdbcType="VARCHAR" />
+		<result column="ksize" property="ksize" jdbcType="VARCHAR" />
+		<result column="sp" property="sp" jdbcType="VARCHAR" />
+		<result column="t_kbn" property="t_kbn" jdbcType="VARCHAR" />
+		<result column="user" property="user" jdbcType="VARCHAR" />
+		<result column="user_id" property="user_id" jdbcType="INTEGER" />
+		<result column="flag" property="flag" jdbcType="VARCHAR" />
+		<result column="moto" property="moto" jdbcType="VARCHAR" />
+		<result column="zaiko" property="zaiko" jdbcType="INTEGER" />
+		<result column="hikiate" property="hikiate" jdbcType="INTEGER" />
+		<result column="yoyaku" property="yoyaku" jdbcType="VARCHAR" />
+		<result column="zaiko_update" property="zaiko_update"
+			jdbcType="TIMESTAMP" />
+		<result column="sZaiko" property="sZaiko" jdbcType="INTEGER" />
+		<result column="sBikou" property="sBikou" jdbcType="VARCHAR" />
+		<result column="sTanto" property="sTanto" jdbcType="VARCHAR" />
+
+		<result column="nagoyaZaiko" property="nagoyaZaiko" jdbcType="INTEGER" />
+		<result column="kaisou_nagoya" property="kaisou_nagoya" jdbcType="VARCHAR" />
+		<result column="tana_nagoya" property="tana_nagoya" jdbcType="VARCHAR" />
+		<result column="moto_nagoya" property="moto_nagoya" jdbcType="VARCHAR" />
+		<result column="moto_nagoya_old" property="moto_nagoya_old" jdbcType="VARCHAR" />
+		<result column="nagoya_update" property="nagoya_update"
+			jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<select id="getSouko" resultMap="soukoResult">
+		SELECT
+			ID,
+			`UPDATE`,
+			`CODE`,
+			`name`,
+			tag,
+			dcode,
+			sw,
+			sw2,
+			kaisou,
+			tana,
+			ksize,
+			sp,
+			t_kbn,
+			`user`,
+			user_id,
+			flag,
+			moto,
+			zaiko,
+			hikiate,
+			yoyaku,
+			zaiko_update,
+			sZaiko,
+			sBikou,
+			sTanto,
+			nagoyaZaiko,
+			kaisou_nagoya,
+			tana_nagoya,
+			moto_nagoya,
+			nagoya_update,
+			concat(kaisou_nagoya,tana_nagoya) as moto_nagoya_old
+		FROM
+			location
+		WHERE 1 = 1
+		<if test="isNagoya == 'true'">
+			AND `tag` like '%[名古屋]%'
+		</if>
+		<choose>
+			<when test="istana == 'false'">
+				AND `kaisou_nagoya` = '' AND `tana_nagoya` = ''
+			</when>
+			<otherwise>
+				<if test="codeSc != null and codeSc != ''">
+					AND ((`code` REGEXP #{codeSc}) OR (`dcode` REGEXP
+					#{codeSc}) OR
+					(`name` REGEXP #{codeSc}))
+				</if>
+			</otherwise>
+		</choose>
+		<if test="kosuSC1 != null and kosuSC1 != ''">
+			AND (`nagoyaZaiko` &gt;= #{kosuSC1})
+		</if>
+		<if test="kosuSC2 != null and kosuSC2 != ''">
+			AND (`nagoyaZaiko` &lt;= #{kosuSC2})
+		</if>
+		<if test="kaisosc != null and kaisosc != ''">
+			AND ((`kaisou_nagoya` = #{kaisosc}))
+		</if>
+		<if test="tanaSc != null and tanaSc != ''">
+			AND ((`tana_nagoya` = #{tanaSc}))
+		</if>
+		<if test="t_kbn == 'true'">
+			AND (`t_kbn` = '取扱中')
+		</if>
+		<if test="zaikoOnly == 'true'">
+			AND (`nagoyaZaiko` > 0)
+		</if>
+		<choose>
+			<when test="orderSC == '順序選択'">
+				order by `nagoya_update` desc
+			</when>
+			<when test="orderSC == 'アップデート順' ">
+				order by `nagoya_update` desc
+			</when>
+			<when test="orderSC == 'コード昇順' ">
+				order by `code`
+			</when>
+			<when test="orderSC == 'コード降順' ">
+				order by `code` desc
+			</when>
+			<when test="orderSC == '棚番昇順' ">
+				order by `tana_nagoya`
+			</when>
+		</choose>
+		LIMIT #{offset}, #{limit}
+	</select>
+
+	<select id="getTotal" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		location
+		WHERE 1 = 1
+		<!-- (`update` >= '0000-00-00') -->
+		<if test="isNagoya == 'true'">
+			AND `tag` like '%[名古屋]%'
+		</if>
+		<choose>
+			<when test="istana == 'false'">
+				AND `kaisou_nagoya` = '' AND `tana_nagoya` = ''
+			</when>
+			<otherwise>
+				<if test="codeSc != null and codeSc != ''">
+					AND ((`code` REGEXP #{codeSc}) OR (`dcode` REGEXP
+					#{codeSc}) OR
+					(`name` REGEXP #{codeSc}))
+				</if>
+			</otherwise>
+		</choose>
+		<if test="kosuSC1 != null and kosuSC1 != ''">
+			AND (`nagoyaZaiko` &gt;= #{kosuSC1})
+		</if>
+		<if test="kosuSC2 != null and kosuSC2 != ''">
+			AND (`nagoyaZaiko` &lt;= #{kosuSC2})
+		</if>
+		<if test="kaisosc != null and kaisosc != ''">
+			AND ((`kaisou_nagoya` = #{kaisosc}))
+		</if>
+		<if test="tanaSc != null and tanaSc != ''">
+			AND ((`tana_nagoya` = #{tanaSc}))
+		</if>
+		<if test="t_kbn == 'true'">
+			AND (`t_kbn` = '取扱中')
+		</if>
+		<if test="zaikoOnly == 'true'">
+			AND (`nagoyaZaiko` > 0)
+		</if>
+		<choose>
+			<when test="orderSC == '順序選択'">
+				order by `nagoya_update` desc
+			</when>
+			<when test="orderSC == 'アップデート順' ">
+				order by `nagoya_update` desc
+			</when>
+			<when test="orderSC == 'コード昇順' ">
+				order by `code`
+			</when>
+			<when test="orderSC == 'コード降順' ">
+				order by `code` desc
+			</when>
+			<when test="orderSC == '棚番昇順' ">
+				order by `tana_nagoya`
+			</when>
+		</choose>
+	</select>
+
+	<update id="upate">
+		<foreach collection="souko" item="item" index="index" open=""
+			close="" separator=";">
+			UPDATE `location`
+			<set>
+				<if test="active == 0">
+					`kaisou_nagoya`=#{item.kaisou_nagoya},
+					`tana_nagoya`=#{item.tana_nagoya},
+					`nagoyaZaiko`=#{item.nagoyaZaiko},
+					`moto_nagoya`=#{item.moto_nagoya_old},
+					`nagoya_update`=#{item.nagoya_update}
+				</if>
+			</set>
+
+			WHERE `code`= #{item.code}
+		</foreach>
+	</update>
+
+	<select id="getSoukoByCodes" resultMap="soukoResult">
+		SELECT
+			ID,
+			`UPDATE`,
+			`CODE`,
+			`name`,
+			tag,
+			dcode,
+			sw,
+			sw2,
+			kaisou,
+			tana,
+			ksize,
+			sp,
+			t_kbn,
+			`user`,
+			user_id,
+			flag,
+			moto,
+			zaiko,
+			hikiate,
+			yoyaku,
+			zaiko_update,
+			sZaiko,
+			sBikou,
+			sTanto,
+			nagoyaZaiko,
+			kaisou_nagoya,
+			tana_nagoya,
+			moto_nagoya,
+			nagoya_update,
+			concat(kaisou_nagoya,tana_nagoya) as moto_nagoya_old
+		FROM
+			location
+		WHERE `CODE` in
+		<foreach collection="codes" item="code" index="index" open="("
+			close=")" separator=",">
+			#{code}
+		</foreach>
+
+
+	</select>
+
+
+
+</mapper>

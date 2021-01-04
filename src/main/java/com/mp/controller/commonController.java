@@ -1,14 +1,9 @@
 package com.mp.controller;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mp.common.DynamicDataSourceHolder;
@@ -30,9 +24,6 @@ import com.mp.dto.option;
 import com.mp.entity.user;
 import com.mp.service.commonService;
 import com.mp.service.userService;
-import com.mp.util.PoiUtil;
-
-import sun.tools.jar.resources.jar;
 
 @Controller
 public class commonController {
@@ -109,7 +100,7 @@ public class commonController {
 	@ResponseBody
 	@RequestMapping(value = "/updateUserConfig", method = RequestMethod.POST)
 	private JSONObject updateUserConfig(HttpServletResponse response, HttpServletRequest request, String id,
-			boolean plan_contr_sw, boolean ne_upload_sw, boolean ne_delete_sw) {
+			boolean plan_contr_sw, boolean ne_upload_sw, boolean ne_delete_sw, boolean dazaifu_wh_see_sw, boolean nagoya_wh_see_sw) {
 		JSONObject object = new JSONObject();
 
 		response.setHeader("Access-Control-Allow-Origin", "*");
@@ -133,6 +124,18 @@ public class commonController {
 			user.setNe_delete(1);
 		} else {
 			user.setNe_delete(0);
+		}
+
+		if (dazaifu_wh_see_sw) {
+			user.setDazaifu_wh_see(1);
+		} else {
+			user.setDazaifu_wh_see(0);
+		}
+
+		if (nagoya_wh_see_sw) {
+			user.setNagoya_wh_see(1);
+		} else {
+			user.setNagoya_wh_see(0);
 		}
 		userService.updateUserConfig(user);
 

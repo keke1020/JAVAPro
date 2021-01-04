@@ -29,36 +29,37 @@
 		<result column="sZaiko" property="sZaiko" jdbcType="INTEGER" />
 		<result column="sBikou" property="sBikou" jdbcType="VARCHAR" />
 		<result column="sTanto" property="sTanto" jdbcType="VARCHAR" />
+
 	</resultMap>
 
 	<select id="getlocation" resultMap="locationResult">
 		SELECT
-		ID,
-		`UPDATE`,
-		`CODE`,
-		`name`,
-		tag,
-		dcode,
-		sw,
-		sw2,
-		kaisou,
-		tana,
-		ksize,
-		sp,
-		t_kbn,
-		`user`,
-		user_id,
-		flag,
-		moto,
-		zaiko,
-		hikiate,
-		yoyaku,
-		zaiko_update,
-		sZaiko,
-		sBikou,
-		sTanto
+			ID,
+			`UPDATE`,
+			`CODE`,
+			`name`,
+			tag,
+			dcode,
+			sw,
+			sw2,
+			kaisou,
+			tana,
+			ksize,
+			sp,
+			t_kbn,
+			`user`,
+			user_id,
+			flag,
+			moto,
+			zaiko,
+			hikiate,
+			yoyaku,
+			zaiko_update,
+			sZaiko,
+			sBikou,
+			sTanto
 		FROM
-		location
+			location
 		WHERE 1 = 1
 		<if test="commonFlag == 'false'">
 			AND (`update` >= '0000-00-00')

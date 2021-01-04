@@ -15,6 +15,9 @@ public class zaikorireki {
 	private String type;
 	private int state;
 
+	//名古屋
+	private String code;
+
 	public int getID() {
 		return ID;
 	}
@@ -77,6 +80,14 @@ public class zaikorireki {
 
 	public void setState(int state) {
 		this.state = state;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 }

@@ -19,8 +19,9 @@ public interface neService {
 	List<ne_meisai> getHomeTenpoinfo2DataByNe_month(String tenpo, String start, String end, int current, int pageCount);
 
 	List<ne_hikaku> getHomeKakuTenpoinfoDataByNe(List<String> codes, String start, String end);
+	List<ne> getHomeKakuTenpoinfoDataByNe2(List<String> codes, String start, String end);
 
-	List<String> getHomeKakuTenpoinfoCodeDataByNe(String start, String end);
+	List<String> getHomeKakuTenpoinfoCodeDataByNe(List<String> codes, String start, String end);
 
 	int getHomeTenpoinfo2CountDataByNe_month(String tenpo, String start, String end);
 

@@ -120,9 +120,15 @@ public class neServiceImpl implements neService {
 	}
 
 	@Override
-	public List<String> getHomeKakuTenpoinfoCodeDataByNe(String start, String end) {
+	public List<String> getHomeKakuTenpoinfoCodeDataByNe(List<String> codes,String start, String end) {
 		// TODO 自動生成されたメソッド・スタブ
-		return neDao.getHomeKakuTenpoinfoCodeDataByNe(start, end);
+		return neDao.getHomeKakuTenpoinfoCodeDataByNe(codes, start, end);
+	}
+
+	@Override
+	public List<ne> getHomeKakuTenpoinfoDataByNe2(List<String> codes, String start, String end) {
+		// TODO 自動生成されたメソッド・スタブ
+		return neDao.getHomeKakuTenpoinfoDataByNe2(codes, start, end);
 	}
 
 

@@ -25,6 +25,7 @@ public class ne_hikaku {
 	private String value13;
 	private String value14;
 	private String value15;
+	private String value16;
 	private String value999;
 
 	public Date getDataTime() {
@@ -163,6 +164,14 @@ public class ne_hikaku {
 		this.value15 = value15;
 	}
 
+	public String getValue16() {
+		return value16;
+	}
+
+	public void setValue16(String value16) {
+		this.value16 = value16;
+	}
+
 	public String getValue999() {
 		return value999;
 	}
@@ -170,6 +179,5 @@ public class ne_hikaku {
 	public void setValue999(String value999) {
 		this.value999 = value999;
 	}
-
 
 }

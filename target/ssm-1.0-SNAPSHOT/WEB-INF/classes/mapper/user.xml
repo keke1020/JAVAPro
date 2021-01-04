@@ -15,6 +15,8 @@
 		<result column="todo_priv2" property="todo_priv2" jdbcType="INTEGER" />
 		<result column="ne_upload" property="ne_upload" jdbcType="INTEGER" />
 		<result column="ne_delete" property="ne_delete" jdbcType="INTEGER" />
+		<result column="dazaifu_wh_see" property="dazaifu_wh_see" jdbcType="INTEGER" />
+		<result column="nagoya_wh_see" property="nagoya_wh_see" jdbcType="INTEGER" />
 	</resultMap>
 
 	<!-- dao接口方法提供sql语句配置 -->
@@ -100,7 +102,9 @@
 		<set>
 			plan_contr = #{plan_contr},
 			ne_upload = #{ne_upload},
-			ne_delete = #{ne_delete}
+			ne_delete = #{ne_delete},
+			dazaifu_wh_see = #{dazaifu_wh_see},
+			nagoya_wh_see = #{nagoya_wh_see}
 		</set>
 		where ID = #{ID}
 	</update>

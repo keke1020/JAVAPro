@@ -30,7 +30,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.jasper.tagplugins.jstl.core.If;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -137,13 +136,14 @@ public class locationController {
 
 				String file_name = place + "xampp\\htdocs\\ordery\\upload\\temp2.csv";
 				Path path_file = Paths.get(file_name);
+
 				Files.copy(path_masterDB, path_file, StandardCopyOption.REPLACE_EXISTING);
 
 //				int error_no = UpdateLocationByCsv(1, file_name, loginuser_id, loginuser);
 				location_up location_up = UpdateLocationByCsv(1, file_name, null, loginuser_id, loginuser);
 
 				Date master_d = Date.from(instant_master);
-				SimpleDateFormat formatter = new SimpleDateFormat("MMMM-dd-yyyy HH:mm:ss", Locale.ENGLISH);
+				SimpleDateFormat formatter = new SimpleDateFormat("MMMM-dd-yyyy HH:mm:ss", Locale.JAPAN);
 				String master_ds = formatter.format(master_d);
 				String master_ds2 = sf3.format(master_d);
 				object.put("mDate", master_ds2);
@@ -689,10 +689,15 @@ public class locationController {
 //		String encode = FileCharDetecter.detector();
 //		System.out.println(encode);//SHIFT_JIS
 
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		if ("SHIFT_JIS".equals(encode) || "MS932".equals(encode)) {
-			reader = new BufferedReader(new InputStreamReader(is, "SHIFT_JIS"));
-		}
+//		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+//		if ("SHIFT_JIS".equals(encode) || "MS932".equals(encode)) {
+//			reader = new BufferedReader(new InputStreamReader(is, "SHIFT_JIS"));
+//		} else {
+//			reader = new BufferedReader(new InputStreamReader(is));
+//		}
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is, "SHIFT_JIS"));
+
 //		InputStreamReader in = new InputStreamReader(is, "SHIFT_JIS");
 //		BufferedReader reader = new BufferedReader(new InputStreamReader(is, "SHIFT_JIS"));
 		try {
@@ -1168,9 +1173,16 @@ public class locationController {
 			location_up.setNewCount(newCount);
 			location_up.setChangeCount(changeCount);
 			location_up.setDelCount(delCount);
+
+			is.close();
+			isr.close();
+			reader.close();
 		} catch (Exception e) {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
+			is.close();
+			isr.close();
+			reader.close();
 		} finally {
 			is.close();
 			isr.close();

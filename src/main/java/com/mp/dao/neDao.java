@@ -24,6 +24,8 @@ public interface neDao {
 	List<ne_meisai> getHomeTenpoinfo2DataByNe_month(@Param("tenpo") String tenpo, @Param("start") String start,
 			@Param("end") String end, @Param("current") int current, @Param("pageCount") int pageCount);
 
+
+
 	int getHomeTenpoinfo2CountDataByNe_month(@Param("tenpo") String tenpo, @Param("start") String start,
 			@Param("end") String end);
 
@@ -68,6 +70,8 @@ public interface neDao {
 	List<ne_hikaku> getHomeKakuTenpoinfoDataByNe(@Param("codes") List<String> codes, @Param("start") String start,
 			@Param("end") String end);
 
-	List<String> getHomeKakuTenpoinfoCodeDataByNe(@Param("start") String start,
+	List<String> getHomeKakuTenpoinfoCodeDataByNe(@Param("codes") List<String> codes, @Param("start") String start,
+			@Param("end") String end);
+	List<ne> getHomeKakuTenpoinfoDataByNe2(@Param("codes") List<String> codes, @Param("start") String start,
 			@Param("end") String end);
 }

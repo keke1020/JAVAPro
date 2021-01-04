@@ -12,6 +12,8 @@ public class user {
 	private int todo_priv2;
 	private int ne_upload;
 	private int ne_delete;
+	private int dazaifu_wh_see;
+	private int nagoya_wh_see;
 
 	public String getID() {
 		return ID;
@@ -99,6 +101,22 @@ public class user {
 
 	public void setNe_delete(int ne_delete) {
 		this.ne_delete = ne_delete;
+	}
+
+	public int getDazaifu_wh_see() {
+		return dazaifu_wh_see;
+	}
+
+	public void setDazaifu_wh_see(int dazaifu_wh_see) {
+		this.dazaifu_wh_see = dazaifu_wh_see;
+	}
+
+	public int getNagoya_wh_see() {
+		return nagoya_wh_see;
+	}
+
+	public void setNagoya_wh_see(int nagoya_wh_see) {
+		this.nagoya_wh_see = nagoya_wh_see;
 	}
 
 }

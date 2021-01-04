@@ -26,4 +26,24 @@ public class zaikorirekiServiceImpl implements zaikorirekiService {
 		return zaikorirekiDao.getRirekiByView(condition, count);
 	}
 
+	@Override
+	public void insertAllNagoya(List<zaikorireki> z) {
+		// TODO 自動生成されたメソッド・スタブ
+		zaikorirekiDao.insertAllNagoya(z);
+	}
+
+	@Override
+	public List<zaikorireki> getNagoyaRireki(String codeSc, String updateSc_s, String updateSc_e, String orderSC,
+			int list_currentPage, int searchCount) {
+		// TODO 自動生成されたメソッド・スタブ
+		return zaikorirekiDao.getNagoyaRireki(codeSc, updateSc_s, updateSc_e, orderSC,
+				list_currentPage, searchCount);
+	}
+
+	@Override
+	public int getNagoyaRireki_total(String codeSc, String updateSc_s, String updateSc_e, String orderSC) {
+		// TODO 自動生成されたメソッド・スタブ
+		return zaikorirekiDao.getNagoyaRireki_total(codeSc, updateSc_s, updateSc_e, orderSC);
+	}
+
 }

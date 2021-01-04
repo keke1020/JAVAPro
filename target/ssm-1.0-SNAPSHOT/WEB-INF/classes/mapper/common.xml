@@ -77,7 +77,17 @@
 	</insert>
 
 	<select id="getTenpoByNe" resultMap="option">
-		select distinct tenpo_code as value, tenpo_code as label from ne order by tenpo_code
+		SELECT DISTINCT
+			tenpo_code AS
+		VALUE
+			,
+			tenpo_code AS label
+		FROM
+			ne
+		WHERE
+			tenpo_code IS NOT NULL and tenpo_code != ''
+		ORDER BY
+			tenpo_code
 	</select>
 
 	<select id="getHomeDataByNe" resultMap="option">
