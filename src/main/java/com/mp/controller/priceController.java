@@ -27,8 +27,8 @@ import com.mp.common.DynamicDataSourceHolder;
 import com.mp.dto.result;
 import com.mp.entity.config;
 import com.mp.entity.file;
-import com.mp.entity.price;
 import com.mp.entity.ne_hikaku;
+import com.mp.entity.price;
 import com.mp.service.fileService;
 import com.mp.service.priceService;
 import com.mp.util.CommonUtil;
@@ -339,8 +339,14 @@ public class priceController {
 
 				String[] item;
 				List<String> dcode_arr = new ArrayList<String>();
+				String dataSource = "";
+				if (config.ISLOCAL) {
+					dataSource = config.DATASOURCE_LOCAL_YUBIN;
+				} else {
+					dataSource = config.DATASOURCE_SERVER_YUBIN;
+				}
 
-				DynamicDataSourceHolder.setDataSource("jrt_dataSource_server");
+				DynamicDataSourceHolder.setDataSource(dataSource);
 				while ((item = csvReader.readNext()) != null) {
 
 					if (num == 0) {
@@ -449,9 +455,81 @@ public class priceController {
 	}
 
 	@ResponseBody
+	@RequestMapping(value = "/deletePriceDataByFileId", method = RequestMethod.POST)
+	private JSONObject deletePriceDataByFileId(HttpServletResponse response,
+			HttpServletRequest request, String id) {
+
+		JSONObject object = new JSONObject();
+		result result = new result();
+
+		try {
+			request.setCharacterEncoding("utf-8");
+			response.setCharacterEncoding("utf-8");
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+
+			file file = fileService.getFileById(id);
+			if (file != null) {
+				if (file.getParentId() != null && !"".equals(file.getParentId())) {
+					String parentId = file.getParentId();
+					int count = priceService.getCountByUuid(parentId);
+					if (count > 0) {
+						priceService.deleteByUuid(parentId);
+						fileService.changeDataStateById(id, "削除済み");
+						result.setState(1);
+						result.setMsg(count + "件を削除しました。");
+					}
+				}
+			}
+			object.put("rows", result);
+			return object;
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e);
+			return object;
+		}
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/backPriceDataByFileId", method = RequestMethod.POST)
+	private JSONObject backPriceDataByFileId(HttpServletResponse response,
+			HttpServletRequest request, String id) {
+
+		JSONObject object = new JSONObject();
+		result result = new result();
+
+		try {
+			request.setCharacterEncoding("utf-8");
+			response.setCharacterEncoding("utf-8");
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+
+			file file = fileService.getFileById(id);
+			if (file != null) {
+				if (file.getParentId() != null && !"".equals(file.getParentId())) {
+					String parentId = file.getParentId();
+					int count = priceService.getCountByUuid(parentId);
+					if (count > 0) {
+						priceService.backByUuid(parentId);
+						fileService.changeDataStateById(id, "");
+						result.setState(1);
+						result.setMsg(count + "件を削除しました。");
+					}
+				}
+			}
+			object.put("rows", result);
+			return object;
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e);
+			return object;
+		}
+	}
+
+	@ResponseBody
 	@RequestMapping(value = "/getHikakuData", method = RequestMethod.POST)
 	private JSONObject getHikakuData(HttpServletResponse response,
-			HttpServletRequest request, String start, String end, int pageCount, int currentPage) {
+			HttpServletRequest request, String start, String end, String kakaku1, int pageCount, int currentPage) {
 		DynamicDataSourceHolder.setDataSource("defultdataSource");
 		JSONObject object = new JSONObject();
 		result result = new result();
@@ -462,116 +540,524 @@ public class priceController {
 			response.setHeader("Access-Control-Allow-Origin", "*");
 			response.setHeader("Cache-Control", "no-cache");
 
-			//			List<price> pr = priceService.getDistinctCodeByDate(start, end);
-
-			//			String tenpo_arr[] = new String[] { "あかね楽天", "アリス楽天", "暁", "あかねYahoo", "FKstyle", "KT雑貨Yahoo", "Lucky9",
-			//					"問屋よかろうもん", "KuraNavi", "Amazon 雑貨の国のアリス", "Amazon ヒューフリット", "Amazon 通販のトココ", "Amazon サラダ" };
-			//
-			//			if (pr.size() > 0) {
-			//				for (int i = 0; i < pr.size(); i++) {
-			//					price_hikaku ph = new price_hikaku();
-			//					String code = pr.get(i).getCode();
-			//
-			//					ph.setCode(code);
-			//
-			//					for (int j = 0; j < tenpo_arr.length; j++) {
-			//						price pi = priceService.getHikakuDataByCodeAndDate(tenpo_arr[j], code, start, end);
-			//						String price = "";
-			//						if (pi != null) {
-			//							price = pi.getPrice();
-			//						}
-			//						if (j == 0) {
-			//							ph.setValue1(price);
-			//						} else if (j == 1) {
-			//							ph.setValue2(price);
-			//						} else if (j == 2) {
-			//							ph.setValue3(price);
-			//						} else if (j == 3) {
-			//							ph.setValue4(price);
-			//						} else if (j == 4) {
-			//							ph.setValue5(price);
-			//						} else if (j == 5) {
-			//							ph.setValue6(price);
-			//						} else if (j == 6) {
-			//							ph.setValue7(price);
-			//						} else if (j == 7) {
-			//							ph.setValue8(price);
-			//						} else if (j == 8) {
-			//							ph.setValue9(price);
-			//						} else if (j == 9) {
-			//							ph.setValue10(price);
-			//						} else if (j == 10) {
-			//							ph.setValue11(price);
-			//						} else if (j == 11) {
-			//							ph.setValue12(price);
-			//						} else if (j == 12) {
-			//							ph.setValue13(price);
-			//						}
-			//					}
-			//					hikaku.add(ph);
-			//				}
-			//			}
-
-			//			List<String> codes = new ArrayList<String>();
-			//			if (pr.size() > 0) {
-			//				for (int i = 0; i < pr.size(); i++) {
-			//					if(!"".equals(pr.get(i).getCode()) && pr.get(i).getCode() != null) {
-			//						codes.add(pr.get(i).getCode());
-			//					}
-			//
-			//				}
-			//			}
 			List<ne_hikaku> price_hikaku = new ArrayList<ne_hikaku>();
+			//			price_hikaku = priceService.getHikakuDataByDate(kakaku1, start, end);
 
-			List<String> codes = new ArrayList<String>();
-			List<price> pr = priceService.getDistinctCodeByDate(start, end);
-			int total = pr.size();
-			int current = (currentPage - 1) * pageCount;
+			List<price> codes = priceService.getDistinctCodeByDate(start, end, 1);
 
-			if (pr.size() > 0) {
-				for (int i = current; i < current + pageCount; i++) {
-					if (!"".equals(pr.get(i).getCode()) && pr.get(i).getCode() != null) {
-						codes.add(pr.get(i).getCode());
+			List<price> pr_all = priceService.getDistinctCodeDataByDate(start, end, 1);
+
+			int Price_Hikaku = 0;
+			int Price_Rashop = 0;
+			int Price_Ralice = 0;
+			int Price_Akatsuki = 0;
+			int Price_Yashop = 0;
+			int Price_FK = 0;
+			int Price_KT = 0;
+			int Price_L9 = 0;
+			int Price_Tonya = 0;
+			int Price_KN = 0;
+			int Price_AmzAlice = 0;
+			int Price_AmzFT = 0;
+			int Price_AmzTKK = 0;
+			int Price_AmzSD = 0;
+
+			//			long Time_Hikaku = 0;
+			long Time_Rashop = 0;
+			long Time_Ralice = 0;
+			long Time_Akatsuki = 0;
+			long Time_Yashop = 0;
+			long Time_FK = 0;
+			long Time_KT = 0;
+			long Time_L9 = 0;
+			long Time_Tonya = 0;
+			long Time_KN = 0;
+			long Time_AmzAlice = 0;
+			long Time_AmzFT = 0;
+			long Time_AmzTKK = 0;
+			long Time_AmzSD = 0;
+
+			boolean isHava_Rashop = false;
+			boolean isHava_Ralice = false;
+			boolean isHava_Akatsuki = false;
+			boolean isHava_Yashop = false;
+			boolean isHava_FK = false;
+			boolean isHava_KT = false;
+			boolean isHava_L9 = false;
+			boolean isHava_Tonya = false;
+			boolean isHava_KN = false;
+			boolean isHava_AmzAlice = false;
+			boolean isHava_AmzFT = false;
+			boolean isHava_AmzTKK = false;
+			boolean isHava_AmzSD = false;
+
+			String zyun_hidukechikai = "日付が近い順";
+			String zyun_yasui = "価格が安い順";
+			String zyun_takai = "価格が高い順";
+
+			if (codes.size() > 0 && pr_all.size() > 0) {
+				for (int i = 0; i < codes.size(); i++) {
+					String code = codes.get(i).getCode().trim();
+					if (code != null && !"".equals(code)) {
+						ne_hikaku ne_hikaku = new ne_hikaku();
+						ne_hikaku.setCode(code);
+
+						Price_Hikaku = 0;
+
+						Price_Rashop = 0;
+						Price_Ralice = 0;
+						Price_Akatsuki = 0;
+						Price_Yashop = 0;
+						Price_FK = 0;
+						Price_KT = 0;
+						Price_L9 = 0;
+						Price_Tonya = 0;
+						Price_KN = 0;
+						Price_AmzAlice = 0;
+						Price_AmzFT = 0;
+						Price_AmzTKK = 0;
+						Price_AmzSD = 0;
+
+						Time_Rashop = 0;
+						Time_Ralice = 0;
+						Time_Akatsuki = 0;
+						Time_Yashop = 0;
+						Time_FK = 0;
+						Time_KT = 0;
+						Time_L9 = 0;
+						Time_Tonya = 0;
+						Time_KN = 0;
+						Time_AmzAlice = 0;
+						Time_AmzFT = 0;
+						Time_AmzTKK = 0;
+						Time_AmzSD = 0;
+
+						isHava_Rashop = false;
+						isHava_Ralice = false;
+						isHava_Akatsuki = false;
+						isHava_Yashop = false;
+						isHava_FK = false;
+						isHava_KT = false;
+						isHava_L9 = false;
+						isHava_Tonya = false;
+						isHava_KN = false;
+						isHava_AmzAlice = false;
+						isHava_AmzFT = false;
+						isHava_AmzTKK = false;
+						isHava_AmzSD = false;
+
+						//kakaku1 日付が近い順 価格が安い順 価格が高い順
+						for (int j = 0; j < pr_all.size(); j++) {
+							if (pr_all.get(j).getCode() != null) {
+								if (pr_all.get(j).getCode().equals(code)) {
+									if (pr_all.get(j).getPrice() != null) {
+										if (!"".equals(pr_all.get(j).getPrice())
+												&& CommonUtil.isInteger(pr_all.get(j).getPrice())) {
+											Price_Hikaku = Integer.parseInt(pr_all.get(j).getPrice());
+											if ("あかね楽天".equals(pr_all.get(j).getTenpo_code())) {
+												if (zyun_hidukechikai.equals(kakaku1)) {
+													if (Time_Rashop == 0) {
+														Time_Rashop = pr_all.get(j).getDataTime().getTime();
+														Price_Rashop = Price_Hikaku;
+													} else {
+														if (pr_all.get(j).getDataTime().getTime() > Time_Rashop) {
+															Time_Rashop = pr_all.get(j).getDataTime().getTime();
+															Price_Rashop = Price_Hikaku;
+														}
+													}
+												} else if (zyun_yasui.equals(kakaku1)) {
+													if (Price_Rashop == 0) {
+														Price_Rashop = Price_Hikaku;
+													} else {
+														if (Price_Hikaku < Price_Rashop) {
+															Price_Rashop = Price_Hikaku;
+														}
+													}
+												} else if (zyun_takai.equals(kakaku1)) {
+													if (Price_Hikaku > Price_Rashop) {
+														Price_Rashop = Price_Hikaku;
+													}
+												}
+												isHava_Rashop = true;
+											} else if ("アリス楽天".equals(pr_all.get(j).getTenpo_code())) {
+												if (zyun_hidukechikai.equals(kakaku1)) {
+													if (Time_Ralice == 0) {
+														Time_Ralice = pr_all.get(j).getDataTime().getTime();
+														Price_Ralice = Price_Hikaku;
+													} else {
+														if (pr_all.get(j).getDataTime().getTime() > Time_Ralice) {
+															Time_Ralice = pr_all.get(j).getDataTime().getTime();
+															Price_Ralice = Price_Hikaku;
+														}
+													}
+												} else if (zyun_yasui.equals(kakaku1)) {
+													if (Price_Ralice == 0) {
+														Price_Ralice = Price_Hikaku;
+													} else {
+														if (Price_Hikaku < Price_Ralice) {
+															Price_Ralice = Price_Hikaku;
+														}
+													}
+												} else if (zyun_takai.equals(kakaku1)) {
+													if (Price_Hikaku > Price_Ralice) {
+														Price_Ralice = Price_Hikaku;
+													}
+												}
+												isHava_Ralice = true;
+											} else if ("暁".equals(pr_all.get(j).getTenpo_code())) {
+												if (zyun_hidukechikai.equals(kakaku1)) {
+													if (Time_Akatsuki == 0) {
+														Time_Akatsuki = pr_all.get(j).getDataTime().getTime();
+														Price_Akatsuki = Price_Hikaku;
+													} else {
+														if (pr_all.get(j).getDataTime().getTime() > Time_Akatsuki) {
+															Time_Akatsuki = pr_all.get(j).getDataTime().getTime();
+															Price_Akatsuki = Price_Hikaku;
+														}
+													}
+												} else if (zyun_yasui.equals(kakaku1)) {
+													if (Price_Akatsuki == 0) {
+														Price_Akatsuki = Price_Hikaku;
+													} else {
+														if (Price_Hikaku < Price_Akatsuki) {
+															Price_Akatsuki = Price_Hikaku;
+														}
+													}
+												} else if (zyun_takai.equals(kakaku1)) {
+													if (Price_Hikaku > Price_Akatsuki) {
+														Price_Akatsuki = Price_Hikaku;
+													}
+												}
+												isHava_Akatsuki = true;
+											} else if ("あかねYahoo".equals(pr_all.get(j).getTenpo_code())) {
+												if (zyun_hidukechikai.equals(kakaku1)) {
+													if (Time_Yashop == 0) {
+														Time_Yashop = pr_all.get(j).getDataTime().getTime();
+														Price_Yashop = Price_Hikaku;
+													} else {
+														if (pr_all.get(j).getDataTime().getTime() > Time_Yashop) {
+															Time_Yashop = pr_all.get(j).getDataTime().getTime();
+															Price_Yashop = Price_Hikaku;
+														}
+													}
+												} else if (zyun_yasui.equals(kakaku1)) {
+													if (Price_Yashop == 0) {
+														Price_Yashop = Price_Hikaku;
+													} else {
+														if (Price_Hikaku < Price_Yashop) {
+															Price_Yashop = Price_Hikaku;
+														}
+													}
+												} else if (zyun_takai.equals(kakaku1)) {
+													if (Price_Hikaku > Price_Yashop) {
+														Price_Yashop = Price_Hikaku;
+													}
+												}
+												isHava_Yashop = true;
+											} else if ("FKstyle".equals(pr_all.get(j).getTenpo_code())) {
+												if (zyun_hidukechikai.equals(kakaku1)) {
+													if (Time_FK == 0) {
+														Time_FK = pr_all.get(j).getDataTime().getTime();
+														Price_FK = Price_Hikaku;
+													} else {
+														if (pr_all.get(j).getDataTime().getTime() > Time_FK) {
+															Time_FK = pr_all.get(j).getDataTime().getTime();
+															Price_FK = Price_Hikaku;
+														}
+													}
+												} else if (zyun_yasui.equals(kakaku1)) {
+													if (Price_FK == 0) {
+														Price_FK = Price_Hikaku;
+													} else {
+														if (Price_Hikaku < Price_FK) {
+															Price_FK = Price_Hikaku;
+														}
+													}
+												} else if (zyun_takai.equals(kakaku1)) {
+													if (Price_Hikaku > Price_FK) {
+														Price_FK = Price_Hikaku;
+													}
+												}
+												isHava_FK = true;
+											} else if ("KT雑貨Yahoo".equals(pr_all.get(j).getTenpo_code())) {
+												if (zyun_hidukechikai.equals(kakaku1)) {
+													if (Time_KT == 0) {
+														Time_KT = pr_all.get(j).getDataTime().getTime();
+														Price_KT = Price_Hikaku;
+													} else {
+														if (pr_all.get(j).getDataTime().getTime() > Time_KT) {
+															Time_KT = pr_all.get(j).getDataTime().getTime();
+															Price_KT = Price_Hikaku;
+														}
+													}
+												} else if (zyun_yasui.equals(kakaku1)) {
+													if (Price_KT == 0) {
+														Price_KT = Price_Hikaku;
+													} else {
+														if (Price_Hikaku < Price_KT) {
+															Price_KT = Price_Hikaku;
+														}
+													}
+												} else if (zyun_takai.equals(kakaku1)) {
+													if (Price_Hikaku > Price_KT) {
+														Price_KT = Price_Hikaku;
+													}
+												}
+												isHava_KT = true;
+											} else if ("Lucky9".equals(pr_all.get(j).getTenpo_code())) {
+												if (zyun_hidukechikai.equals(kakaku1)) {
+													if (Time_L9 == 0) {
+														Time_L9 = pr_all.get(j).getDataTime().getTime();
+														Price_L9 = Price_Hikaku;
+													} else {
+														if (pr_all.get(j).getDataTime().getTime() > Time_L9) {
+															Time_L9 = pr_all.get(j).getDataTime().getTime();
+															Price_L9 = Price_Hikaku;
+														}
+													}
+												} else if (zyun_yasui.equals(kakaku1)) {
+													if (Price_L9 == 0) {
+														Price_L9 = Price_Hikaku;
+													} else {
+														if (Price_Hikaku < Price_L9) {
+															Price_L9 = Price_Hikaku;
+														}
+													}
+												} else if (zyun_takai.equals(kakaku1)) {
+													if (Price_Hikaku > Price_L9) {
+														Price_L9 = Price_Hikaku;
+													}
+												}
+												isHava_L9 = true;
+											} else if ("問屋よかろうもん".equals(pr_all.get(j).getTenpo_code())) {
+												if (zyun_hidukechikai.equals(kakaku1)) {
+													if (Time_Tonya == 0) {
+														Time_Tonya = pr_all.get(j).getDataTime().getTime();
+														Price_Tonya = Price_Hikaku;
+													} else {
+														if (pr_all.get(j).getDataTime().getTime() > Time_Tonya) {
+															Time_Tonya = pr_all.get(j).getDataTime().getTime();
+															Price_Tonya = Price_Hikaku;
+														}
+													}
+												} else if (zyun_yasui.equals(kakaku1)) {
+													if (Price_Tonya == 0) {
+														Price_Tonya = Price_Hikaku;
+													} else {
+														if (Price_Hikaku < Price_Tonya) {
+															Price_Tonya = Price_Hikaku;
+														}
+													}
+												} else if (zyun_takai.equals(kakaku1)) {
+													if (Price_Hikaku > Price_Tonya) {
+														Price_Tonya = Price_Hikaku;
+													}
+												}
+												isHava_Tonya = true;
+											} else if ("KuraNavi".equals(pr_all.get(j).getTenpo_code())) {
+												if (zyun_hidukechikai.equals(kakaku1)) {
+													if (Time_KN == 0) {
+														Time_KN = pr_all.get(j).getDataTime().getTime();
+														Price_KN = Price_Hikaku;
+													} else {
+														if (pr_all.get(j).getDataTime().getTime() > Time_KN) {
+															Time_KN = pr_all.get(j).getDataTime().getTime();
+															Price_KN = Price_Hikaku;
+														}
+													}
+												} else if (zyun_yasui.equals(kakaku1)) {
+													if (Price_KN == 0) {
+														Price_KN = Price_Hikaku;
+													} else {
+														if (Price_Hikaku < Price_KN) {
+															Price_KN = Price_Hikaku;
+														}
+													}
+												} else if (zyun_takai.equals(kakaku1)) {
+													if (Price_Hikaku > Price_KN) {
+														Price_KN = Price_Hikaku;
+													}
+												}
+												isHava_KN = true;
+											} else if ("Amazon 雑貨の国のアリス".equals(pr_all.get(j).getTenpo_code())) {
+												if (zyun_hidukechikai.equals(kakaku1)) {
+													if (Time_AmzAlice == 0) {
+														Time_AmzAlice = pr_all.get(j).getDataTime().getTime();
+														Price_AmzAlice = Price_Hikaku;
+													} else {
+														if (pr_all.get(j).getDataTime().getTime() > Time_AmzAlice) {
+															Time_AmzAlice = pr_all.get(j).getDataTime().getTime();
+															Price_AmzAlice = Price_Hikaku;
+														}
+													}
+												} else if (zyun_yasui.equals(kakaku1)) {
+													if (Price_AmzAlice == 0) {
+														Price_AmzAlice = Price_Hikaku;
+													} else {
+														if (Price_Hikaku < Price_AmzAlice) {
+															Price_AmzAlice = Price_Hikaku;
+														}
+													}
+												} else if (zyun_takai.equals(kakaku1)) {
+													if (Price_Hikaku > Price_AmzAlice) {
+														Price_AmzAlice = Price_Hikaku;
+													}
+												}
+												isHava_AmzAlice = true;
+											} else if ("Amazon ヒューフリット".equals(pr_all.get(j).getTenpo_code())) {
+												if (zyun_hidukechikai.equals(kakaku1)) {
+													if (Time_AmzFT == 0) {
+														Time_AmzFT = pr_all.get(j).getDataTime().getTime();
+														Price_AmzFT = Price_Hikaku;
+													} else {
+														if (pr_all.get(j).getDataTime().getTime() > Time_AmzFT) {
+															Time_AmzFT = pr_all.get(j).getDataTime().getTime();
+															Price_AmzFT = Price_Hikaku;
+														}
+													}
+												} else if (zyun_yasui.equals(kakaku1)) {
+													if (Price_AmzFT == 0) {
+														Price_AmzFT = Price_Hikaku;
+													} else {
+														if (Price_Hikaku < Price_AmzFT) {
+															Price_AmzFT = Price_Hikaku;
+														}
+													}
+												} else if (zyun_takai.equals(kakaku1)) {
+													if (Price_Hikaku > Price_AmzFT) {
+														Price_AmzFT = Price_Hikaku;
+													}
+												}
+												isHava_AmzFT = true;
+											} else if ("Amazon 通販のトココ".equals(pr_all.get(j).getTenpo_code())) {
+												if (zyun_hidukechikai.equals(kakaku1)) {
+													if (Time_AmzTKK == 0) {
+														Time_AmzTKK = pr_all.get(j).getDataTime().getTime();
+														Price_AmzTKK = Price_Hikaku;
+													} else {
+														if (pr_all.get(j).getDataTime().getTime() > Time_Rashop) {
+															Time_AmzTKK = pr_all.get(j).getDataTime().getTime();
+															Price_AmzTKK = Price_Hikaku;
+														}
+													}
+												} else if (zyun_yasui.equals(kakaku1)) {
+													if (Price_AmzTKK == 0) {
+														Price_AmzTKK = Price_Hikaku;
+													} else {
+														if (Price_Hikaku < Price_AmzTKK) {
+															Price_AmzTKK = Price_Hikaku;
+														}
+													}
+												} else if (zyun_takai.equals(kakaku1)) {
+													if (Price_Hikaku > Price_AmzTKK) {
+														Price_AmzTKK = Price_Hikaku;
+													}
+												}
+												isHava_AmzTKK = true;
+											} else if ("Amazon サラダ".equals(pr_all.get(j).getTenpo_code())) {
+												if (zyun_hidukechikai.equals(kakaku1)) {
+													if (Time_AmzSD == 0) {
+														Time_AmzSD = pr_all.get(j).getDataTime().getTime();
+														Price_AmzSD = Price_Hikaku;
+													} else {
+														if (pr_all.get(j).getDataTime().getTime() > Time_AmzSD) {
+															Time_AmzSD = pr_all.get(j).getDataTime().getTime();
+															Price_AmzSD = Price_Hikaku;
+														}
+													}
+												} else if (zyun_yasui.equals(kakaku1)) {
+													if (Price_AmzSD == 0) {
+														Price_AmzSD = Price_Hikaku;
+													} else {
+														if (Price_Hikaku < Price_AmzSD) {
+															Price_AmzSD = Price_Hikaku;
+														}
+													}
+												} else if (zyun_takai.equals(kakaku1)) {
+													if (Price_Hikaku > Price_AmzSD) {
+														Price_AmzSD = Price_Hikaku;
+													}
+												}
+												isHava_AmzSD = true;
+											}
+										}
+									}
+								}
+							}
+						}
+
+						if (isHava_Rashop) {
+							ne_hikaku.setValue1(String.valueOf(Price_Rashop));
+						}
+
+						if (isHava_Ralice) {
+							ne_hikaku.setValue2(String.valueOf(Price_Ralice));
+						}
+
+						if (isHava_Akatsuki) {
+							ne_hikaku.setValue3(String.valueOf(Price_Akatsuki));
+						}
+
+						if (isHava_Yashop) {
+							ne_hikaku.setValue4(String.valueOf(Price_Yashop));
+						}
+
+						if (isHava_FK) {
+							ne_hikaku.setValue5(String.valueOf(Price_FK));
+						}
+
+						if (isHava_KT) {
+							ne_hikaku.setValue6(String.valueOf(Price_KT));
+						}
+
+						if (isHava_L9) {
+							ne_hikaku.setValue7(String.valueOf(Price_L9));
+						}
+
+						if (isHava_Tonya) {
+							ne_hikaku.setValue8(String.valueOf(Price_Tonya));
+						}
+
+						if (isHava_KN) {
+							ne_hikaku.setValue9(String.valueOf(Price_KN));
+						}
+
+						if (isHava_AmzAlice) {
+							ne_hikaku.setValue10(String.valueOf(Price_AmzAlice));
+						}
+
+						if (isHava_AmzFT) {
+							ne_hikaku.setValue11(String.valueOf(Price_AmzFT));
+						}
+
+						if (isHava_AmzTKK) {
+							ne_hikaku.setValue12(String.valueOf(Price_AmzTKK));
+						}
+
+						if (isHava_AmzSD) {
+							ne_hikaku.setValue13(String.valueOf(Price_AmzSD));
+						}
+
+						price_hikaku.add(ne_hikaku);
 					}
 				}
 			}
 
-			if (codes.size() > 0) {
-				price_hikaku = priceService.getHikakuDataByDate(codes, start, end);
-				//				if(price_hikaku.size() > 0) {
-				//					for (int i = 0; i < price_hikaku.size(); i++) {
-				//						if(price_hikaku.get(i).getValue1() == null || "".equals(price_hikaku.get(i).getValue1())) {
-				//							price_hikaku.get(i).setValue1("×");
-				//						} else if (price_hikaku.get(i).getValue2() == null || "".equals(price_hikaku.get(i).getValue2())) {
-				//							price_hikaku.get(i).setValue2("×");
-				//						} else if (price_hikaku.get(i).getValue3() == null || "".equals(price_hikaku.get(i).getValue3())) {
-				//							price_hikaku.get(i).setValue3("×");
-				//						} else if (price_hikaku.get(i).getValue4() == null || "".equals(price_hikaku.get(i).getValue4())) {
-				//							price_hikaku.get(i).setValue4("×");
-				//						} else if (price_hikaku.get(i).getValue5() == null || "".equals(price_hikaku.get(i).getValue5())) {
-				//							price_hikaku.get(i).setValue5("×");
-				//						} else if (price_hikaku.get(i).getValue6() == null || "".equals(price_hikaku.get(i).getValue6())) {
-				//							price_hikaku.get(i).setValue6("×");
-				//						} else if (price_hikaku.get(i).getValue7() == null || "".equals(price_hikaku.get(i).getValue7())) {
-				//							price_hikaku.get(i).setValue7("×");
-				//						} else if (price_hikaku.get(i).getValue8() == null || "".equals(price_hikaku.get(i).getValue8())) {
-				//							price_hikaku.get(i).setValue8("×");
-				//						} else if (price_hikaku.get(i).getValue9() == null || "".equals(price_hikaku.get(i).getValue9())) {
-				//							price_hikaku.get(i).setValue9("×");
-				//						} else if (price_hikaku.get(i).getValue10() == null || "".equals(price_hikaku.get(i).getValue10())) {
-				//							price_hikaku.get(i).setValue10("×");
-				//						} else if (price_hikaku.get(i).getValue11() == null || "".equals(price_hikaku.get(i).getValue11())) {
-				//							price_hikaku.get(i).setValue11("×");
-				//						} else if (price_hikaku.get(i).getValue12() == null || "".equals(price_hikaku.get(i).getValue12())) {
-				//							price_hikaku.get(i).setValue12("×");
-				//						} else if (price_hikaku.get(i).getValue13() == null || "".equals(price_hikaku.get(i).getValue13())) {
-				//							price_hikaku.get(i).setValue13("×");
-				//						}
-				//					}
-				//				}
+			int current = (currentPage - 1) * pageCount;
+			int total = price_hikaku.size();
+
+			List<ne_hikaku> price_hikaku_rs = new ArrayList<ne_hikaku>();
+
+			if (total > 0) {
+				int index_last = current + pageCount;
+				if (index_last > total) {
+					index_last = total;
+				}
+				price_hikaku_rs = price_hikaku.subList(current, index_last);
 			}
 
-			object.put("hikaku", price_hikaku);
+			object.put("hikaku", price_hikaku_rs);
+			object.put("total", total);
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println(e);
@@ -593,7 +1079,7 @@ public class priceController {
 			response.setCharacterEncoding("utf-8");
 
 			int current = (currentPage - 1) * pageCount;
-			List<price> dataList = priceService.getPriceData(date_s, tenpo, current, pageCount);
+			List<price> dataList = priceService.getPriceData(date_s, tenpo, 1, current, pageCount);
 
 			for (int i = 0; i < dataList.size(); i++) {
 				String tenpo_ = dataList.get(i).getTenpo_code();
@@ -699,7 +1185,7 @@ public class priceController {
 				}
 			}
 
-			int total = priceService.getPriceData_total(date_s, tenpo);
+			int total = priceService.getPriceData_total(date_s, tenpo, 1);
 
 			object.put("dataList", dataList);
 			object.put("total", total);

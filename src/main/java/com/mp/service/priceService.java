@@ -12,19 +12,29 @@ public interface priceService {
 
 	void deleteByDataTime(String tenpo, String time);
 
-	List<price> getPriceData(String date, String tenpo, int current, int pageCount);
+	List<price> getPriceData(String date, String tenpo, int show, int current, int pageCount);
 
-	int getPriceData_total(String date, String tenpo);
+	int getPriceData_total(String date, String tenpo, int show);
 
-	List<price> getDistinctCodeByDate(String start, String end);
+	List<price> getDistinctCodeByDate(String start, String end, int show);
+
+	List<price> getDistinctCodeDataByDate(String start, String end, int show);
 
 	List<price> getDistinctCodeByDate_ne(String start, String end);
 
 	price getHikakuDataByCodeAndDate(String tenpo, String code, String start, String end);
 
-	List<ne_hikaku> getHikakuDataByDate(List<String> codes, String start, String end);
+	List<ne_hikaku> getHikakuDataByDate(String kakaku1,
+			String start, String end);
+
 	List<ne_hikaku> getHikakuDataByDate_ne(String start, String end);
+
 	String getDcodeByLocation(String code);
 
+	void deleteByUuid(String uuid);
+
+	void backByUuid(String uuid);
+
+	int getCountByUuid(String uuid);
 
 }

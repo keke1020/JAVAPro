@@ -84,6 +84,19 @@
 			<type>maven-plugin</type>
 		</dependency>
 
+		<!-- https://blog.csdn.net/a616735104/article/details/101625769 https://mvnrepository.com/artifact/commons-io/commons-io -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.6</version>
+		</dependency>
+
 		<!-- 1.日志 -->
 		<!-- 实现slf4j接口并整合 -->
 		<dependency>

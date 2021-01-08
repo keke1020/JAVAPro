@@ -11,6 +11,8 @@
 		<result column="user_id" property="user_id" jdbcType="INTEGER" />
 		<result column="result" property="result" jdbcType="VARCHAR" />
 		<result column="type" property="type" jdbcType="VARCHAR" />
+
+		<result column="code" property="code" jdbcType="VARCHAR" />
 	</resultMap>
 
 	<!-- dao接口方法提供sql语句配置 -->
@@ -55,5 +57,97 @@
 		LIMIT #{count}
 	</select>
 
+	<insert id="insertAllNagoya" parameterType="java.util.ArrayList">
+		insert into `nagoyarireki`
+		(
+		`update`,
+		`code`,
+		`message`,
+		`user`
+		)
+		values
+		<foreach collection="zaikorireki" item="item" index="index"
+			separator=",">
+			(
+			#{item.update},
+			#{item.code},
+			#{item.message},
+			#{item.user}
+			)
+		</foreach>
+	</insert>
+
+	<select id="getNagoyaRireki" resultMap="zaikorirekiResult">
+		select * from nagoyarireki
+		where 1=1
+		<if test="code != null and code != ''">
+			AND (`code` REGEXP #{code})
+		</if>
+		<choose>
+            <when test="update_s != '' and update_e != ''">
+            	AND `update` &gt;= #{update_s}
+				AND `update` &lt;= #{update_e}
+            </when>
+            <when test="update_s != '' and update_e == ''">
+            	AND `update` &gt;= #{update_s}
+            </when>
+            <when test="update_s == '' and update_e != ''">
+				AND `update` &lt;= #{update_e}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+		<choose>
+			<when test="order == '順序選択'">
+				order by `update` desc
+			</when>
+			<when test="order == 'アップデート順' ">
+				order by `update` desc
+			</when>
+			<when test="order == 'コード昇順' ">
+				order by `code`
+			</when>
+			<when test="order == 'コード降順' ">
+				order by `code` desc
+			</when>
+		</choose>
+		LIMIT #{offset}, #{limit}
+	</select>
+
+	<select id="getNagoyaRireki_total" resultType="java.lang.Integer">
+		select count(*) from nagoyarireki
+		where 1=1
+		<if test="code != null and code != ''">
+			AND (`code` REGEXP #{code})
+		</if>
+		<choose>
+            <when test="update_s != '' and update_e != ''">
+            	AND `update` &gt;= #{update_s}
+				AND `update` &lt;= #{update_e}
+            </when>
+            <when test="update_s != '' and update_e == ''">
+            	AND `update` &gt;= #{update_s}
+            </when>
+            <when test="update_s == '' and update_e != ''">
+				AND `update` &lt;= #{update_e}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+		<choose>
+			<when test="order == '順序選択'">
+				order by `update` desc
+			</when>
+			<when test="order == 'アップデート順' ">
+				order by `update` desc
+			</when>
+			<when test="order == 'コード昇順' ">
+				order by `code`
+			</when>
+			<when test="order == 'コード降順' ">
+				order by `code` desc
+			</when>
+		</choose>
+	</select>
 
 </mapper>

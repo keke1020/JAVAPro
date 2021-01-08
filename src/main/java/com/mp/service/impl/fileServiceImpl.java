@@ -53,6 +53,12 @@ public class fileServiceImpl implements fileService{
 		return fileDao.getUploadRirekiByType(type);
 	}
 
+	@Override
+	public void changeDataStateById(String id, String state) {
+		// TODO 自動生成されたメソッド・スタブ
+		fileDao.changeDataStateById(id, state);
+	}
+
 
 
 }

@@ -28,23 +28,23 @@ public class priceServiceImpl implements priceService {
 	@Override
 	public void deleteByDataTime(String tenpo, String time) {
 		// TODO 自動生成されたメソッド・スタブ
-		priceDao.deleteByDataTime(tenpo,time);
+		priceDao.deleteByDataTime(tenpo, time);
 	}
 
-	public List<price> getPriceData(String date, String tenpo, int current, int pageCount) {
+	public List<price> getPriceData(String date, String tenpo, int show, int current, int pageCount) {
 		// TODO 自動生成されたメソッド・スタブ
-		return priceDao.getPriceData(date, tenpo, current, pageCount);
+		return priceDao.getPriceData(date, tenpo, show, current, pageCount);
 	}
 
-	public int getPriceData_total(String date, String tenpo) {
+	public int getPriceData_total(String date, String tenpo, int show) {
 		// TODO 自動生成されたメソッド・スタブ
-		return priceDao.getPriceData_total(date, tenpo);
+		return priceDao.getPriceData_total(date, tenpo, show);
 	}
 
 	@Override
-	public List<price> getDistinctCodeByDate(String start, String end) {
+	public List<price> getDistinctCodeByDate(String start, String end,int show) {
 		// TODO 自動生成されたメソッド・スタブ
-		return priceDao.getDistinctCodeByDate(start, end);
+		return priceDao.getDistinctCodeByDate(start, end,show);
 	}
 
 	@Override
@@ -60,9 +60,9 @@ public class priceServiceImpl implements priceService {
 	}
 
 	@Override
-	public List<ne_hikaku> getHikakuDataByDate(List<String> codes, String start, String end) {
+	public List<ne_hikaku> getHikakuDataByDate(String kakaku1, String start, String end) {
 		// TODO 自動生成されたメソッド・スタブ
-		return priceDao.getHikakuDataByDate(codes, start, end);
+		return priceDao.getHikakuDataByDate(kakaku1, start, end);
 	}
 
 	@Override
@@ -77,7 +77,28 @@ public class priceServiceImpl implements priceService {
 		return priceDao.getDcodeByLocation(code);
 	}
 
+	@Override
+	public List<price> getDistinctCodeDataByDate(String start, String end, int show) {
+		// TODO 自動生成されたメソッド・スタブ
+		return priceDao.getDistinctCodeDataByDate(start, end, show);
+	}
 
+	@Override
+	public void deleteByUuid(String uuid) {
+		// TODO 自動生成されたメソッド・スタブ
+		priceDao.deleteByUuid(uuid);
+	}
 
+	@Override
+	public int getCountByUuid(String uuid) {
+		// TODO 自動生成されたメソッド・スタブ
+		return priceDao.getCountByUuid(uuid);
+	}
+
+	@Override
+	public void backByUuid(String uuid) {
+		// TODO 自動生成されたメソッド・スタブ
+		priceDao.backByUuid(uuid);
+	}
 
 }

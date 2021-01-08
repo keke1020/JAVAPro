@@ -17,9 +17,9 @@
 		<result column="user" property="user" jdbcType="VARCHAR" />
 		<result column="updatetime" property="updatetime"
 			jdbcType="TIMESTAMP" />
-		<result column="memo" property="memo"
+		<result column="memo" property="memo" jdbcType="VARCHAR" />
+		<result column="data_state" property="data_state"
 			jdbcType="VARCHAR" />
-
 	</resultMap>
 
 	<select id="getFilesByParentId" resultMap="fileResult">
@@ -40,6 +40,7 @@
 		SELECT
 		ID,
 		name,
+		parentId,
 		changeName,
 		memo,
 		path
@@ -51,8 +52,10 @@
 
 	<insert id="insert" parameterType="com.mp.entity.file"
 		useGeneratedKeys="true" keyProperty="ID" keyColumn="ID">
-		insert into file(`type`,
-		`parentId`, `name`, `changeName`, `path`, `user_id`, `updatetime` , `memo`)
+		insert into
+		file(`type`,
+		`parentId`, `name`, `changeName`, `path`, `user_id`,
+		`updatetime` , `memo`)
 		values(
 		#{type},
 		#{parentId},
@@ -66,7 +69,8 @@
 	</insert>
 
 	<update id="clearParentId" parameterType="com.mp.entity.file">
-		UPDATE `file` set `parentId` = null WHERE parentId = #{parentid} and type = #{type}
+		UPDATE `file` set
+		`parentId` = null WHERE parentId = #{parentid} and type = #{type}
 	</update>
 
 	<update id="updateParentId" parameterType="com.mp.entity.file">
@@ -84,64 +88,67 @@
 
 
 	<select id="getLastFinishFilesByParentId" resultMap="fileResult">
-		SELECT * from file where parentId = #{id} and type = '2' ORDER BY id desc
+		SELECT *
+		from file where parentId = #{id} and type = '2' ORDER BY id desc
 	</select>
 
 	<select id="getUploadRirekiByNe" resultMap="fileResult">
 		SELECT
-			ID,
-			type,
-			parentId,
-			NAME,
-			changeName,
-			path,
-			user_id,
-			memo,
-			updatetime,
-			(
-				SELECT
-					realname
-				FROM
-					USER
-				WHERE
-					ID = user_id
-			) AS USER
+		ID,
+		type,
+		parentId,
+		NAME,
+		changeName,
+		path,
+		user_id,
+		memo,
+		updatetime,
+		(
+		SELECT
+		realname
 		FROM
-			file
+		USER
 		WHERE
-			type = 'ne'
+		ID = user_id
+		) AS USER
+		FROM
+		file
+		WHERE
+		type = 'ne'
 		ORDER BY
-			id DESC
+		id DESC
 	</select>
 
 	<select id="getUploadRirekiByType" resultMap="fileResult">
 		SELECT
-			ID,
-			type,
-			parentId,
-			NAME,
-			changeName,
-			path,
-			user_id,
-			memo,
-			updatetime,
-			(
-				SELECT
-					realname
-				FROM
-					USER
-				WHERE
-					ID = user_id
-			) AS USER
+		ID,
+		type,
+		parentId,
+		NAME,
+		changeName,
+		path,
+		user_id,
+		memo,
+		updatetime,
+		data_state,
+		(
+		SELECT
+		realname
 		FROM
-			file
+		USER
 		WHERE
-			type = #{type}
+		ID = user_id
+		) AS USER
+		FROM
+		file
+		WHERE
+		type = #{type}
 		ORDER BY
-			id DESC
+		id DESC
 	</select>
 
-
-
+	<update id="changeDataStateById" parameterType="com.mp.entity.file">
+		update file set data_state = #{state} where ID = #{id}
+	</update>
 
 </mapper>

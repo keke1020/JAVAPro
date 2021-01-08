@@ -15,6 +15,7 @@ public class file {
 	private String user;
 	private String value;
 	private String memo;
+	private String data_state;
 
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Tokyo")
 	private Date updatetime;
@@ -105,6 +106,14 @@ public class file {
 
 	public void setMemo(String memo) {
 		this.memo = memo;
+	}
+
+	public String getData_state() {
+		return data_state;
+	}
+
+	public void setData_state(String data_state) {
+		this.data_state = data_state;
 	}
 
 }

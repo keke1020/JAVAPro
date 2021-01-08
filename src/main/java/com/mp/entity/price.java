@@ -19,6 +19,7 @@ public class price {
 	private int import_userId;
 	private String import_user;
 	private String uuid;
+	private int show;
 
 	public int getID() {
 		return ID;
@@ -114,6 +115,14 @@ public class price {
 
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
+	}
+
+	public int getShow() {
+		return show;
+	}
+
+	public void setShow(int show) {
+		this.show = show;
 	}
 
 }

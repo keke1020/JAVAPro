@@ -1,5 +1,7 @@
 package com.mp.controller;
 
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -16,6 +18,8 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -141,9 +145,9 @@ public class soukoController {
 					.parseInt(new String(request.getParameter("rireki_curr").getBytes("ISO-8859-1"), "UTF-8"));
 			list_currentPage = (list_currentPage - 1) * searchCount;
 
-			List<zaikorireki> rireki = zaikorirekiService.getNagoyaRireki(codeSc, updateSc_s, updateSc_e,orderSC,
+			List<zaikorireki> rireki = zaikorirekiService.getNagoyaRireki(codeSc, updateSc_s, updateSc_e, orderSC,
 					list_currentPage, searchCount);
-			int total = zaikorirekiService.getNagoyaRireki_total(codeSc, updateSc_s, updateSc_e,orderSC);
+			int total = zaikorirekiService.getNagoyaRireki_total(codeSc, updateSc_s, updateSc_e, orderSC);
 			object.put("rireki", rireki);
 			object.put("total", total);
 		} catch (Exception e) {
@@ -267,6 +271,72 @@ public class soukoController {
 					soukoService.upate(active, soukoNodes);
 					if (nagoyarirekis.size() > 0) {
 						zaikorirekiService.insertAllNagoya(nagoyarirekis);
+					}
+
+					//					エクセル保存
+					List<souko> soukos_all = soukoService.getSouko("false", "true", "コード昇順", "", "", "", "", "", "",
+							"", 0, 999999999, "");
+
+					if (soukos_all.size() > 0) {
+						try {
+
+							String place = "";
+							if (config.ISLOCAL) {
+								place = config.LOCATION_PLACE_LOCAL;
+							} else {
+								place = config.LOCATION_PLACE_SERVER;
+							}
+
+							FileOutputStream fos = new FileOutputStream(
+									place + "xampp\\htdocs\\ordery\\logi\\location.csv");
+							OutputStreamWriter osw = new OutputStreamWriter(fos, "SJIS");
+							CSVFormat csvFormat = CSVFormat.DEFAULT.withHeader("商品コード", "商品名", "商品分類タグ", "代表商品コード",
+									"ship-weight", "ロケーション", "ロケーション(名古屋)", "梱包サイズ", "特殊", "sw2");
+							CSVPrinter csvPrinter = new CSVPrinter(osw, csvFormat);
+							StringBuffer location_dzf = new StringBuffer();
+							StringBuffer location_ngy = new StringBuffer();
+
+							for (int k = 0; k < soukos_all.size(); k++) {
+								location_dzf.setLength(0);
+								location_ngy.setLength(0);
+
+								if (soukos_all.get(k).getKaisou() == null || "".equals(soukos_all.get(k).getKaisou())) {
+								} else {
+									location_dzf.append(soukos_all.get(k).getKaisou());
+								}
+
+								if (soukos_all.get(k).getTana() == null || "".equals(soukos_all.get(k).getTana())) {
+								} else {
+									location_dzf.append(soukos_all.get(k).getTana());
+								}
+
+								if (soukos_all.get(k).getKaisou_nagoya() == null
+										|| "".equals(soukos_all.get(k).getKaisou_nagoya())) {
+								} else {
+									location_ngy.append(soukos_all.get(k).getKaisou_nagoya());
+								}
+
+								if (soukos_all.get(k).getTana_nagoya() == null
+										|| "".equals(soukos_all.get(k).getTana_nagoya())) {
+								} else {
+									location_ngy.append(soukos_all.get(k).getTana_nagoya());
+								}
+
+								csvPrinter.printRecord(soukos_all.get(k).getCode(), soukos_all.get(k).getName(),
+										soukos_all.get(k).getTag(),
+										soukos_all.get(k).getDcode(), soukos_all.get(k).getSw(),
+										location_dzf.toString(),
+										location_ngy.toString(),
+										soukos_all.get(k).getKsize(), soukos_all.get(k).getSp(),
+										soukos_all.get(k).getSw2());
+							}
+
+							csvPrinter.flush();
+							csvPrinter.close();
+						} catch (Exception e) {
+							// TODO: handle exception
+							System.out.println(e);
+						}
 					}
 				}
 			}

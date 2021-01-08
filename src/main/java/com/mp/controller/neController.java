@@ -413,7 +413,26 @@ public class neController {
 			}
 
 			if (ne_add.size() > 0) {
-				neService.insert(ne_add);
+				double ne_size = ne_add.size();
+				double thousand = 1000;
+				int thousandCount = (int) Math.ceil(ne_size / thousand);
+
+				int start = 0;
+				int end = 0;
+				List<ne> ne_add_ = new ArrayList<ne>();
+
+				for (int i = 0; i < thousandCount; i++) {
+					start = 1000 * i;
+
+					if (i == (thousandCount - 1)) {
+						end = ne_add.size();
+					} else {
+						end = 1000 * (i + 1);
+					}
+
+					ne_add_ = ne_add.subList(start, end);
+					neService.insert(ne_add_);
+				}
 
 				String date = sf6.format(now);
 				String place_str = path + "\\wanfang_file_NE\\" + date;
@@ -771,7 +790,27 @@ public class neController {
 
 			if (ne_meisai_add.size() > 0) {
 				neService.deleteByDenpyono(denpyo_arr);
-				neService.insertNeMeisai(ne_meisai_add);
+
+				double ne_meisai__size = ne_meisai_add.size();
+				double thousand = 1000;
+				int thousandCount = (int) Math.ceil(ne_meisai__size / thousand);
+
+				int start = 0;
+				int end = 0;
+				List<ne_meisai> ne_meisai_ = new ArrayList<ne_meisai>();
+
+				for (int i = 0; i < thousandCount; i++) {
+					start = 1000 * i;
+
+					if (i == (thousandCount - 1)) {
+						end = ne_meisai_add.size();
+					} else {
+						end = 1000 * (i + 1);
+					}
+
+					ne_meisai_ = ne_meisai_add.subList(start, end);
+					neService.insertNeMeisai(ne_meisai_);
+				}
 
 				String date = sf6.format(now);
 				String place_str = path + "\\wanfang_file_NE\\" + date;
@@ -1948,7 +1987,8 @@ public class neController {
 							nh.setValue15(String.valueOf(value15));
 							nh.setValue16(String.valueOf(value16));
 
-							value999 = value1 + value2 + value3+ value4+ value5+ value6+ value7+ value8+ value9+ value10+ value11+ value12+ value13+ value14+ value15;
+							value999 = value1 + value2 + value3 + value4 + value5 + value6 + value7 + value8 + value9
+									+ value10 + value11 + value12 + value13 + value14 + value15;
 							nh.setValue999(String.valueOf(value999));
 							ne_hikaku.add(nh);
 						}
