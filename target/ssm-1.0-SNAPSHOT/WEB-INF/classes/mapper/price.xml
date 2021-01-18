@@ -20,15 +20,14 @@
 			jdbcType="INTEGER" />
 		<result column="import_user" property="import_user"
 			jdbcType="VARCHAR" />
-		<result column="uuid" property="uuid"
-			jdbcType="VARCHAR" />
+		<result column="uuid" property="uuid" jdbcType="VARCHAR" />
+		<result column="show" property="show" jdbcType="INTEGER" />
 	</resultMap>
 
 	<resultMap type="ne_hikaku" id="ne_hikakuResult">
 		<result column="dataTime" property="dataTime"
 			jdbcType="TIMESTAMP" />
-		<result column="code" property="code"
-			jdbcType="VARCHAR" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
 		<result column="value1" property="value1" jdbcType="VARCHAR" />
 		<result column="value2" property="value2" jdbcType="VARCHAR" />
 		<result column="value3" property="value3" jdbcType="VARCHAR" />
@@ -45,7 +44,8 @@
 	</resultMap>
 
 	<select id="getDcodeByLocation" resultType="java.lang.String">
-		select dcode from location where code = #{code}
+		select dcode from
+		location where code = #{code}
 	</select>
 
 	<insert id="insert" parameterType="java.util.ArrayList">
@@ -86,255 +86,296 @@
 
 	<delete id="deleteByDataTime">
 		delete from `price`
-		where dataTime = #{time} and tenpo_code = #{tenpo}
+		where dataTime = #{time} and
+		tenpo_code = #{tenpo}
 	</delete>
 
 	<select id="getDistinctCodeByDate" resultMap="priceResult">
 		SELECT
-			DISTINCT `code`
+		`code`
 		FROM
-			price
+		price
 		WHERE
-			dataTime &gt;= #{start}
+		dataTime &gt;= #{start}
 		AND dataTime &lt;= #{end}
+		AND `show` = #{show}
+		AND `code` != ""
+		GROUP BY `code`
+	</select>
+
+	<select id="getDistinctCodeDataByDate" resultMap="priceResult">
+		SELECT
+			`code`,
+			price,
+			tenpo_code,
+			`dataTime`
+		FROM
+		price
+		WHERE
+		dataTime &gt;= #{start}
+		AND dataTime &lt;= #{end}
+		AND `show` = #{show}
 		ANd `code` != ""
 	</select>
 
 	<select id="getDistinctCodeByDate_ne" resultMap="priceResult">
 		SELECT
-			DISTINCT nm.`code`
+		DISTINCT
+		nm.`code`
 		FROM
-			ne_meisai nm
-		LEFT JOIN ne n ON nm.jyuchu_denpyo_no = n.jyuchu_denpyo_no
+		ne_meisai nm
+		LEFT JOIN ne n ON nm.jyuchu_denpyo_no =
+		n.jyuchu_denpyo_no
 		WHERE
-			n.jyuchu_bi &gt;= #{start}
-		AND n.jyuchu_bi &lt;= #{end}
-		order by nm.`code`
+		n.jyuchu_bi &gt;= #{start}
+		AND n.jyuchu_bi &lt;=
+		#{end}
+		order by
+		nm.`code`
 	</select>
 
 	<select id="getHikakuDataByCodeAndDate" resultMap="priceResult">
 		SELECT
-			*
+		*
 		FROM
-			price
+		price
 		WHERE
-			tenpo_code = #{tenpo}
+		tenpo_code = #{tenpo}
 		AND `code` = #{code}
-		AND dataTime &gt;= #{start}
-		AND dataTime &lt;= #{end}
+		AND dataTime &gt;=
+		#{start}
+		AND dataTime
+		&lt;= #{end}
 		ORDER BY
-			dataTime DESC
+		dataTime DESC
 		LIMIT 1
 	</select>
 
 	<select id="getHikakuDataByDate" resultMap="ne_hikakuResult">
 		SELECT
-			p.`code`,
-			(
-				SELECT
-					price
-				FROM
-					price
-				WHERE
-					1 = 1
-				AND dataTime &gt;= #{start}
-				AND dataTime &lt;= #{end}
-				AND `code` = p.`code`
-				AND tenpo_code = 'あかね楽天'
-				ORDER BY
-					dataTime DESC
-				LIMIT 1
-			) AS value1,
-			(
-				SELECT
-					price
-				FROM
-					price
-				WHERE
-					1 = 1
-				AND dataTime &gt;= #{start}
-				AND dataTime &lt;= #{end}
-				AND `code` = p.`code`
-				AND tenpo_code = 'アリス楽天'
-				ORDER BY
-					dataTime DESC
-				LIMIT 1
-			) AS value2,
-			(
-				SELECT
-					price
-				FROM
-					price
-				WHERE
-					1 = 1
-				AND dataTime &gt;= #{start}
-				AND dataTime &lt;= #{end}
-				AND `code` = p.`code`
-				AND tenpo_code = '暁'
-				ORDER BY
-					dataTime DESC
-				LIMIT 1
-			) AS value3,
-			(
-				SELECT
-					price
-				FROM
-					price
-				WHERE
-					1 = 1
-				AND dataTime &gt;= #{start}
-				AND dataTime &lt;= #{end}
-				AND `code` = p.`code`
-				AND tenpo_code = 'あかねYahoo'
-				ORDER BY
-					dataTime DESC
-				LIMIT 1
-			) AS value4,
-			(
-				SELECT
-					price
-				FROM
-					price
-				WHERE
-					1 = 1
-				AND dataTime &gt;= #{start}
-				AND dataTime &lt;= #{end}
-				AND `code` = p.`code`
-				AND tenpo_code = 'FKstyle'
-				ORDER BY
-					dataTime DESC
-				LIMIT 1
-			) AS value5,
-			(
-				SELECT
-					price
-				FROM
-					price
-				WHERE
-					1 = 1
-				AND dataTime &gt;= #{start}
-				AND dataTime &lt;= #{end}
-				AND `code` = p.`code`
-				AND tenpo_code = 'KT雑貨Yahoo'
-				ORDER BY
-					dataTime DESC
-				LIMIT 1
-			) AS value6,
-			(
-				SELECT
-					price
-				FROM
-					price
-				WHERE
-					1 = 1
-				AND dataTime &gt;= #{start}
-				AND dataTime &lt;= #{end}
-				AND `code` = p.`code`
-				AND tenpo_code = 'Lucky9'
-				ORDER BY
-					dataTime DESC
-				LIMIT 1
-			) AS value7,
-			(
-				SELECT
-					price
-				FROM
-					price
-				WHERE
-					1 = 1
-				AND dataTime &gt;= #{start}
-				AND dataTime &lt;= #{end}
-				AND `code` = p.`code`
-				AND tenpo_code = '問屋よかろうもん'
-				ORDER BY
-					dataTime DESC
-				LIMIT 1
-			) AS value8,
-			(
-				SELECT
-					price
-				FROM
-					price
-				WHERE
-					1 = 1
-				AND dataTime &gt;= #{start}
-				AND dataTime &lt;= #{end}
-				AND `code` = p.`code`
-				AND tenpo_code = 'KuraNavi'
-				ORDER BY
-					dataTime DESC
-				LIMIT 1
-			) AS value9,
-			(
-				SELECT
-					price
-				FROM
-					price
-				WHERE
-					1 = 1
-				AND dataTime &gt;= #{start}
-				AND dataTime &lt;= #{end}
-				AND `code` = p.`code`
-				AND tenpo_code = 'Amazon 雑貨の国のアリス'
-				ORDER BY
-					dataTime DESC
-				LIMIT 1
-			) AS value10,
-			(
-				SELECT
-					price
-				FROM
-					price
-				WHERE
-					1 = 1
-				AND dataTime &gt;= #{start}
-				AND dataTime &lt;= #{end}
-				AND `code` = p.`code`
-				AND tenpo_code = 'Amazon ヒューフリット'
-				ORDER BY
-					dataTime DESC
-				LIMIT 1
-			) AS value11,
-			(
-				SELECT
-					price
-				FROM
-					price
-				WHERE
-					1 = 1
-				AND dataTime &gt;= #{start}
-				AND dataTime &lt;= #{end}
-				AND `code` = p.`code`
-				AND tenpo_code = 'Amazon 通販のトココ'
-				ORDER BY
-					dataTime DESC
-				LIMIT 1
-			) AS value12,
-			(
-				SELECT
-					price
-				FROM
-					price
-				WHERE
-					1 = 1
-				AND dataTime &gt;= #{start}
-				AND dataTime &lt;= #{end}
-				AND `code` = p.`code`
-				AND tenpo_code = 'Amazon サラダ'
-				ORDER BY
-					dataTime DESC
-				LIMIT 1
-			) AS value13
+		p.`code`,
+		(
+		SELECT
+		price
 		FROM
-			price p
+		price
+		WHERE
+		1 = 1
+		AND dataTime &gt;= #{start}
+		AND dataTime
+		&lt;= #{end}
+		AND `code` = p.`code`
+		AND tenpo_code = 'あかね楽天'
+		ORDER BY
+		dataTime DESC
+		LIMIT 1
+		) AS value1,
+		(
+		SELECT
+		price
+		FROM
+		price
+		WHERE
+		1 = 1
+		AND
+		dataTime &gt;= #{start}
+		AND dataTime &lt;= #{end}
+		AND `code` = p.`code`
+		AND tenpo_code = 'アリス楽天'
+		ORDER BY
+		dataTime DESC
+		LIMIT 1
+		) AS value2,
+		(
+		SELECT
+		price
+		FROM
+		price
+		WHERE
+		1 = 1
+		AND dataTime &gt;= #{start}
+		AND dataTime
+		&lt;= #{end}
+		AND `code` = p.`code`
+		AND tenpo_code = '暁'
+		ORDER BY
+		dataTime
+		DESC
+		LIMIT 1
+		) AS value3,
+		(
+		SELECT
+		price
+		FROM
+		price
+		WHERE
+		1 = 1
+		AND dataTime
+		&gt;= #{start}
+		AND dataTime &lt;= #{end}
+		AND `code` = p.`code`
+		AND
+		tenpo_code = 'あかねYahoo'
+		ORDER BY
+		dataTime DESC
+		LIMIT 1
+		) AS value4,
+		(
+		SELECT
+		price
+		FROM
+		price
+		WHERE
+		1 = 1
+		AND dataTime &gt;= #{start}
+		AND dataTime
+		&lt;= #{end}
+		AND `code` = p.`code`
+		AND tenpo_code = 'FKstyle'
+		ORDER BY
+		dataTime DESC
+		LIMIT 1
+		) AS value5,
+		(
+		SELECT
+		price
+		FROM
+		price
+		WHERE
+		1 = 1
+		AND
+		dataTime &gt;= #{start}
+		AND dataTime &lt;= #{end}
+		AND `code` = p.`code`
+		AND tenpo_code = 'KT雑貨Yahoo'
+		ORDER BY
+		dataTime DESC
+		LIMIT 1
+		) AS value6,
+		(
+		SELECT
+		price
+		FROM
+		price
+		WHERE
+		1 = 1
+		AND dataTime &gt;= #{start}
+		AND dataTime
+		&lt;= #{end}
+		AND `code` = p.`code`
+		AND tenpo_code = 'Lucky9'
+		ORDER BY
+		dataTime DESC
+		LIMIT 1
+		) AS value7,
+		(
+		SELECT
+		price
+		FROM
+		price
+		WHERE
+		1 = 1
+		AND
+		dataTime &gt;= #{start}
+		AND dataTime &lt;= #{end}
+		AND `code` = p.`code`
+		AND tenpo_code = '問屋よかろうもん'
+		ORDER BY
+		dataTime DESC
+		LIMIT 1
+		) AS value8,
+		(
+		SELECT
+		price
+		FROM
+		price
+		WHERE
+		1 = 1
+		AND dataTime &gt;= #{start}
+		AND dataTime
+		&lt;= #{end}
+		AND `code` = p.`code`
+		AND tenpo_code = 'KuraNavi'
+		ORDER BY
+		dataTime DESC
+		LIMIT 1
+		) AS value9,
+		(
+		SELECT
+		price
+		FROM
+		price
+		WHERE
+		1 = 1
+		AND
+		dataTime &gt;= #{start}
+		AND dataTime &lt;= #{end}
+		AND `code` = p.`code`
+		AND tenpo_code = 'Amazon 雑貨の国のアリス'
+		ORDER BY
+		dataTime DESC
+		LIMIT 1
+		) AS
+		value10,
+		(
+		SELECT
+		price
+		FROM
+		price
+		WHERE
+		1 = 1
+		AND dataTime &gt;= #{start}
+		AND
+		dataTime &lt;= #{end}
+		AND `code` = p.`code`
+		AND tenpo_code = 'Amazon
+		ヒューフリット'
+		ORDER BY
+		dataTime DESC
+		LIMIT 1
+		) AS value11,
+		(
+		SELECT
+		price
+		FROM
+		price
+		WHERE
+		1 = 1
+		AND dataTime &gt;= #{start}
+		AND dataTime &lt;= #{end}
+		AND `code` = p.`code`
+		AND tenpo_code = 'Amazon 通販のトココ'
+		ORDER BY
+		dataTime
+		DESC
+		LIMIT 1
+		) AS value12,
+		(
+		SELECT
+		price
+		FROM
+		price
+		WHERE
+		1 = 1
+		AND dataTime
+		&gt;= #{start}
+		AND dataTime &lt;= #{end}
+		AND `code` = p.`code`
+		AND
+		tenpo_code = 'Amazon サラダ'
+		ORDER BY
+		dataTime DESC
+		LIMIT 1
+		) AS value13
+		FROM
+		price p
 		WHERE 1=1
-		AND p.`code` IN
-		<foreach collection="codes" item="code" index="index" open="("
-			close=")" separator=",">
-			#{code}
-		</foreach>
+		AND p.`dataTime` &gt;= #{start}
+		AND p.`dataTime` &lt;=
+		#{end}
 		GROUP BY p.`code`
 	</select>
+
 
 	<select id="getHikakuDataByDate_ne" resultMap="ne_hikakuResult">
 
@@ -365,8 +406,9 @@
 		FROM
 		price
 		WHERE 1=1
-			AND `tenpo_code` = #{tenpo}
-			AND `dataTime` = #{date}
+		AND `show` = #{show}
+		AND `tenpo_code` = #{tenpo}
+		AND `dataTime` = #{date}
 		ORDER BY
 		CODE
 		LIMIT #{current}, #{pageCount}
@@ -374,12 +416,32 @@
 
 	<select id="getPriceData_total" resultType="java.lang.Integer">
 		SELECT
-			count(*)
+		count(*)
 		FROM
 		price
 		WHERE 1=1
-			AND `tenpo_code` = #{tenpo}
-			AND `dataTime` = #{date}
+		AND `show` = #{show}
+		AND `tenpo_code` = #{tenpo}
+		AND `dataTime` = #{date}
 	</select>
 
+	<update id="deleteByUuid" parameterType="com.mp.entity.price">
+		UPDATE `price`
+		<set>
+			`show` = 0
+		</set>
+		WHERE `uuid` = #{uuid}
+	</update>
+
+	<update id="backByUuid" parameterType="com.mp.entity.price">
+		UPDATE `price`
+		<set>
+			`show` = 1
+		</set>
+		WHERE `uuid` = #{uuid}
+	</update>
+
+	<select id="getCountByUuid" resultType="java.lang.Integer">
+		select count(*) from price where uuid = #{uuid}
+	</select>
 </mapper>
