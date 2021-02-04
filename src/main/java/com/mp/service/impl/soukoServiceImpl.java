@@ -46,4 +46,51 @@ public class soukoServiceImpl implements soukoService {
 		return soukoDao.getSoukoByCodes(codes);
 	}
 
+	@Override
+	public List<souko> getCodeDataBySoukoNagoya(String code, int currentPage, int searchCount) {
+		// TODO 自動生成されたメソッド・スタブ
+		return soukoDao.getCodeDataBySoukoNagoya(code, currentPage, searchCount);
+	}
+
+	@Override
+	public void nyuushukkaForSoukoNagoyaByCode(souko so) {
+		// TODO 自動生成されたメソッド・スタブ
+		soukoDao.nyuushukkaForSoukoNagoyaByCode(so);
+	}
+
+	@Override
+	public int getTotalBySoukoNagoya(String code) {
+		// TODO 自動生成されたメソッド・スタブ
+		return soukoDao.getTotalBySoukoNagoya(code);
+	}
+
+	@Override
+	public void deleteNagoyaZaikoById(int id) {
+		// TODO 自動生成されたメソッド・スタブ
+		soukoDao.deleteNagoyaZaikoById(id);
+	}
+
+	@Override
+	public void nyuushukkaForSoukoNagoya(List<souko> soukos) {
+		// TODO 自動生成されたメソッド・スタブ
+		soukoDao.nyuushukkaForSoukoNagoya(soukos);
+	}
+
+	@Override
+	public List<souko> getNagoyaRireki2(int list_currentPage, int searchCount) {
+		// TODO 自動生成されたメソッド・スタブ
+		return soukoDao.getNagoyaRireki2(list_currentPage, searchCount);
+	}
+
+	@Override
+	public int getNagoyaRireki_total2() {
+		// TODO 自動生成されたメソッド・スタブ
+		return soukoDao.getNagoyaRireki_total2();
+	}
+
+	@Override
+	public List<souko> getNagoyaRireki2ByUUid(String uuid) {
+		// TODO 自動生成されたメソッド・スタブ
+		return soukoDao.getNagoyaRireki2ByUUid(uuid);
+	}
 }

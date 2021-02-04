@@ -13,9 +13,11 @@ public interface zaikorirekiService {
 
 	void insertAllNagoya(List<zaikorireki> z);
 
-	List<zaikorireki> getNagoyaRireki(String codeSc, String updateSc_s, String updateSc_e, String orderSC,
+	List<zaikorireki> getNagoyaRireki(String codeSc,String type, String updateSc_s, String updateSc_e, String orderSC,
 			int list_currentPage, int searchCount);
 
 	int getNagoyaRireki_total(String codeSc, String updateSc_s, String updateSc_e, String orderSC);
+
+
 
 }

@@ -15,4 +15,20 @@ public interface soukoService {
 
 	void upate(int active, List<souko> souko);
 	List<souko> getSoukoByCodes(List<String> codes);
+
+	List<souko> getCodeDataBySoukoNagoya(String code, int currentPage, int searchCount);
+
+	void nyuushukkaForSoukoNagoyaByCode(souko so);
+
+	int getTotalBySoukoNagoya(String code);
+
+	void deleteNagoyaZaikoById(int id);
+
+	void nyuushukkaForSoukoNagoya(List<souko> soukos);
+
+	List<souko> getNagoyaRireki2(int list_currentPage, int searchCount);
+
+	int getNagoyaRireki_total2();
+
+	List<souko> getNagoyaRireki2ByUUid(String uuid);
 }

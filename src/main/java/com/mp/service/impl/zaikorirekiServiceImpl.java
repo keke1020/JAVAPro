@@ -33,10 +33,10 @@ public class zaikorirekiServiceImpl implements zaikorirekiService {
 	}
 
 	@Override
-	public List<zaikorireki> getNagoyaRireki(String codeSc, String updateSc_s, String updateSc_e, String orderSC,
+	public List<zaikorireki> getNagoyaRireki(String codeSc, String type,String updateSc_s, String updateSc_e, String orderSC,
 			int list_currentPage, int searchCount) {
 		// TODO 自動生成されたメソッド・スタブ
-		return zaikorirekiDao.getNagoyaRireki(codeSc, updateSc_s, updateSc_e, orderSC,
+		return zaikorirekiDao.getNagoyaRireki(codeSc, type,updateSc_s, updateSc_e, orderSC,
 				list_currentPage, searchCount);
 	}
 
@@ -45,5 +45,7 @@ public class zaikorirekiServiceImpl implements zaikorirekiService {
 		// TODO 自動生成されたメソッド・スタブ
 		return zaikorirekiDao.getNagoyaRireki_total(codeSc, updateSc_s, updateSc_e, orderSC);
 	}
+
+
 
 }

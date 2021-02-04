@@ -62,6 +62,7 @@
 		(
 		`update`,
 		`code`,
+		`type`,
 		`message`,
 		`user`
 		)
@@ -71,6 +72,7 @@
 			(
 			#{item.update},
 			#{item.code},
+			#{item.type},
 			#{item.message},
 			#{item.user}
 			)
@@ -83,6 +85,7 @@
 		<if test="code != null and code != ''">
 			AND (`code` REGEXP #{code})
 		</if>
+		AND type = #{type}
 		<choose>
             <when test="update_s != '' and update_e != ''">
             	AND `update` &gt;= #{update_s}
@@ -149,5 +152,6 @@
 			</when>
 		</choose>
 	</select>
+
 
 </mapper>

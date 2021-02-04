@@ -1,6 +1,9 @@
 package com.mp.controller;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -14,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,7 +29,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mp.common.DynamicDataSourceHolder;
@@ -33,14 +39,21 @@ import com.mp.dto.result;
 import com.mp.entity.config;
 import com.mp.entity.souko;
 import com.mp.entity.zaikorireki;
+import com.mp.service.locationService;
 import com.mp.service.soukoService;
 import com.mp.service.zaikorirekiService;
+import com.mp.util.CommonUtil;
+import com.mp.util.CsvUtil;
+import com.mp.util.FileUtil;
 
 @Controller
 public class soukoController {
 
 	@Autowired
 	private soukoService soukoService;
+
+	@Autowired
+	private locationService locationService;
 
 	@Autowired
 	private zaikorirekiService zaikorirekiService;
@@ -122,6 +135,249 @@ public class soukoController {
 	}
 
 	@ResponseBody
+	@RequestMapping(value = "/getCodeDataBySoukoNagoya", method = RequestMethod.POST)
+	private JSONObject getCodeDataBySoukoNagoya(HttpServletResponse response, HttpServletRequest request, String code) {
+		JSONObject object = new JSONObject();
+		if (config.ISLOCAL) {
+			dataSource = config.DATASOURCE_LOCAL_YUBIN;
+		} else {
+			dataSource = config.DATASOURCE_SERVER_YUBIN;
+		}
+		DynamicDataSourceHolder.setDataSource(dataSource);
+
+		try {
+			request.setCharacterEncoding("utf-8");
+			response.setCharacterEncoding("utf-8");
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+
+			int searchCount = Integer
+					.parseInt(new String(request.getParameter("searchCount").getBytes("ISO-8859-1"), "UTF-8"));
+			int currentPage = Integer
+					.parseInt(new String(request.getParameter("currentPage").getBytes("ISO-8859-1"), "UTF-8"));
+			currentPage = (currentPage - 1) * searchCount;
+
+			List<souko> souko = new ArrayList<souko>();
+			souko = soukoService.getCodeDataBySoukoNagoya(code, currentPage, searchCount);
+			int total = soukoService.getTotalBySoukoNagoya(code);
+
+			object.put("souko", souko);
+			object.put("total", total);
+		} catch (Exception e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+
+		return object;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/deleteNagoyaZaikoById", method = RequestMethod.POST)
+	private JSONObject deleteNagoyaZaikoById(HttpServletResponse response, HttpServletRequest request, int id) {
+		JSONObject object = new JSONObject();
+		if (config.ISLOCAL) {
+			dataSource = config.DATASOURCE_LOCAL_YUBIN;
+		} else {
+			dataSource = config.DATASOURCE_SERVER_YUBIN;
+		}
+		DynamicDataSourceHolder.setDataSource(dataSource);
+
+		try {
+			request.setCharacterEncoding("utf-8");
+			response.setCharacterEncoding("utf-8");
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+			soukoService.deleteNagoyaZaikoById(id);
+		} catch (Exception e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+
+		return object;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/nyuushukkaForSoukoNagoya", method = RequestMethod.POST)
+	private JSONObject nyuushukkaForSoukoNagoya(HttpServletResponse response, HttpServletRequest request, String code,
+			String in_common, String out_common, String user) {
+		JSONObject object = new JSONObject();
+		if (config.ISLOCAL) {
+			dataSource = config.DATASOURCE_LOCAL_YUBIN;
+		} else {
+			dataSource = config.DATASOURCE_SERVER_YUBIN;
+		}
+		DynamicDataSourceHolder.setDataSource(dataSource);
+
+		try {
+			request.setCharacterEncoding("utf-8");
+			response.setCharacterEncoding("utf-8");
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+
+			int in = 0;
+			int out = 0;
+
+			if (in_common != null && !"".equals(in_common)) {
+				in = Integer.valueOf(in_common);
+			}
+			if (out_common != null && !"".equals(out_common)) {
+				out = Integer.valueOf(out_common);
+			}
+			souko souko = new souko();
+			souko.setCode(code);
+			souko.setIn(in);
+			souko.setOut(out);
+			souko.setUpdate(new Date());
+			souko.setUser(user);
+			souko.setUuid(UUID.randomUUID().toString());
+
+			soukoService.nyuushukkaForSoukoNagoyaByCode(souko);
+			result result = new result();
+			result.setState(1);
+			result.setMsg("追加しました！");
+			object.put("rows", result);
+		} catch (Exception e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+
+		return object;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/uploadCsvACtion_souko", method = RequestMethod.POST)
+	private JSONObject uploadCsvACtion_souko(@RequestParam(value = "file") MultipartFile file,
+			HttpServletResponse response, HttpServletRequest request, String user) {
+		DynamicDataSourceHolder.setDataSource("defultdataSource");
+		JSONObject object = new JSONObject();
+		result result = new result();
+
+		try {
+			request.setCharacterEncoding("utf-8");
+			response.setCharacterEncoding("utf-8");
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+
+			String path = "";
+			if (config.ISLOCAL) {
+				dataSource = config.DATASOURCE_LOCAL_YUBIN;
+			} else {
+				dataSource = config.DATASOURCE_SERVER_YUBIN;
+			}
+			DynamicDataSourceHolder.setDataSource(dataSource);
+
+			Date now = new Date();
+
+			if (!"csv".equals(FileUtil.getFileType(file.getOriginalFilename()))) {
+				result.setState(0);
+				object.put("rows", result);
+				return object;
+			}
+
+			InputStream is = file.getInputStream();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is, "Shift-JIS"));
+
+			int num = 0;
+			Integer code_index = null;
+			Integer in_index = null;
+			Integer out_index = null;
+			Integer souko_index = null;
+
+			List<souko> soukos = new ArrayList<souko>();
+			List<zaikorireki> zos = new ArrayList<zaikorireki>();
+
+			//			List<location> lo = locationService.getlocation("false", "true", "", "", "", "", "", "", "", "", "",
+			//					"", "false", 0, 0);
+			List<souko> souko_master = soukoService.getSouko("true", "true", "", "", "", "", "", "", "", "", 0,
+					100000000, "false");
+			List<String> codes = new ArrayList<String>();
+
+			if (souko_master.size() > 0) {
+				for (int i = 0; i < souko_master.size(); i++) {
+					codes.add(souko_master.get(i).getCode());
+				}
+			}
+
+			String uuid = UUID.randomUUID().toString();
+
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				String item[] = line.split(",\\s*(?![^\"]*\"\\,)");// CSV格式文件为逗号分隔符文件，这里根据逗号切分
+				if (num == 0) {
+					if (!CommonUtil.isHave(item, "商品コード") || !CommonUtil.isHave(item, "入荷数")
+							|| !CommonUtil.isHave(item, "出荷数") || !CommonUtil.isHave(item, "倉庫")) {
+						result.setState(0);
+						result.setMsg("正しいcsvファイルをアップロードしてください。");
+						object.put("rows", result);
+						return object;
+					}
+					for (int i = 0; i < item.length; i++) {
+						if ("商品コード".equals(CsvUtil.getValue(item, i))) {
+							code_index = i;
+						} else if ("入荷数".equals(CsvUtil.getValue(item, i))) {
+							in_index = i;
+						} else if ("出荷数".equals(CsvUtil.getValue(item, i))) {
+							out_index = i;
+						} else if ("倉庫".equals(CsvUtil.getValue(item, i))) {
+							souko_index = i;
+						}
+					}
+				} else {
+					String code_csv = CsvUtil.getValue(item, code_index).trim();
+					String in_csv = CsvUtil.getValue(item, in_index).trim();
+					String out_csv = CsvUtil.getValue(item, out_index).trim();
+					int in = 0;
+					int out = 0;
+					String souko_csv = CsvUtil.getValue(item, souko_index).trim();
+
+					if (!"".equals(code_csv) && !"".equals(souko_csv)) {
+						if ("名古屋".equals(souko_csv) && codes.contains(code_csv)) {
+
+							if (CommonUtil.isInteger(in_csv)) {
+								in = Integer.valueOf(in_csv);
+							}
+
+							if (CommonUtil.isInteger(out_csv)) {
+								out = Integer.valueOf(out_csv);
+							}
+
+							souko so = new souko();
+							so.setCode(code_csv);
+							so.setIn(in);
+							so.setOut(out);
+							so.setUuid(uuid);
+							so.setUser(user);
+							so.setUpdate(now);
+							soukos.add(so);
+						}
+					}
+				}
+				num++;
+			}
+
+			if (soukos.size() > 0) {
+				soukoService.nyuushukkaForSoukoNagoya(soukos);
+
+				result.setState(1);
+				result.setMsg(soukos.size() + "件を登録しました。");
+			} else {
+				result.setState(0);
+				result.setMsg("登録するデータがないです。");
+			}
+
+			object.put("rows", result);
+			return object;
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e);
+			result.setState(0);
+			result.setMsg("インポート中にエラーがあります。");
+			object.put("rows", result);
+			return object;
+		}
+	}
+
+	@ResponseBody
 	@RequestMapping(value = "/getNagoyaRireki", method = RequestMethod.POST)
 	private JSONObject getNagoyaRireki(HttpServletResponse response, HttpServletRequest request, String codeSc,
 			String updateSc_s, String updateSc_e, String orderSC) {
@@ -145,11 +401,75 @@ public class soukoController {
 					.parseInt(new String(request.getParameter("rireki_curr").getBytes("ISO-8859-1"), "UTF-8"));
 			list_currentPage = (list_currentPage - 1) * searchCount;
 
-			List<zaikorireki> rireki = zaikorirekiService.getNagoyaRireki(codeSc, updateSc_s, updateSc_e, orderSC,
+			List<zaikorireki> rireki = zaikorirekiService.getNagoyaRireki(codeSc, "tana", updateSc_s, updateSc_e,
+					orderSC,
 					list_currentPage, searchCount);
 			int total = zaikorirekiService.getNagoyaRireki_total(codeSc, updateSc_s, updateSc_e, orderSC);
 			object.put("rireki", rireki);
 			object.put("total", total);
+		} catch (Exception e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+
+		return object;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/getNagoyaRireki2", method = RequestMethod.POST)
+	private JSONObject getNagoyaRireki2(HttpServletResponse response, HttpServletRequest request) {
+		JSONObject object = new JSONObject();
+		if (config.ISLOCAL) {
+			dataSource = config.DATASOURCE_LOCAL_YUBIN;
+		} else {
+			dataSource = config.DATASOURCE_SERVER_YUBIN;
+		}
+		DynamicDataSourceHolder.setDataSource(dataSource);
+
+		try {
+			request.setCharacterEncoding("utf-8");
+			response.setCharacterEncoding("utf-8");
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+
+			int searchCount = Integer
+					.parseInt(new String(request.getParameter("searchCount").getBytes("ISO-8859-1"), "UTF-8"));
+			int list_currentPage = Integer
+					.parseInt(new String(request.getParameter("curr").getBytes("ISO-8859-1"), "UTF-8"));
+			list_currentPage = (list_currentPage - 1) * searchCount;
+
+			List<souko> souko = soukoService.getNagoyaRireki2(list_currentPage, searchCount);
+
+			int total = soukoService.getNagoyaRireki_total2();
+			object.put("rireki", souko);
+			object.put("total", total);
+		} catch (Exception e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+
+		return object;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/getNagoyaRireki2ByUUid", method = RequestMethod.POST)
+	private JSONObject getNagoyaRireki2ByUUid(HttpServletResponse response, HttpServletRequest request, String uuid) {
+		JSONObject object = new JSONObject();
+		if (config.ISLOCAL) {
+			dataSource = config.DATASOURCE_LOCAL_YUBIN;
+		} else {
+			dataSource = config.DATASOURCE_SERVER_YUBIN;
+		}
+		DynamicDataSourceHolder.setDataSource(dataSource);
+
+		try {
+			request.setCharacterEncoding("utf-8");
+			response.setCharacterEncoding("utf-8");
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			response.setHeader("Cache-Control", "no-cache");
+
+			List<souko> souko_ri = soukoService.getNagoyaRireki2ByUUid(uuid);
+			object.put("rireki", souko_ri);
 		} catch (Exception e) {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
@@ -253,6 +573,7 @@ public class soukoController {
 
 								if (add_flag) {
 									nagoyarireki.setCode(code);
+									nagoyarireki.setType("tana");
 									nagoyarireki.setUpdate(now);
 									nagoyarireki.setUser(loginuser);
 									nagoyarireki.setMessage(

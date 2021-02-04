@@ -9,7 +9,7 @@ public class souko {
 	private int router_index;
 	private boolean chk;
 
-	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Tokyo")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Tokyo")
 	private Date update;
 
 	private String code;
@@ -47,6 +47,10 @@ public class souko {
 	private String moto_nagoya;
 	private String moto_nagoya_old; //階数　棚
 	private Date nagoya_update;
+	private int in;//入荷
+	private int out;//出荷
+	private String uuid;//履歴と連携
+	private String rireki_na;
 
 	public int getID() {
 		return ID;
@@ -319,4 +323,37 @@ public class souko {
 	public void setNagoya_update(Date nagoya_update) {
 		this.nagoya_update = nagoya_update;
 	}
+
+	public int getIn() {
+		return in;
+	}
+
+	public void setIn(int in) {
+		this.in = in;
+	}
+
+	public int getOut() {
+		return out;
+	}
+
+	public void setOut(int out) {
+		this.out = out;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public String getRireki_na() {
+		return rireki_na;
+	}
+
+	public void setRireki_na(String rireki_na) {
+		this.rireki_na = rireki_na;
+	}
+
 }

@@ -30,98 +30,108 @@
 		<result column="sBikou" property="sBikou" jdbcType="VARCHAR" />
 		<result column="sTanto" property="sTanto" jdbcType="VARCHAR" />
 
-		<result column="nagoyaZaiko" property="nagoyaZaiko" jdbcType="INTEGER" />
-		<result column="kaisou_nagoya" property="kaisou_nagoya" jdbcType="VARCHAR" />
-		<result column="tana_nagoya" property="tana_nagoya" jdbcType="VARCHAR" />
-		<result column="moto_nagoya" property="moto_nagoya" jdbcType="VARCHAR" />
-		<result column="moto_nagoya_old" property="moto_nagoya_old" jdbcType="VARCHAR" />
+		<result column="nagoyaZaiko" property="nagoyaZaiko"
+			jdbcType="INTEGER" />
+		<result column="kaisou_nagoya" property="kaisou_nagoya"
+			jdbcType="VARCHAR" />
+		<result column="tana_nagoya" property="tana_nagoya"
+			jdbcType="VARCHAR" />
+		<result column="moto_nagoya" property="moto_nagoya"
+			jdbcType="VARCHAR" />
+		<result column="moto_nagoya_old" property="moto_nagoya_old"
+			jdbcType="VARCHAR" />
 		<result column="nagoya_update" property="nagoya_update"
 			jdbcType="TIMESTAMP" />
+		<result column="in" property="in" jdbcType="INTEGER" />
+		<result column="out" property="out" jdbcType="INTEGER" />
+		<result column="uuid" property="uuid" jdbcType="VARCHAR" />
 	</resultMap>
 
 	<select id="getSouko" resultMap="soukoResult">
 		SELECT
-			ID,
-			`UPDATE`,
-			`CODE`,
-			`name`,
-			tag,
-			dcode,
-			sw,
-			sw2,
-			kaisou,
-			tana,
-			ksize,
-			sp,
-			t_kbn,
-			`user`,
-			user_id,
-			flag,
-			moto,
-			zaiko,
-			hikiate,
-			yoyaku,
-			zaiko_update,
-			sZaiko,
-			sBikou,
-			sTanto,
-			nagoyaZaiko,
-			kaisou_nagoya,
-			tana_nagoya,
-			moto_nagoya,
-			nagoya_update,
-			concat(kaisou_nagoya,tana_nagoya) as moto_nagoya_old
+		ID,
+		`UPDATE`,
+		`CODE`,
+		`name`,
+		tag,
+		dcode,
+		sw,
+		sw2,
+		kaisou,
+		tana,
+		ksize,
+		sp,
+		t_kbn,
+		`user`,
+		user_id,
+		flag,
+		moto,
+		zaiko,
+		hikiate,
+		yoyaku,
+		zaiko_update,
+		sZaiko,
+		sBikou,
+		sTanto,
+		(select (sum(ln.`in`) - sum(ln.`out`)) from
+		location_nagoya ln where ln.`code` = lo.`CODE`) as nagoyaZaiko,
+		kaisou_nagoya,
+		tana_nagoya,
+		moto_nagoya,
+		nagoya_update,
+		concat(kaisou_nagoya,tana_nagoya) as
+		moto_nagoya_old
 		FROM
-			location
+		location lo
 		WHERE 1 = 1
 		<if test="isNagoya == 'true'">
-			AND `tag` like '%[名古屋]%'
+			AND lo.`tag` like '%[名古屋]%'
 		</if>
 		<choose>
 			<when test="istana == 'false'">
-				AND `kaisou_nagoya` = '' AND `tana_nagoya` = ''
+				AND lo.`kaisou_nagoya` = '' AND lo.`tana_nagoya` = ''
 			</when>
 			<otherwise>
 				<if test="codeSc != null and codeSc != ''">
-					AND ((`code` REGEXP #{codeSc}) OR (`dcode` REGEXP
+					AND ((lo.`code` REGEXP #{codeSc}) OR (lo.`dcode` REGEXP
 					#{codeSc}) OR
-					(`name` REGEXP #{codeSc}))
+					(lo.`name` REGEXP #{codeSc}))
 				</if>
 			</otherwise>
 		</choose>
 		<if test="kosuSC1 != null and kosuSC1 != ''">
-			AND (`nagoyaZaiko` &gt;= #{kosuSC1})
+			AND (`lo.nagoyaZaiko` &gt;= #{kosuSC1})
 		</if>
 		<if test="kosuSC2 != null and kosuSC2 != ''">
-			AND (`nagoyaZaiko` &lt;= #{kosuSC2})
+			AND (`lo.nagoyaZaiko` &lt;= #{kosuSC2})
 		</if>
 		<if test="kaisosc != null and kaisosc != ''">
-			AND ((`kaisou_nagoya` = #{kaisosc}))
+			AND ((`lo.kaisou_nagoya` = #{kaisosc}))
 		</if>
 		<if test="tanaSc != null and tanaSc != ''">
-			AND ((`tana_nagoya` = #{tanaSc}))
+			AND ((`lo.tana_nagoya` = #{tanaSc}))
 		</if>
 		<if test="t_kbn == 'true'">
-			AND (`t_kbn` = '取扱中')
+			AND (`lo.t_kbn` = '取扱中')
 		</if>
 		<if test="zaikoOnly == 'true'">
-			AND (`nagoyaZaiko` > 0)
+			AND (`lo.nagoyaZaiko` > 0)
 		</if>
 		<choose>
 			<when test="orderSC == '順序選択'">
-				order by `nagoya_update` desc
+				order by lo.`nagoya_update` desc
 			</when>
 			<when test="orderSC == 'アップデート順' ">
-				order by `nagoya_update` desc
+				order by lo.`nagoya_update` desc
 			</when>
 			<when test="orderSC == 'コード昇順' ">
-				order by `code`
+				order by lo.`code`
 			</when>
 			<when test="orderSC == 'コード降順' ">
-				order by `code` desc
+				order by lo.`code` desc
 			</when>
 			<when test="orderSC == '棚番昇順' ">
-				order by `tana_nagoya`
+				order by lo.`tana_nagoya`
 			</when>
 		</choose>
 		LIMIT #{offset}, #{limit}
@@ -206,47 +216,145 @@
 
 	<select id="getSoukoByCodes" resultMap="soukoResult">
 		SELECT
-			ID,
-			`UPDATE`,
-			`CODE`,
-			`name`,
-			tag,
-			dcode,
-			sw,
-			sw2,
-			kaisou,
-			tana,
-			ksize,
-			sp,
-			t_kbn,
-			`user`,
-			user_id,
-			flag,
-			moto,
-			zaiko,
-			hikiate,
-			yoyaku,
-			zaiko_update,
-			sZaiko,
-			sBikou,
-			sTanto,
-			nagoyaZaiko,
-			kaisou_nagoya,
-			tana_nagoya,
-			moto_nagoya,
-			nagoya_update,
-			concat(kaisou_nagoya,tana_nagoya) as moto_nagoya_old
+		ID,
+		`UPDATE`,
+		`CODE`,
+		`name`,
+		tag,
+		dcode,
+		sw,
+		sw2,
+		kaisou,
+		tana,
+		ksize,
+		sp,
+		t_kbn,
+		`user`,
+		user_id,
+		flag,
+		moto,
+		zaiko,
+		hikiate,
+		yoyaku,
+		zaiko_update,
+		sZaiko,
+		sBikou,
+		sTanto,
+		nagoyaZaiko,
+		kaisou_nagoya,
+		tana_nagoya,
+		moto_nagoya,
+		nagoya_update,
+		concat(kaisou_nagoya,tana_nagoya) as
+		moto_nagoya_old
 		FROM
-			location
+		location
 		WHERE `CODE` in
 		<foreach collection="codes" item="code" index="index" open="("
 			close=")" separator=",">
 			#{code}
 		</foreach>
-
-
 	</select>
 
+
+	<select id="getCodeDataBySoukoNagoya" resultMap="soukoResult">
+		select * from
+		location_nagoya
+		where `code` = #{code}
+		LIMIT
+		#{currentPage},#{searchCount}
+	</select>
+
+
+
+	<insert id="nyuushukkaForSoukoNagoyaByCode"
+		parameterType="com.mp.entity.souko" useGeneratedKeys="true"
+		keyProperty="ID" keyColumn="ID">
+		insert into location_nagoya(`code`, `in`,
+		`out`, `update`, `user`, `uuid`)
+		values(
+		#{code},
+		#{in},
+		#{out},
+		#{update},
+		#{user},
+		#{uuid}
+		)
+	</insert>
+
+	<select id="getTotalBySoukoNagoya"
+		resultType="java.lang.Integer">
+		select count(*) from
+		location_nagoya
+		where `code` = #{code}
+	</select>
+
+	<delete id="deleteNagoyaZaikoById">
+		delete from `location_nagoya`
+		WHERE ID = #{id}
+	</delete>
+
+	<insert id="nyuushukkaForSoukoNagoya"
+		parameterType="java.util.ArrayList">
+		insert into `location_nagoya`
+		(
+		`code`,
+		`in`,
+		`out`,
+		`update`,
+		`user`,
+		`uuid`
+		)
+		values
+		<foreach collection="soukos" item="item" index="index"
+			separator=",">
+			(
+			#{item.code},
+			#{item.in},
+			#{item.out},
+			#{item.update},
+			#{item.user},
+			#{item.uuid}
+			)
+		</foreach>
+	</insert>
+
+		<select id="getNagoyaRireki2" resultMap="soukoResult">
+		SELECT
+			uuid,
+			`update`,
+			`user`
+		FROM
+			location_nagoya
+		GROUP BY
+			uuid
+		ORDER BY
+			`update` DESC
+		LIMIT #{offset}, #{limit}
+	</select>
+
+	<select id="getNagoyaRireki_total2" resultType="java.lang.Integer">
+		SELECT
+			count(*) from (
+			SELECT
+				*
+			FROM
+				location_nagoya
+			GROUP BY
+				uuid
+		) AS count
+	</select>
+
+	<select id="getNagoyaRireki2ByUUid" resultMap="soukoResult">
+		SELECT
+			`code`,
+			`in`,
+			`out`
+		FROM
+			location_nagoya
+		WHERE
+			uuid = #{uuid}
+	</select>
 
 
 </mapper>

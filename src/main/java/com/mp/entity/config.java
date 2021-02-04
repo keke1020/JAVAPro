@@ -1,7 +1,7 @@
 package com.mp.entity;
 
 public class config {
-	public static boolean ISLOCAL = true;
+	public static boolean ISLOCAL = false;
 
 	public static String LOCATION_PLACE_LOCAL = "E:\\";
 	public static String LOCATION_PLACE_SERVER = "E:\\";
