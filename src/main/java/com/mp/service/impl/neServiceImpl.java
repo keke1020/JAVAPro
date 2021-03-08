@@ -131,6 +131,12 @@ public class neServiceImpl implements neService {
 		return neDao.getHomeKakuTenpoinfoDataByNe2(codes, start, end);
 	}
 
+	@Override
+	public List<ne> getHomedata(String tenpo, String beginDateStr, String endDateStr) {
+		// TODO 自動生成されたメソッド・スタブ
+		return neDao.getHomedata(tenpo, beginDateStr, endDateStr);
+	}
+
 
 
 

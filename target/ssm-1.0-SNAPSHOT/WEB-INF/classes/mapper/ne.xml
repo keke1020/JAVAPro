@@ -970,4 +970,28 @@
 		`teika`=VALUES(`teika`),
 		`tag`=VALUES(`tag`)
 	</insert>
+
+	<select id="getHomedata" resultMap="neResult">
+		SELECT
+			goukei_kin,
+			jyuchu_bi,
+			jyuchu_name,
+			jyuchu_bi
+		FROM
+			ne
+		WHERE
+			jyuchu_bi &gt;= #{beginDateStr}
+		AND jyuchu_bi &lt;= #{endDateStr}
+		AND tenpo_code = #{tenpo}
+	</select>
+
+
+
+
+
+
+
+
+
+
 </mapper>

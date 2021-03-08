@@ -74,4 +74,6 @@ public interface neDao {
 			@Param("end") String end);
 	List<ne> getHomeKakuTenpoinfoDataByNe2(@Param("codes") List<String> codes, @Param("start") String start,
 			@Param("end") String end);
+
+	List<ne> getHomedata(@Param("tenpo") String tenpo, @Param("beginDateStr") String beginDateStr, @Param("endDateStr") String endDateStr);
 }

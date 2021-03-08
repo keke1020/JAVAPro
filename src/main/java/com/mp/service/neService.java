@@ -51,4 +51,8 @@ public interface neService {
 
 	void insertGoods(List<ne_goods> ng);
 
+	List<ne> getHomedata(String tenpo, String beginDateStr, String endDateStr);
+
+
+
 }

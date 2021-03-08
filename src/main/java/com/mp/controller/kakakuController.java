@@ -1,7 +1,6 @@
 package com.mp.controller;
 
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -18,11 +17,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -38,21 +35,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mp.common.DynamicDataSourceHolder;
 import com.mp.dto.RakutenYahooApiDate;
-import com.mp.dto.option;
 import com.mp.dto.result;
 import com.mp.entity.config;
-import com.mp.entity.file;
 import com.mp.entity.kakaku;
-import com.mp.entity.location;
-import com.mp.service.commonService;
 import com.mp.service.kakakuService;
 import com.mp.util.CommonUtil;
-import com.mp.util.PoiUtil;
 
 @Controller
 public class kakakuController {
@@ -67,6 +58,7 @@ public class kakakuController {
 			boolean t_price_ch2, boolean s_price_ch1, boolean s_price_ch2, boolean s_limit_ch1, boolean s_limit_ch2) {
 		DynamicDataSourceHolder.setDataSource("jrt_dataSource");
 		JSONObject object = new JSONObject();
+
 
 		String place = "";
 		try {
